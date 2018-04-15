@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Chat - Customer Module</title>
+<link type="text/css" rel="stylesheet" href="style.css" />
+</head> 
+<body>
+<div id="wrapper">   
+    <ul id="chatbox"></ul>
+</div>
+<div id="oldchat">
+</div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+<script type="text/javascript">
+// jQuery Document
+$(document).ready(function(){
+ 
+});
+//
+var chat_index=0;
+function getMessages(letter) {
+    var div = $("#chatbox");
+    var getchat = $.ajax({
+        url: "httplog.htm?chatindex="+chat_index,
+        type: "GET",
+        success: function (data, status, req ) {
+          div.append(data);
+          chat_index=getchat.getResponseHeader('ChatIndex');
+          if (div.children('li').length>500) {
+            div.children('li')[0].remove();
+          }
+          $('#chatbox').animate({scrollTop: document.body.scrollHeight},"fast");
+        }
+    });
+}
+setInterval(getMessages, 500);
+</script>
+</body>
+</html>

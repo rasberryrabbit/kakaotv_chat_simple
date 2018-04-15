@@ -1,0 +1,83 @@
+/* CSS Document */
+.txt_system {
+    color: skyblue;
+}
+
+body {
+    font:12px arial;
+    color: none;
+    padding:1px; }
+  
+form, p, span {
+    margin:0;
+    padding:0; }
+   
+.link_id {
+    color: yellowgreen;
+    text-decoration: none; 
+    margin-right: 10px;
+    background-color: none; }
+
+.txt_talk {
+    color: gray;
+    background-color: none;
+}
+
+#chatbox, li {
+    list-style-type: none;
+    padding: 2px;
+}
+  
+#wrapper {
+    position: relative;
+    height: 400px;
+}  
+
+#chatbox {
+    text-align: left;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.box_alert {
+    background-color: yellow;
+    padding: 10px;
+}
+
+em,.screen_out {
+    color: red;
+    margin-right: 5px;    
+}
+
+strong,.screen_out {
+    color: red;
+    margin-right: 5px;    
+}
+
+.txt_name {
+    color: yellowgreen;
+    background-color: black;
+    padding: 1px;
+}
+
+.txt_msg {
+    color: black;
+    margin: 5px;
+}
+
+.txt_cookie {
+    color: gold;
+    margin-right: 5px;
+    background-color: black;
+    padding: 1px;
+}
+
+.kakao_emoticon {
+    padding: 10px;
+}
+
+.view_emot_detail {
+    color: none;
+    background-color: none;
+}

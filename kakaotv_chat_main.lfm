@@ -1,0 +1,52 @@
+object FormKakaoTVChat: TFormKakaoTVChat
+  Left = 274
+  Height = 700
+  Top = 140
+  Width = 1280
+  Caption = 'Kakao Chat'
+  ClientHeight = 700
+  ClientWidth = 1280
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  LCLVersion = '1.9.0.0'
+  object Panel1: TPanel
+    Left = 8
+    Height = 496
+    Top = 16
+    Width = 1264
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 552
+    Height = 25
+    Top = 520
+    Width = 152
+    Anchors = [akBottom]
+    Caption = 'Activate'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+  object Panel2: TPanel
+    Left = 8
+    Height = 138
+    Top = 552
+    Width = 1264
+    Anchors = [akLeft, akRight, akBottom]
+    TabOrder = 2
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 125
+    OnTimer = Timer1Timer
+    Left = 88
+    Top = 336
+  end
+  object UniqueInstance1: TUniqueInstance
+    Enabled = True
+    Identifier = 'KaKaoChatParser'
+    Left = 168
+    Top = 336
+  end
+end
