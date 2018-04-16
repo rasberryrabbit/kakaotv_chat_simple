@@ -59,16 +59,18 @@ implementation
 {$R *.lfm}
 
 uses
-  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler;
+  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, syncobjs;
 
 const
-  MaxChecksum = 1;
+  MaxChecksum = 2;
 
 var
   cefb : TChromium;
   MainBrowser : ICefBrowser;
 
   lastchecksum : array[0..MaxChecksum] of TSHA1Digest;
+  lastchkCount : Integer = 0;
+
   ChatBuffer:TCefChatBuffer;
   ChatHead:TCefChatBuffer;
   ChatScript:TCefChatBuffer;
@@ -84,10 +86,15 @@ type
   TElementIdVisitor = class(TCefDomVisitorOwn)
   private
     FNameID: string;
+    FEvent:TEvent;
   protected
     procedure Visit(const document: ICefDomDocument); override;
   public
     constructor Create(const AId: string); reintroduce;
+    destructor Destroy; override;
+
+    procedure Enter;
+    procedure Leave;
   end;
 
 
@@ -192,6 +199,25 @@ constructor TElementIdVisitor.Create(const AId: string);
 begin
   inherited Create;
   FNameID := AId;
+  FEvent:=TEvent.Create(nil,True,True,'CEFELVI'+IntToStr(GetTickCount64));
+end;
+
+destructor TElementIdVisitor.Destroy;
+begin
+  FEvent.Free;
+  inherited Destroy;
+end;
+
+procedure TElementIdVisitor.Enter;
+begin
+  while FEvent.WaitFor(0)=wrTimeout do
+    Sleep(0);
+  FEvent.ResetEvent;
+end;
+
+procedure TElementIdVisitor.Leave;
+begin
+  FEvent.SetEvent;
 end;
 
 procedure TElementIdVisitor.Visit(const document: ICefDomDocument);
@@ -200,11 +226,12 @@ var
   stemp : string;
   procedure ProcessNode(ANode: ICefDomNode);
   var
-    Node, Nodex, NodeName, NodeChat: ICefDomNode;
+    Node, Nodex, NodeN, NodeName, NodeChat: ICefDomNode;
     s, smarkup, sclass, sbuf, scheck: UnicodeString;
-    checksum : TSHA1Digest;
+    checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
     chkCount, i: Integer;
+    matched : Boolean;
   begin
     if Assigned(ANode) then
     begin
@@ -219,25 +246,37 @@ var
             if Nodex.HasChildren then begin
               NodeName:=Nodex.FirstChild;
               NodeChat:=NodeName.NextSibling;
-            end else begin
-              Nodex:=Nodex.PreviousSibling;
-              Continue;
-            end;
-            // checksum
-            smarkup:=Nodex.AsMarkup;
-            scheck:=document.BaseUrl+smarkup;
-            checksum:=SHA1Buffer(scheck[1],Length(scheck)*SizeOf(WideChar));
+            end else
+              NodeName:=nil;
 
-            // get bottom line checksum
-            if chkCount<=MaxChecksum then begin
-              bottomchecksum[chkCount]:=checksum;
-              Inc(chkCount);
-            end;
+            // check MaxChecksum+1 bottom lines
+            NodeN:=Nodex;
+            i:=0;
+            matched:=lastchkCount>0;
+            while Assigned(NodeN) do begin
+              scheck:=document.BaseUrl+NodeN.AsMarkup;
+              checksumN:=SHA1Buffer(scheck[1],Length(scheck)*SizeOf(WideChar));
 
-            // check checksum
-            if SHA1Match(checksum,lastchecksum[0]) then
+              // check checksum
+              if (lastchkCount>0) and (i<lastchkCount) then begin
+                if not SHA1Match(checksumN,lastchecksum[i]) then
+                  matched:=False;
+              end;
+              Inc(i);
+
+              // fill bottom checksum
+              if chkCount<=MaxChecksum then begin
+                bottomchecksum[chkCount]:=checksumN;
+                Inc(chkCount);
+              end else
+                break;
+
+              NodeN:=NodeN.PreviousSibling;
+            end;
+            if matched then
               break;
 
+            smarkup:=Nodex.AsMarkup;
             if s<>'' then
               s:=sLineBreak+s;
             // get chat message
@@ -277,8 +316,11 @@ var
             Nodex:=Nodex.PreviousSibling;
           end;
           // set last checksum
-          if chkCount>0 then
-            lastchecksum[0]:=bottomchecksum[0];
+          if chkCount>0 then begin
+            for i:=0 to chkCount-1 do
+              lastchecksum[i]:=bottomchecksum[i];
+            lastchkCount:=chkCount;
+          end;
 
           if s<>'' then begin
             FormKakaoTVChat.log.AddLogLine(UTF8Encode(s));
@@ -410,6 +452,7 @@ end;
 procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrowser;
   const Frame: ICefFrame; transitionType: TCefTransitionType);
 begin
+  lastchkCount:=0;
   ChatHead.Clear;
   ChatScript.Clear;
   ChatBuffer.Clear;
