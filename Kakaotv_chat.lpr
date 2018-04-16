@@ -7,7 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package, uChatBuffer;
+  Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package, uChatBuffer,
+  uKakaoCEF;
 
 {$R *.res}
 

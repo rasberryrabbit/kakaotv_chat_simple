@@ -47,7 +47,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
   end
   object Timer1: TTimer
     Enabled = False
-    Interval = 125
+    Interval = 300
     OnTimer = Timer1Timer
     Left = 88
     Top = 336

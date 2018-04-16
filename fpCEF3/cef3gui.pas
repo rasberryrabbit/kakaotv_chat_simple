@@ -371,7 +371,7 @@ Type
       const targetUrl: ustring; targetDisposition: TCefWindowOpenDisposition; useGesture: Boolean): Boolean;
     function doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame;
       const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
-    function doOnGetResourceHandler(const browser: ICefBrowser; const frame: ICefFrame;
+    function doOnGetResourceHandler(const browser_: ICefBrowser; const frame: ICefFrame;
       const request: ICefRequest): ICefResourceHandler;
     procedure doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame;
       const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);

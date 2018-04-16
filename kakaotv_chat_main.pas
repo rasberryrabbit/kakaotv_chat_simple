@@ -64,13 +64,13 @@ implementation
 {$R *.lfm}
 
 uses
-  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler;
+  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF;
 
 const
   MaxChecksum = 2;
 
 var
-  cefb : TChromium;
+  cefb : TkakaoCEF;
   MainBrowser : ICefBrowser;
 
   lastchecksum : array[0..MaxChecksum] of TSHA1Digest;
@@ -243,8 +243,8 @@ var
     s, smarkup, sclass, sbuf, scheck: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
-    chkCount, i: Integer;
-    matched : Boolean;
+    chkCount, i, j: Integer;
+    matched, skipAddMarkup : Boolean;
   begin
     if Assigned(ANode) then
     begin
@@ -290,19 +290,51 @@ var
               break;
 
             smarkup:=Nodex.AsMarkup;
+            skipAddMarkup:=False;
             if s<>'' then
               s:=sLineBreak+s;
             // get chat message
             if Assigned(NodeName) and Assigned(NodeChat) then begin
               sbuf:=sbuf+NodeName.ElementInnerText+' : ';
               while Assigned(NodeChat) do begin
-                if NodeChat.GetElementAttribute('CLASS')='txt_talk' then
+                // make log message
+                sclass:=NodeChat.GetElementAttribute('CLASS');
+                if sclass='txt_talk' then
                   sbuf:=sbuf+NodeChat.ElementInnerText
                 else
+                if Pos('kakao_emoticon',sclass)<>0 then begin
+                  skipAddMarkup:=True;
+                  sbuf:=sbuf+NodeChat.AsMarkup;
+                end else
                   sbuf:=sbuf+NodeChat.AsMarkup;
                 NodeChat:=NodeChat.NextSibling;
               end;
               s:=sbuf+s;
+              // change img url
+              if skipAddMarkup then begin
+                scheck:=Nodex.AsMarkup;
+                i:=Pos('?',scheck);
+                j:=i;
+                while i>0 do begin
+                  if scheck[i]='/' then
+                    break;
+                  Dec(i);
+                end;
+                if i>0 then begin
+                  Dec(i);
+                  while i>0 do begin
+                    if scheck[i]='/' then
+                      break;
+                    Dec(i);
+                  end;
+                end;
+                Inc(i);
+                sclass:=UnicodeStringReplace(Copy(scheck,i,j-i),'/','_',[rfReplaceAll]);
+                i:=Pos('//',scheck);
+                if i<>0 then
+                  scheck:=Copy(scheck,1,i-1)+'img/'+sclass+Copy(scheck,j);
+                ChatBuffer.Add(UTF8Encode(scheck));
+              end;
             end else if Assigned(NodeName) then begin
               // cookie alert
               if NodeName.GetElementAttribute('CLASS')='box_alert' then begin
@@ -324,7 +356,8 @@ var
               s:=smarkup+s;
 
             // fill by markup
-            ChatBuffer.Add(UTF8Encode(Nodex.AsMarkup));
+            if not skipAddMarkup then
+              ChatBuffer.Add(UTF8Encode(Nodex.AsMarkup));
 
             Nodex:=Nodex.PreviousSibling;
           end;
@@ -382,11 +415,15 @@ begin
   log.Align:=alClient;
   FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
   CefSingleProcess:=True; //must be true
-  // temp folder
+  // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
   if not DirectoryExists(ImgPath) then
     CreateDir(ImgPath);
-  cefb:=TChromium.Create(self);
+  // image fodler
+  cefImageFolder:=ImgPath+PathDelim+'img';
+  if not DirectoryExists(cefImageFolder) then
+    CreateDir(cefImageFolder);
+  cefb:=TkakaoCEF.Create(self);
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;

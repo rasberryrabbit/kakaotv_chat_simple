@@ -302,7 +302,7 @@ Type
         useGesture: Boolean): Boolean; virtual;
       function doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue; virtual;
-      function doOnGetResourceHandler(const Browser: ICefBrowser; const Frame: ICefFrame;
+      function doOnGetResourceHandler(const Browser_: ICefBrowser; const Frame: ICefFrame;
         const request: ICefRequest): ICefResourceHandler; virtual;
       procedure doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; const response: ICefResponse; var newUrl: ustring); virtual;
@@ -1271,7 +1271,7 @@ begin
   Else Result := RV_CONTINUE;
 end;
 
-function TCustomChromium.doOnGetResourceHandler(const Browser: ICefBrowser;
+function TCustomChromium.doOnGetResourceHandler(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
 begin
   If Assigned(fOnGetResourceHandler) then

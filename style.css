@@ -80,4 +80,5 @@ strong,.screen_out {
 .view_emot_detail {
     color: none;
     background-color: none;
+    display: none;
 }
