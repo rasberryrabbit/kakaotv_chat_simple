@@ -33,6 +33,7 @@ type
 
   TFormKakaoTVChat = class(TForm)
     Button1: TButton;
+    CheckBoxClearB: TCheckBox;
     Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
@@ -481,7 +482,8 @@ begin
   //lastchkCount:=0;
   ChatHead.Clear;
   ChatScript.Clear;
-  ChatBuffer.Clear;
+  if CheckBoxClearB.Checked then
+    ChatBuffer.Clear;
   log.Font.Name:='Default';
 end;
 
