@@ -33,6 +33,7 @@ type
 
   TFormKakaoTVChat = class(TForm)
     Button1: TButton;
+    CheckBoxDisableLog: TCheckBox;
     CheckBoxClearB: TCheckBox;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -243,19 +244,21 @@ var
     s, smarkup, sclass, sbuf, scheck: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
-    chkCount, i, j: Integer;
-    matched, skipAddMarkup : Boolean;
+    chkCount, i, j, ItemCount : Integer;
+    matched, skipAddMarkup, disLog : Boolean;
   begin
     if Assigned(ANode) then
     begin
       Node := ANode.FirstChild;
       while Assigned(Node) do begin
+        disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
         if Node.GetElementAttribute('id')=FNameID then begin
-          s:='';
+          ItemCount:=0;
           Nodex:=Node.LastChild;
           chkCount:=0;
           while Assigned(Nodex) do begin
             sbuf:='';
+            s:='';
             if Nodex.HasChildren then begin
               NodeName:=Nodex.FirstChild;
               NodeChat:=NodeName.NextSibling;
@@ -291,8 +294,6 @@ var
 
             smarkup:=Nodex.AsMarkup;
             skipAddMarkup:=False;
-            if s<>'' then
-              s:=sLineBreak+s;
             // get chat message
             if Assigned(NodeName) and Assigned(NodeChat) then begin
               sbuf:=sbuf+NodeName.ElementInnerText+' : ';
@@ -333,7 +334,6 @@ var
                 i:=Pos('//',scheck);
                 if i<>0 then
                   scheck:=Copy(scheck,1,i-1)+'img/'+sclass+Copy(scheck,j);
-                ChatBuffer.Add(UTF8Encode(scheck));
               end;
             end else if Assigned(NodeName) then begin
               // cookie alert
@@ -357,9 +357,25 @@ var
 
             // fill by markup
             if not skipAddMarkup then
-              ChatBuffer.Add(UTF8Encode(Nodex.AsMarkup));
+              scheck:=Nodex.AsMarkup;
+
+            // chat
+            i:=ChatBuffer.Count-ItemCount;
+            if i<0 then
+             i:=0;
+            ChatBuffer.Insert(i,UTF8Encode(scheck));
+            // log
+            if not disLog then begin
+              j:=FormKakaoTVChat.log.Count-ItemCount;
+              if j<0 then
+               j:=0;
+              FormKakaoTVChat.log.InsertLog(j,UTF8Encode(s));
+            end;
 
             Nodex:=Nodex.PreviousSibling;
+            Inc(ItemCount);
+            if ItemCount>=ChatBuffer.MaxLines then
+              break;
           end;
           // set last checksum
           if chkCount>0 then begin
@@ -368,15 +384,14 @@ var
             lastchkCount:=chkCount;
           end;
 
-          if s<>'' then begin
-            FormKakaoTVChat.log.AddLogLine(UTF8Encode(s));
-          end;
-        end else
+          break;
+
+        end{ else
         if (Node.ElementTagName='SCRIPT') {or (Node.ElementTagName='IFRAME')} then begin
           stemp:=UTF8Encode(Node.AsMarkup);
           if ChatScript.IndexOf(stemp)=-1 then
             ChatScript.Add(stemp);
-        end;
+        end};
         ProcessNode(Node);
         Node := Node.NextSibling;
       end;
@@ -388,10 +403,10 @@ begin
     NodeH := document.Head.FirstChild;
     while Assigned(NodeH) do begin
       stemp:=UTF8Encode(NodeH.AsMarkup);
-      if NodeH.ElementTagName='SCRIPT' then begin
+      {if NodeH.ElementTagName='SCRIPT' then begin
         if ChatScript.IndexOf(stemp)=-1 then
           ChatScript.Add(stemp);
-      end else begin
+      end else} begin
         if ChatHead.IndexOf(stemp)=-1 then
           ChatHead.Add(stemp);
       end;

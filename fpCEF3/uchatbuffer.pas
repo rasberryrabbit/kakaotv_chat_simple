@@ -67,6 +67,7 @@ type
       procedure Leave;
 
       function Add(const S: string): Integer; override;
+      procedure Insert(Index: Integer; const S: string); override;
       procedure Delete(Index: Integer); override;
       procedure Clear; override;
       function GetLines(var etime: int64): string;
@@ -216,6 +217,28 @@ begin
   end;
   try
     Objects[Result]:=ChatTime;
+  except
+    ChatTime.Free;
+  end;
+  while GetCount>MaxLines do
+    Delete(0);
+end;
+
+procedure TCefChatBuffer.Insert(Index: Integer; const S: string);
+var
+  ChatTime:TCefChatTime;
+begin
+  Inc(FChatCount);
+  inherited Insert(Index, S);
+  Enter;
+  try
+    ChatTime:=TCefChatTime.Create;
+    ChatTime.TimeCount:=FChatCount;
+  finally
+    Leave;
+  end;
+  try
+    Objects[Index]:=ChatTime;
   except
     ChatTime.Free;
   end;
