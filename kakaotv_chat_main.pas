@@ -534,9 +534,15 @@ begin
   //lastchkCount:=0;
   ChatHead.Clear;
   ChatScript.Clear;
-  if CheckBoxClearB.Checked then
-    ChatBuffer.Clear;
-  log.Font.Name:='Default';
+  if TryEnter then begin
+    try
+      if CheckBoxClearB.Checked then
+        ChatBuffer.Clear;
+      log.Font.Name:='Default';
+    finally
+      Leave;
+    end;
+  end;
 end;
 
 procedure TFormKakaoTVChat.CefLoadStateChange(Sender: TObject;
