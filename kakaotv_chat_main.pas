@@ -55,6 +55,8 @@ type
     procedure HttpError(const msg: string; aSocket: TLSocket);
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
     procedure CefLoadStateChange(Sender: TObject; const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
+
+    procedure OnAppException(Sender : TObject; E : Exception);
   end;
 
 var
@@ -443,6 +445,7 @@ begin
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
   cefb.OnLoadingStateChange:=@CefLoadStateChange;
+  Application.OnException:=@OnAppException;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -532,10 +535,10 @@ procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrow
   const Frame: ICefFrame; transitionType: TCefTransitionType);
 begin
   //lastchkCount:=0;
-  ChatHead.Clear;
-  ChatScript.Clear;
   if TryEnter then begin
     try
+      ChatHead.Clear;
+      ChatScript.Clear;
       if CheckBoxClearB.Checked then
         ChatBuffer.Clear;
       log.Font.Name:='Default';
@@ -550,6 +553,11 @@ procedure TFormKakaoTVChat.CefLoadStateChange(Sender: TObject;
 begin
   if not isLoading then begin
   end;
+end;
+
+procedure TFormKakaoTVChat.OnAppException(Sender: TObject; E: Exception);
+begin
+  ShowMessage(E.ToString);
 end;
 
 
