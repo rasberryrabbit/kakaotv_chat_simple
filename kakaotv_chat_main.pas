@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api, cef3own, cef3gui,
-  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc;
+  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs;
 
 type
 
@@ -43,8 +43,12 @@ type
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
+    FEventMain:TEvent;
   public
     log:TLogListFPC;
+
+    function TryEnter:Boolean;
+    procedure Leave;
 
     procedure HttpError(const msg: string; aSocket: TLSocket);
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
@@ -59,7 +63,7 @@ implementation
 {$R *.lfm}
 
 uses
-  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, syncobjs;
+  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler;
 
 const
   MaxChecksum = 2;
@@ -140,6 +144,7 @@ begin
       //  end;
       //end else
       //  FormKakaoTVChat.log.AddLog(Format('> %s %d',[errv8.GetMessage,errv8.LineNumber]));
+
       Visitor := TElementIdVisitor.Create(AId);
       AFrame.VisitDom(Visitor);
     end;
@@ -169,19 +174,26 @@ var
 begin
   Result:=inherited OnProcessMessageReceived(browser, sourceProcess, message);
   if message.Name='visitdom' then begin
-    surl:='<iframe src="'+UTF8Encode(browser.MainFrame.Url)+'" ></iframe>';
-    if ChatScript.IndexOf(surl)=-1 then
-      ChatScript.Add(surl);
-    fcount:=browser.GetFrameCount;
-    SetLength(fid,fcount);
-    try
-      browser.GetFrameIdentifiers(@fcount,@fid[0]);
-      for i:=0 to fcount-1 do begin
-        chatframe:=browser.GetFrameByident(fid[i]);
-        ProcessElementsById(chatframe,'chatArea');
+    { thread-safe? }
+    if FormKakaoTVChat.TryEnter then begin
+      try
+        surl:='<iframe src="'+UTF8Encode(browser.MainFrame.Url)+'" ></iframe>';
+        if ChatScript.IndexOf(surl)=-1 then
+          ChatScript.Add(surl);
+        fcount:=browser.GetFrameCount;
+        SetLength(fid,fcount);
+        try
+          browser.GetFrameIdentifiers(@fcount,@fid[0]);
+          for i:=0 to fcount-1 do begin
+            chatframe:=browser.GetFrameByident(fid[i]);
+            ProcessElementsById(chatframe,'chatArea');
+          end;
+        finally
+          SetLength(fid,0);
+        end;
+      finally
+        FormKakaoTVChat.Leave;
       end;
-    finally
-      SetLength(fid,0);
     end;
   end;
 end;
@@ -367,6 +379,7 @@ begin
   log:=TLogListFPC.Create(self);
   log.Parent:=Panel2;
   log.Align:=alClient;
+  FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
   CefSingleProcess:=True; //must be true
   // temp folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
@@ -384,6 +397,7 @@ begin
   ChatScript.Free;
   ChatHead.Free;
   ChatBuffer.Free;
+  FEventMain.Free;
 end;
 
 procedure TFormKakaoTVChat.Button1Click(Sender: TObject);
@@ -444,6 +458,18 @@ begin
   cefb.Browser.SendProcessMessage(PID_RENDERER,TCefProcessMessageRef.New('visitdom'));
 end;
 
+function TFormKakaoTVChat.TryEnter: Boolean;
+begin
+  Result:=FEventMain.WaitFor(0)=wrSignaled;
+  if Result then
+    FEventMain.ResetEvent;
+end;
+
+procedure TFormKakaoTVChat.Leave;
+begin
+  FEventMain.SetEvent;
+end;
+
 procedure TFormKakaoTVChat.HttpError(const msg: string; aSocket: TLSocket);
 begin
   log.AddLogLine(msg);
@@ -452,7 +478,7 @@ end;
 procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrowser;
   const Frame: ICefFrame; transitionType: TCefTransitionType);
 begin
-  lastchkCount:=0;
+  //lastchkCount:=0;
   ChatHead.Clear;
   ChatScript.Clear;
   ChatBuffer.Clear;

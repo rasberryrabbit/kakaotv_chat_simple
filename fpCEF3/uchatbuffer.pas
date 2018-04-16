@@ -202,13 +202,24 @@ begin
 end;
 
 function TCefChatBuffer.Add(const S: string): Integer;
-
+var
+  ChatTime:TCefChatTime;
 begin
-  Result:=inherited Add(S);
-  Objects[Result]:=TCefChatTime.Create;
   Inc(FChatCount);
-  TCefChatTime(Objects[Result]).TimeCount:=FChatCount;
-  while Count>MaxLines do
+  Result:=inherited Add(S);
+  Enter;
+  try
+    ChatTime:=TCefChatTime.Create;
+    ChatTime.TimeCount:=FChatCount;
+  finally
+    Leave;
+  end;
+  try
+    Objects[Result]:=ChatTime;
+  except
+    ChatTime.Free;
+  end;
+  while GetCount>MaxLines do
     Delete(0);
 end;
 
