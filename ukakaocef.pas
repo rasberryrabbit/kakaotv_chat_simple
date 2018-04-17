@@ -91,10 +91,13 @@ end;
 function TKakaoResourceHandler.ProcessRequest(const request: ICefRequest;
   const callback: ICefCallback): Boolean;
 begin
-  Result:=True;
   FOffset:=0;
   FCallback:=callback;
-  TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
+  if Assigned(FBrowser) and Assigned(FBrowser.Host) then begin
+    TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
+    Result:=True;
+  end else
+      Result:=False;
 end;
 
 procedure TKakaoResourceHandler.GetResponseHeaders(
@@ -192,6 +195,7 @@ function TkakaoCEF.doOnGetResourceHandler(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
 begin
   if (request.GetResourceType=RT_IMAGE)
+    and Assigned(Browser_)
     and (Pos('/dna/emoticons/',request.Url)<>0) then begin
     Result:=TKakaoResourceHandler.Create(Browser_,Frame,'KakaoImage',request);
   end else
