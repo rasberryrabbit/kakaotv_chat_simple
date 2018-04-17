@@ -4,9 +4,9 @@
 }
 
 body {
-    font:12px arial;
+    font: 12px arial;
     color: none;
-    padding:1px; }
+    padding: 2px; }
   
 form, p, span {
     margin:0;
@@ -16,28 +16,30 @@ form, p, span {
     color: yellowgreen;
     text-decoration: none; 
     margin-right: 10px;
+    text-shadow: 0 0 1px #FFFF00;
     background-color: none; }
 
 .txt_talk {
     color: gray;
     background-color: none;
+    word-wrap: keep-all;
 }
 
 #chatbox, li {
     list-style-type: none;
-    padding: 2px;
+    padding: 3px;
 }
   
 #wrapper {
     position: relative;
-    height: 400px;
+    height: 300px;
 }  
 
 #chatbox {
     text-align: left;
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: auto;
 }
 
 .box_alert {
