@@ -811,6 +811,7 @@ begin
           FindClose(srec);
         end;
         outmsg:=outmsg+'</div></body></html>';
+        ASocket.FResponseInfo.ContentType:='text/html; charset=utf-8';
         ASocket.FResponseInfo.Status:=hsOK;
       end else begin
         // not found
@@ -893,6 +894,7 @@ begin
       for i:=0 to ChatScript.Count-1 do
         outmsg:=outmsg+ChatScript.Strings[i]+#13#10;
       ASocket.FResponseInfo.Status:=hsOK;
+      ASocket.FResponseInfo.ContentType:='text/html; charset=utf-8';
       ResposeMsg;
     end else
     if Pos(httpLogUrl,uri)<>0 then begin
@@ -917,6 +919,7 @@ begin
       end;
       // send chatindex in header
       AppendString(ASocket.FHeaderOut.ExtraHeaders,'ChatIndex: '+IntToHex(endtime,16)+#13#10);
+      ASocket.FResponseInfo.ContentType:='text/html; charset=utf-8';
       ASocket.FResponseInfo.Status:=hsOK;
       ResposeMsg;
     end else
