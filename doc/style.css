@@ -16,7 +16,6 @@ form, p, span {
     color: yellowgreen;
     text-decoration: none; 
     margin-right: 10px;
-    text-shadow: 0 0 1px #FFFF00;
     background-color: none; }
 
 .txt_talk {
@@ -39,7 +38,8 @@ form, p, span {
     text-align: left;
     position: absolute;
     bottom: 0;
-    width: auto;
+    width: 300px;
+    outline: 1px dotted #00ff00;
 }
 
 .box_alert {
