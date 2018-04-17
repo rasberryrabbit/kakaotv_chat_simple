@@ -91,11 +91,20 @@ end;
 function TKakaoResourceHandler.ProcessRequest(const request: ICefRequest;
   const callback: ICefCallback): Boolean;
 begin
+  // with browser
   if Assigned(FBrowser) and Assigned(FBrowser.Host) then begin
     try
       FOffset:=0;
       FCallback:=callback;
       TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
+      Result:=True;
+    except
+      Result:=False;
+    end;
+    // with frame
+    if (not Result) and Assigned(FFrame) and Assigned(FFrame.Browser) then
+    try
+      TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FFrame.Browser.Host.GetRequestContext);
       Result:=True;
     except
       Result:=False;
