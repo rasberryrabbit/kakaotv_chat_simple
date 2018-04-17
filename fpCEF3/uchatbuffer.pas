@@ -79,7 +79,7 @@ type
 implementation
 
 const
-  DefaultChatLinesMax = 300;
+  DefaultChatLinesMax = 500;
 
 { TCefChatBuffer }
 
