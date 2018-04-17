@@ -78,6 +78,9 @@
       <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;C:\development\extras\lnet\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <CodeGeneration>
+      <RelocatableUnit Value="True"/>
+    </CodeGeneration>
     <Linking>
       <Debugging>
         <UseExternalDbgSyms Value="True"/>
