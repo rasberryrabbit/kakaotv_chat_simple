@@ -101,14 +101,14 @@ begin
     except
       Result:=False;
     end;
-    // with frame
-    if (not Result) and Assigned(FFrame) and Assigned(FFrame.Browser) then
-    try
-      TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FFrame.Browser.Host.GetRequestContext);
-      Result:=True;
-    except
-      Result:=False;
-    end;
+    //// with frame
+    //if (not Result) and Assigned(FFrame) and Assigned(FFrame.Browser) then
+    //try
+    //  TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FFrame.Browser.Host.GetRequestContext);
+    //  Result:=True;
+    //except
+    //  Result:=False;
+    //end;
   end else
       Result:=False;
 end;

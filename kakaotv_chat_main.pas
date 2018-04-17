@@ -11,23 +11,20 @@ uses
 
 type
 
-  { TMyRenderProcessHandler }
+  { TKaKaoRenderProcessHandler }
 
-  TMyRenderProcessHandler=class(TCefRenderProcessHandlerOwn)
+  TKaKaoRenderProcessHandler=class(TCefRenderProcessHandlerOwn)
     protected
       function OnProcessMessageReceived(const browser: ICefBrowser;
         sourceProcess: TCefProcessId; const message: ICefProcessMessage
         ): Boolean; override;
       procedure OnBrowserCreated(const browser: ICefBrowser); override;
+      procedure OnUncaughtException(const browser: ICefBrowser;
+        const frame: ICefFrame; const context: ICefV8Context;
+        const exception: ICefV8Exception; const stackTrace: ICefV8StackTrace);
+        override;
   end;
 
-  { TMyCefDownloadImage }
-
-  TMyCefDownloadImage = class(TCefDownloadImageCallbackOwn)
-    protected
-      procedure OnDownloadImageFinished(const imageUrl: ustring;
-        httpStatusCode: Integer; image: ICefImage); override;
-  end;
 
   { TFormKakaoTVChat }
 
@@ -54,7 +51,6 @@ type
 
     procedure HttpError(const msg: string; aSocket: TLSocket);
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
-    procedure CefLoadStateChange(Sender: TObject; const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
 
   end;
 
@@ -105,29 +101,6 @@ type
   end;
 
 
-const
-  imgscript=';(function() {'+
-    'var getDataFromImg = function(img) {;'+
-    '    var canvas = document.createElement(''canvas'');'+
-    '    canvas.setAttribute("id","myimg");'+
-    '    var xdiv=document.querySelector("div");'+
-    '    document.body.insertBefore(canvas,xdiv);'+
-    '    var context = canvas.getContext(''2d'');'+
-    '    context.drawImage(img, 0, 0 );'#13#10+
-    '    var b64=canvas.toDataURL("image/png");'+
-    '    return b64;'+
-    '}'+#13#10+
-    'var images = document.querySelectorAll(''.thumb_img'');'+
-    'var finalArray = [];'+
-    'for ( var i=0; i<images.length; i++ )'+
-    '{'+
-    '    finalArray.push(images[i].currentSrc);'+
-    '    finalArray.push(getDataFromImg(images[i]));'+
-    '}'+
-    'return finalArray;'+
-    '})()';
-
-
 procedure ProcessElementsById(const AFrame: ICefFrame; const AId: string);
 var
   Visitor: TElementIdVisitor;
@@ -141,32 +114,15 @@ begin
     if ChatScript.IndexOf(surl)=-1 then
       ChatScript.Add(surl);
     if (0<>Pos('live/chat/',AFrame.GetUrl)) then begin
-      //if AFrame.GetV8Context.Eval(imgscript,AFrame.Url,0,retv8,errv8) then begin
-      //  if retv8.GetArrayLength>0 then begin
-      //
-      //  end;
-      //end else
-      //  FormKakaoTVChat.log.AddLog(Format('> %s %d',[errv8.GetMessage,errv8.LineNumber]));
-
       Visitor := TElementIdVisitor.Create(AId);
       AFrame.VisitDom(Visitor);
     end;
   end;
 end;
 
-{ TMyCefDownloadImage }
+{ TKaKaoRenderProcessHandler }
 
-procedure TMyCefDownloadImage.OnDownloadImageFinished(const imageUrl: ustring;
-  httpStatusCode: Integer; image: ICefImage);
-begin
-  inherited OnDownloadImageFinished(imageUrl, httpStatusCode, image);
-  FormKakaoTVChat.log.AddLogLine(Format('image %d',[httpStatusCode]));
-end;
-
-
-{ TMyRenderProcessHandler }
-
-function TMyRenderProcessHandler.OnProcessMessageReceived(
+function TKaKaoRenderProcessHandler.OnProcessMessageReceived(
   const browser: ICefBrowser; sourceProcess: TCefProcessId;
   const message: ICefProcessMessage): Boolean;
 var
@@ -201,10 +157,19 @@ begin
   end;
 end;
 
-procedure TMyRenderProcessHandler.OnBrowserCreated(const browser: ICefBrowser);
+procedure TKaKaoRenderProcessHandler.OnBrowserCreated(const browser: ICefBrowser);
 begin
   inherited OnBrowserCreated(browser);
   MainBrowser:=browser;
+end;
+
+procedure TKaKaoRenderProcessHandler.OnUncaughtException(
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const context: ICefV8Context; const exception: ICefV8Exception;
+  const stackTrace: ICefV8StackTrace);
+begin
+  FormKakaoTVChat.log.AddLog(exception.GetMessage);
+  inherited OnUncaughtException(browser, frame, context, exception, stackTrace);
 end;
 
 
@@ -440,10 +405,10 @@ begin
   if not DirectoryExists(cefImageFolder) then
     CreateDir(cefImageFolder);
   cefb:=TkakaoCEF.Create(self);
+  cefb.Name:='cefKakao';
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
-  cefb.OnLoadingStateChange:=@CefLoadStateChange;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -532,7 +497,6 @@ end;
 procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrowser;
   const Frame: ICefFrame; transitionType: TCefTransitionType);
 begin
-  //lastchkCount:=0;
   if TryEnter then begin
     try
       ChatHead.Clear;
@@ -546,20 +510,13 @@ begin
   end;
 end;
 
-procedure TFormKakaoTVChat.CefLoadStateChange(Sender: TObject;
-  const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
-begin
-  if not isLoading then begin
-  end;
-end;
-
 procedure AppExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
 begin
   ShowMessage(Format('%s',[BacktraceStrFunc(Addr)]));
 end;
 
 initialization
-  CefRenderProcessHandler := TMyRenderProcessHandler.Create;
+  CefRenderProcessHandler := TKaKaoRenderProcessHandler.Create;
   ExceptProc:=@AppExceptProc;
 
 end.
