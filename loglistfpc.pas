@@ -499,6 +499,8 @@ begin
     temp.F:=txtColor;
     temp.B:=BackColor;
     CheckTextLen(s);
+    if Idx>Count then
+       Idx:=Count;
     LogData.Insert(Idx,s);
     LogData.Objects[Idx]:=temp;
     FAddFlag:=True;
