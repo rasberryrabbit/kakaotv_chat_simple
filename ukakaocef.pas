@@ -23,7 +23,7 @@ type
 
   TKakaoResourceHandler=class(TCefResourceHandlerOwn)
     private
-      FOffset:NativeUInt;
+      FOffset:TSize;
       FCallback:ICefCallback;
       FResponse:ICefResponse;
       FStream:TMemoryStream;
@@ -43,7 +43,7 @@ type
   const schemeName: ustring; const request: ICefRequest); override;
       destructor Destroy; override;
 
-      procedure WriteResponse(const Request:ICefUrlRequest; Data:Pointer; Size:NativeUInt); virtual;
+      procedure WriteResponse(const Request:ICefUrlRequest; Data:Pointer; Size:TSize); virtual;
       procedure CompleteRequest(const Request:ICefUrlRequest); virtual;
   end;
 
@@ -91,11 +91,15 @@ end;
 function TKakaoResourceHandler.ProcessRequest(const request: ICefRequest;
   const callback: ICefCallback): Boolean;
 begin
-  FOffset:=0;
-  FCallback:=callback;
   if Assigned(FBrowser) and Assigned(FBrowser.Host) then begin
-    TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
-    Result:=True;
+    try
+      FOffset:=0;
+      FCallback:=callback;
+      TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
+      Result:=True;
+    except
+      Result:=False;
+    end;
   end else
       Result:=False;
 end;
@@ -119,7 +123,7 @@ begin
   if Assigned(FStream) and (FOffset<FStream.Size) then begin
     Result:=True;
     bytesRead:=bytesToRead;
-    Move(Pointer(NativeUInt(FStream.Memory)+FOffset)^,dataOut^,bytesRead);
+    Move(Pointer(TSize(FStream.Memory)+FOffset)^,dataOut^,bytesRead);
     Inc(FOffset,bytesRead);
   end else
     Result:=False;
@@ -142,7 +146,7 @@ begin
 end;
 
 procedure TKakaoResourceHandler.WriteResponse(const Request: ICefUrlRequest;
-  Data: Pointer; Size: NativeUInt);
+  Data: Pointer; Size: TSize);
 begin
   if Assigned(FStream) then
     FStream.Write(Data^,Size);
