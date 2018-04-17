@@ -233,8 +233,6 @@ var
 
             // check MaxChecksum+1 bottom lines
             NodeN:=Nodex;
-            // add tag id
-            NodeN.SetElementAttribute('ID','kakaotv');
             i:=0;
             matched:=lastchkCount>0;
             while Assigned(NodeN) do begin
