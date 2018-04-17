@@ -101,7 +101,8 @@ procedure TKakaoResourceHandler.GetResponseHeaders(
   const response: ICefResponse; out responseLength: Int64; out
   redirectUrl: ustring);
 begin
-  responseLength:=FStream.Size;
+  if Assigned(FStream) then
+    responseLength:=FStream.Size;
   response.Status:=FResponse.Status;
   response.StatusText:=FResponse.StatusText;
   response.MimeType:=FResponse.MimeType;
@@ -112,7 +113,7 @@ function TKakaoResourceHandler.ReadResponse(const dataOut: Pointer;
   bytesToRead: Integer; var bytesRead: Integer; const callback: ICefCallback
   ): Boolean;
 begin
-  if FOffset<FStream.Size then begin
+  if Assigned(FStream) and (FOffset<FStream.Size) then begin
     Result:=True;
     bytesRead:=bytesToRead;
     Move(Pointer(NativeUInt(FStream.Memory)+FOffset)^,dataOut^,bytesRead);
@@ -140,7 +141,8 @@ end;
 procedure TKakaoResourceHandler.WriteResponse(const Request: ICefUrlRequest;
   Data: Pointer; Size: NativeUInt);
 begin
-  FStream.Write(Data^,Size);
+  if Assigned(FStream) then
+    FStream.Write(Data^,Size);
 end;
 
 procedure TKakaoResourceHandler.CompleteRequest(const Request: ICefUrlRequest);
@@ -148,7 +150,8 @@ var
   newName:string;
   i, j : Integer;
 begin
-  FStream.Position:=0;
+  if Assigned(FStream) then
+    FStream.Position:=0;
   FResponse:=Request.GetResponse;
   if cefImageFolder<>'' then begin
     // save image files
