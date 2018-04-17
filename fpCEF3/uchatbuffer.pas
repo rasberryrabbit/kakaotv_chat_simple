@@ -229,6 +229,8 @@ var
   ChatTime:TCefChatTime;
 begin
   Inc(FChatCount);
+  if Index>Count then
+    Index:=Count;
   inherited Insert(Index, S);
   Enter;
   try

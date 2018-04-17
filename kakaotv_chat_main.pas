@@ -56,7 +56,6 @@ type
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
     procedure CefLoadStateChange(Sender: TObject; const browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean);
 
-    procedure OnAppException(Sender : TObject; E : Exception);
   end;
 
 var
@@ -445,7 +444,6 @@ begin
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
   cefb.OnLoadingStateChange:=@CefLoadStateChange;
-  Application.OnException:=@OnAppException;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -555,14 +553,14 @@ begin
   end;
 end;
 
-procedure TFormKakaoTVChat.OnAppException(Sender: TObject; E: Exception);
+procedure AppExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
 begin
-  ShowMessage(E.ToString);
+  ShowMessage(Format('%s',[BacktraceStrFunc(Addr)]));
 end;
-
 
 initialization
   CefRenderProcessHandler := TMyRenderProcessHandler.Create;
+  ExceptProc:=@AppExceptProc;
 
 end.
 
