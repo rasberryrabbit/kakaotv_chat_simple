@@ -662,9 +662,10 @@ function TBigFileURIHandler.HandleURI(ASocket: TLHTTPServerSocket): TOutputItem;
 const
   uploadaction='upload.action.htm';
   httpLogUrl='httplog.htm';
-  httpChatUrl='httpchat.htm';
+  httpAlertUrl='httpalertlog.htm';
   folderQuery='folder=';
   indexQuery='chatindex=';
+  alertQuery='alertindex=';
 
 var
   fstream:TBigFileOutput;
@@ -888,13 +889,30 @@ begin
         end;
       end;
     end else
-    if Pos(httpChatUrl,uri)<>0 then begin
-      // httpchat.htm
-      outmsg:='';
-      for i:=0 to ChatScript.Count-1 do
-        outmsg:=outmsg+ChatScript.Strings[i]+#13#10;
-      ASocket.FResponseInfo.Status:=hsOK;
+    if Pos(httpAlertUrl,uri)<>0 then begin
+      // httpalertlog.htm
+      // get alertindex
+      temp:=ASocket.FRequestInfo.QueryParams;
+      i:=Pos(alertQuery,LowerCase(temp));
+      if i>0 then begin
+        i:=i+Length(alertQuery);
+        j:=i;
+        while j<=Length(temp) do begin
+          if temp[j]='&' then
+            break;
+          Inc(j);
+        end;
+        endtime:=StrToInt64Def('$'+Trim(Copy(temp,i,j-i)),0);
+      end else
+        endtime:=0;
+      try
+        outmsg:=ChatScript.GetLines(endtime);
+      except
+      end;
+      // send alertindex in header
+      AppendString(ASocket.FHeaderOut.ExtraHeaders,'AlertIndex: '+IntToHex(endtime,16)+#13#10);
       ASocket.FResponseInfo.ContentType:='text/html; charset=utf-8';
+      ASocket.FResponseInfo.Status:=hsOK;
       ResposeMsg;
     end else
     if Pos(httpLogUrl,uri)<>0 then begin

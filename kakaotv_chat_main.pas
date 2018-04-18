@@ -111,9 +111,11 @@ var
 begin
   if Assigned(AFrame) then
   begin
+    {
     surl:='<iframe src="'+UTF8Encode(AFrame.Url)+'" ></iframe>';
     if ChatScript.IndexOf(surl)=-1 then
       ChatScript.Add(surl);
+    }
     if (0<>Pos('live/chat/',AFrame.GetUrl)) then begin
       Visitor := TElementIdVisitor.Create(AId);
       AFrame.VisitDom(Visitor);
@@ -137,9 +139,11 @@ begin
     { thread-safe? }
     if FormKakaoTVChat.TryEnter then begin
       try
+        {
         surl:='<iframe src="'+UTF8Encode(browser.MainFrame.Url)+'" ></iframe>';
         if ChatScript.IndexOf(surl)=-1 then
           ChatScript.Add(surl);
+        }
         fcount:=browser.GetFrameCount;
         SetLength(fid,fcount);
         try
@@ -326,6 +330,7 @@ var
                         sbuf:=sbuf+' : '+NodeChat.ElementInnerText;
                   NodeChat:=NodeChat.NextSibling;
                 end;
+                ChatScript.Add(UTF8Encode(Nodex.AsMarkup));
                 s:=sbuf+s;
               end else
                 s:=smarkup+s;
@@ -514,7 +519,7 @@ begin
   if TryEnter then begin
     try
       ChatHead.Clear;
-      ChatScript.Clear;
+      //ChatScript.Clear;
       if CheckBoxClearB.Checked then
         ChatBuffer.Clear;
       log.Font.Name:='Default';
