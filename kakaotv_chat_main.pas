@@ -7,7 +7,8 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api, cef3own, cef3gui,
-  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs;
+  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs,
+  WebSocket2;
 
 type
 
@@ -37,6 +38,7 @@ type
     Timer1: TTimer;
     UniqueInstance1: TUniqueInstance;
     procedure Button1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -81,6 +83,9 @@ var
 
   HttpServer:TBigFileLHTTPServerComponent;
   ImgPath:string;
+
+  WebSockChat:TWebSocketServer;
+  WebSockAlert:TWebSocketServer;
 
 
 type
@@ -211,7 +216,7 @@ var
   procedure ProcessNode(ANode: ICefDomNode);
   var
     Node, Nodex, NodeN, NodeName, NodeChat: ICefDomNode;
-    s, smarkup, sclass, sbuf, scheck: UnicodeString;
+    s, smarkup, sclass, sbuf, scheck, sockchat: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
     chkCount, dupCount, dupCountChk, i, j, ItemCount : Integer;
@@ -227,6 +232,7 @@ var
           Nodex:=Node.LastChild;
           chkCount:=0;
           dupCount:=0;
+          sockchat:='';
           while Assigned(Nodex) do begin
             sbuf:='';
             s:='';
@@ -330,7 +336,10 @@ var
                         sbuf:=sbuf+' : '+NodeChat.ElementInnerText;
                   NodeChat:=NodeChat.NextSibling;
                 end;
-                ChatScript.Add(UTF8Encode(Nodex.AsMarkup));
+                scheck:=Nodex.AsMarkup;
+                ChatScript.Add(UTF8Encode(scheck));
+                // websock send alert
+                WebSockAlert.BroadcastText(pchar(UTF8Encode(scheck)));
                 s:=sbuf+s;
               end else
                 s:=smarkup+s;
@@ -346,6 +355,7 @@ var
             if i<0 then
              i:=0;
             ChatBuffer.Insert(i,UTF8Encode(scheck));
+            sockchat:=scheck+#13#10+sockchat;
             // log
             if not disLog then begin
               j:=FormKakaoTVChat.log.Count-ItemCount;
@@ -359,6 +369,10 @@ var
             if ItemCount>=ChatBuffer.MaxLines then
               break;
           end;
+          // send chat to websocket
+          if sockchat<>'' then
+            WebSockChat.BroadcastText(pchar(UTF8Encode(sockchat)));
+
           // set last checksum
           if chkCount>0 then begin
             for i:=0 to chkCount-1 do
@@ -369,12 +383,7 @@ var
 
           break;
 
-        end{ else
-        if (Node.ElementTagName='SCRIPT') {or (Node.ElementTagName='IFRAME')} then begin
-          stemp:=UTF8Encode(Node.AsMarkup);
-          if ChatScript.IndexOf(stemp)=-1 then
-            ChatScript.Add(stemp);
-        end};
+        end;
         ProcessNode(Node);
         Node := Node.NextSibling;
       end;
@@ -386,13 +395,8 @@ begin
     NodeH := document.Head.FirstChild;
     while Assigned(NodeH) do begin
       stemp:=UTF8Encode(NodeH.AsMarkup);
-      {if NodeH.ElementTagName='SCRIPT' then begin
-        if ChatScript.IndexOf(stemp)=-1 then
-          ChatScript.Add(stemp);
-      end else} begin
-        if ChatHead.IndexOf(stemp)=-1 then
-          ChatHead.Add(stemp);
-      end;
+      if ChatHead.IndexOf(stemp)=-1 then
+        ChatHead.Add(stemp);
       NodeH:=NodeH.NextSibling;
     end;
   end;
@@ -428,6 +432,10 @@ begin
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
+  WebSockChat:=TWebSocketServer.Create('0.0.0.0','8190');
+  WebSockChat.FreeOnTerminate:=True;
+  WebSockAlert:=TWebSocketServer.Create('0.0.0.0','8192');
+  WebSockAlert.FreeOnTerminate:=True;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -436,6 +444,7 @@ begin
   ChatHead.Free;
   ChatBuffer.Free;
   FEventMain.Free;
+  Sleep(100);
 end;
 
 procedure TFormKakaoTVChat.Button1Click(Sender: TObject);
@@ -445,6 +454,15 @@ begin
     Button1.Caption:='Stop'
     else
       Button1.Caption:='Activate';
+end;
+
+procedure TFormKakaoTVChat.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  WebSockChat.TerminateThread;
+  WebSockAlert.TerminateThread;
+
+  Sleep(1000);
 end;
 
 procedure TFormKakaoTVChat.FormShow(Sender: TObject);
@@ -489,6 +507,9 @@ begin
   HttpServer.RegisterHandler(x);
   HttpServer.Port:=8090;
   HttpServer.Listen(8090);
+  // websock
+  WebSockChat.Start;
+  WebSockAlert.Start;
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);
@@ -536,7 +557,7 @@ end;
 
 initialization
   CefRenderProcessHandler := TKaKaoRenderProcessHandler.Create;
-  ExceptProc:=@AppExceptProc;
+  //ExceptProc:=@AppExceptProc;
 
 end.
 

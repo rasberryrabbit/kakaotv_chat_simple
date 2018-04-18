@@ -6,6 +6,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
   Caption = 'Kakao Chat'
   ClientHeight = 679
   ClientWidth = 1280
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow

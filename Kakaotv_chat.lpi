@@ -75,7 +75,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;C:\development\extras\lnet\"/>
+      <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;websocket\bauglir library 2.0.4;websocket\synapse 203;C:\development\extras\lnet\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
