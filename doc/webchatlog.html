@@ -42,7 +42,7 @@ alertsock.onmessage = function (event) {
       for (var i=0; i<images.length; i++) {
           images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
       }
-  }, 1000); // 10000 milliseconds = 10 seconds
+  }, 1200); // 10000 milliseconds = 10 seconds
 </script>
 </body>
 </html>

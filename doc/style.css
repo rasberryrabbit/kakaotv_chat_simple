@@ -18,6 +18,12 @@ form, p, span {
     margin-right: 10px;
     background-color: none; }
 
+.my {
+    color: blue;
+    text-decoration: none; 
+    margin-right: 10px;
+    background-color: none; }
+
 .txt_talk {
     color: gray;
     background-color: none;
