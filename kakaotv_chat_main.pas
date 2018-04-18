@@ -409,6 +409,7 @@ begin
   log.Align:=alClient;
   FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
   CefSingleProcess:=True; //must be true
+  CefNoSandbox:=False;
   // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
   if not DirectoryExists(ImgPath) then
