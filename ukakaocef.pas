@@ -101,14 +101,6 @@ begin
     except
       Result:=False;
     end;
-    //// with frame
-    //if (not Result) and Assigned(FFrame) and Assigned(FFrame.Browser) then
-    //try
-    //  TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FFrame.Browser.Host.GetRequestContext);
-    //  Result:=True;
-    //except
-    //  Result:=False;
-    //end;
   end else
       Result:=False;
 end;
@@ -207,12 +199,12 @@ end;
 function TkakaoCEF.doOnGetResourceHandler(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
 begin
-  if (request.GetResourceType=RT_IMAGE)
+  Result:=inherited doOnGetResourceHandler(Browser_,Frame,request);
+  if not Assigned(Result)
+    and (request.GetResourceType=RT_IMAGE)
     and Assigned(Browser_)
-    and (Pos('/dna/emoticons/',request.Url)<>0) then begin
+    and (Pos('/dna/emoticons/',request.Url)<>0) then
     Result:=TKakaoResourceHandler.Create(Browser_,Frame,'KakaoImage',request);
-  end else
-      Result:=inherited doOnGetResourceHandler(Browser_, Frame, request);
 end;
 
 initialization

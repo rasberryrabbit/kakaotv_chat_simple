@@ -169,7 +169,6 @@ procedure TKaKaoRenderProcessHandler.OnUncaughtException(
   const context: ICefV8Context; const exception: ICefV8Exception;
   const stackTrace: ICefV8StackTrace);
 begin
-  FormKakaoTVChat.log.AddLog(exception.GetMessage);
   inherited OnUncaughtException(browser, frame, context, exception, stackTrace);
 end;
 
@@ -410,6 +409,7 @@ begin
   FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
   CefSingleProcess:=True; //must be true
   CefNoSandbox:=False;
+  CefLogSeverity:=LOGSEVERITY_ERROR_REPORT;
   // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
   if not DirectoryExists(ImgPath) then
