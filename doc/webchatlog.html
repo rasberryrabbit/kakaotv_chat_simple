@@ -37,6 +37,12 @@ alertsock.onmessage = function (event) {
     }
     $('#alertbox').animate({scrollTop: document.body.scrollHeight},"fast");
 }
+  setInterval(function() {
+      var images = document.images;
+      for (var i=0; i<images.length; i++) {
+          images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+      }
+  }, 1000); // 10000 milliseconds = 10 seconds
 </script>
 </body>
 </html>
