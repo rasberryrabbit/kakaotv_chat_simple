@@ -65,7 +65,7 @@ uses
   sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF;
 
 const
-  MaxChecksum = 2;
+  MaxChecksum = 3;
 
 var
   cefb : TkakaoCEF;
@@ -73,6 +73,7 @@ var
 
   lastchecksum : array[0..MaxChecksum] of TSHA1Digest;
   lastchkCount : Integer = 0;
+  lastDupChk : Integer = 0;
 
   ChatBuffer:TCefChatBuffer;
   ChatHead:TCefChatBuffer;
@@ -210,7 +211,7 @@ var
     s, smarkup, sclass, sbuf, scheck: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
-    chkCount, i, j, ItemCount : Integer;
+    chkCount, dupCount, dupCountChk, i, j, ItemCount : Integer;
     matched, skipAddMarkup, disLog : Boolean;
   begin
     if Assigned(ANode) then
@@ -222,6 +223,7 @@ var
           ItemCount:=0;
           Nodex:=Node.LastChild;
           chkCount:=0;
+          dupCount:=0;
           while Assigned(Nodex) do begin
             sbuf:='';
             s:='';
@@ -233,29 +235,39 @@ var
 
             // check MaxChecksum+1 bottom lines
             NodeN:=Nodex;
-            i:=0;
             matched:=lastchkCount>0;
+            i:=0;
+            dupCountChk:=lastDupChk+1;
             while Assigned(NodeN) do begin
               scheck:=document.BaseUrl+NodeN.AsMarkup;
               checksumN:=SHA1Buffer(scheck[1],Length(scheck)*SizeOf(WideChar));
 
-              // check checksum
-              if (lastchkCount>0) and (i<lastchkCount) then begin
-                if not SHA1Match(checksumN,lastchecksum[i]) then
+              if matched and (i<lastchkCount) then begin
+                if SHA1Match(checksumN,lastchecksum[i]) then begin
+                  if i=0 then
+                    Dec(dupCountChk);
+                  if dupCountChk<1 then
+                    Inc(i);
+                end else
                   matched:=False;
               end;
-              Inc(i);
 
               // fill bottom checksum
               if chkCount<=MaxChecksum then begin
-                bottomchecksum[chkCount]:=checksumN;
-                Inc(chkCount);
+                // check duplication on first checksum
+                if (chkCount=1) and
+                  SHA1Match(checksumN,bottomchecksum[0]) then
+                  Inc(dupCount)
+                  else begin
+                    bottomchecksum[chkCount]:=checksumN;
+                    Inc(chkCount);
+                  end;
               end else
                 break;
 
               NodeN:=NodeN.PreviousSibling;
             end;
-            if matched then
+            if matched and (dupCountChk>=0) then
               break;
 
             smarkup:=Nodex.AsMarkup;
@@ -348,6 +360,7 @@ var
             for i:=0 to chkCount-1 do
               lastchecksum[i]:=bottomchecksum[i];
             lastchkCount:=chkCount;
+            lastDupChk:=dupCount;
           end;
 
           break;
