@@ -22,7 +22,6 @@ type
   { TKakaoResourceHandler }
 
   TKakaoResourceHandler=class(TCefResourceHandlerOwn)
-    private
       FOffset:TSize;
       FCallback:ICefCallback;
       FResponse:ICefResponse;
@@ -50,7 +49,6 @@ type
   { TKakaoRequestClient }
 
   TKakaoRequestClient=class(TCefUrlrequestClientOwn)
-    private
       FHandler:TKakaoResourceHandler;
     protected
       procedure OnDownloadData(const request: ICefUrlRequest; data: Pointer;
@@ -201,8 +199,8 @@ function TkakaoCEF.doOnGetResourceHandler(const Browser_: ICefBrowser;
 begin
   Result:=inherited doOnGetResourceHandler(Browser_,Frame,request);
   if not Assigned(Result)
-    and (request.GetResourceType=RT_IMAGE)
     and Assigned(Browser_)
+    and (request.GetResourceType=RT_IMAGE)
     and (Pos('/dna/emoticons/',request.Url)<>0) then
     Result:=TKakaoResourceHandler.Create(Browser_,Frame,'KakaoImage',request);
 end;
