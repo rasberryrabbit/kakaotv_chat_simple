@@ -22,12 +22,6 @@ type
   { TKakaoResourceHandler }
 
   TKakaoResourceHandler=class(TCefResourceHandlerOwn)
-      FOffset:TSize;
-      FCallback:ICefCallback;
-      FResponse:ICefResponse;
-      FStream:TMemoryStream;
-      FBrowser:ICefBrowser;
-      FFrame:ICefFrame;
     protected
       function ProcessRequest(const request: ICefRequest;
         const callback: ICefCallback): Boolean; override;
@@ -37,6 +31,11 @@ type
         var bytesRead: Integer; const callback: ICefCallback): Boolean;
         override;
     public
+      FOffset:TSize;
+      FCallback:ICefCallback;
+      FResponse:ICefResponse;
+      FStream:TMemoryStream;
+      FBrowser:ICefBrowser;
 
       constructor Create(const browser: ICefBrowser; const frame: ICefFrame;
   const schemeName: ustring; const request: ICefRequest); override;
@@ -135,7 +134,6 @@ begin
   inherited Create(browser, frame, schemeName, request);
   FStream:=TMemoryStream.Create;
   FBrowser:=browser;
-  FFrame:=frame;
 end;
 
 destructor TKakaoResourceHandler.Destroy;
