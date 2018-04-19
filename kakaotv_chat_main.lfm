@@ -51,6 +51,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Height = 19
     Top = 507
     Width = 80
+    Anchors = [akLeft, akBottom]
     Caption = 'Disable log'
     TabOrder = 2
   end
@@ -59,6 +60,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Height = 19
     Top = 507
     Width = 104
+    Anchors = [akLeft, akBottom]
     Caption = 'Remove system'
     Checked = True
     State = cbChecked
