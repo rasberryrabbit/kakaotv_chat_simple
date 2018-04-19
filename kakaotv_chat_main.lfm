@@ -27,7 +27,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Anchors = [akBottom]
     Caption = 'Activate'
     OnClick = Button1Click
-    TabOrder = 3
+    TabOrder = 4
   end
   object Panel2: TPanel
     Left = 8
@@ -35,7 +35,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 531
     Width = 1264
     Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 4
+    TabOrder = 5
   end
   object CheckBoxClearB: TCheckBox
     Left = 8
@@ -53,6 +53,16 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 80
     Caption = 'Disable log'
     TabOrder = 2
+  end
+  object CheckBoxRemSyS: TCheckBox
+    Left = 256
+    Height = 19
+    Top = 507
+    Width = 104
+    Caption = 'Remove system'
+    Checked = True
+    State = cbChecked
+    TabOrder = 3
   end
   object Timer1: TTimer
     Enabled = False

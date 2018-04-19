@@ -31,6 +31,7 @@ type
 
   TFormKakaoTVChat = class(TForm)
     Button1: TButton;
+    CheckBoxRemSyS: TCheckBox;
     CheckBoxDisableLog: TCheckBox;
     CheckBoxClearB: TCheckBox;
     Panel1: TPanel;
@@ -220,13 +221,14 @@ var
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
     chkCount, dupCount, dupCountChk, i, j, ItemCount : Integer;
-    matched, skipAddMarkup, disLog : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
   begin
     if Assigned(ANode) then
     begin
+      RemoveSys:=FormKakaoTVChat.CheckBoxRemSyS.Checked;
+      disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
       Node := ANode.FirstChild;
       while Assigned(Node) do begin
-        disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
         if Node.GetElementAttribute('id')=FNameID then begin
           ItemCount:=0;
           Nodex:=Node.LastChild;
@@ -236,6 +238,7 @@ var
           while Assigned(Nodex) do begin
             sbuf:='';
             s:='';
+            doAddMsg:=True;
             if Nodex.HasChildren then begin
               NodeName:=Nodex.FirstChild;
               NodeChat:=NodeName.NextSibling;
@@ -341,27 +344,32 @@ var
                 // websock send alert
                 WebSockAlert.BroadcastText(pchar(UTF8Encode(scheck)));
                 s:=sbuf+s;
-              end else
+              end else begin
+                if RemoveSys and (Pos('txt_system',smarkup)<>0) then
+                  doAddMsg:=False;
                 s:=smarkup+s;
+              end;
             end else
               s:=smarkup+s;
 
-            // fill by markup
-            if not skipAddMarkup then
-              scheck:=Nodex.AsMarkup;
+            if doAddMsg then begin
+              // fill by markup
+              if not skipAddMarkup then
+                scheck:=Nodex.AsMarkup;
 
-            // chat
-            i:=ChatBuffer.Count-ItemCount;
-            if i<0 then
-             i:=0;
-            ChatBuffer.Insert(i,UTF8Encode(scheck));
-            sockchat:=scheck+#13#10+sockchat;
-            // log
-            if not disLog then begin
-              j:=FormKakaoTVChat.log.Count-ItemCount;
-              if j<0 then
-               j:=0;
-              FormKakaoTVChat.log.InsertLog(j,UTF8Encode(s));
+              // chat
+              i:=ChatBuffer.Count-ItemCount;
+              if i<0 then
+               i:=0;
+              ChatBuffer.Insert(i,UTF8Encode(scheck));
+              sockchat:=scheck+#13#10+sockchat;
+              // log
+              if not disLog then begin
+                j:=FormKakaoTVChat.log.Count-ItemCount;
+                if j<0 then
+                 j:=0;
+                FormKakaoTVChat.log.InsertLog(j,UTF8Encode(s));
+              end;
             end;
 
             Nodex:=Nodex.PreviousSibling;
