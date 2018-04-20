@@ -19,7 +19,7 @@ $(document).ready(function(){
  
 });
 //
-var chatsock = new WebSocket("ws://localhost:8190");
+var chatsock = new WebSocket("ws://localhost:8190","chat");
 chatsock.onmessage = function (event) {
     var div = $("#chatbox");
     div.append(event.data);
@@ -28,7 +28,7 @@ chatsock.onmessage = function (event) {
     }
     $('#chatbox').animate({scrollTop: document.body.scrollHeight},"fast");
 }
-var alertsock = new WebSocket("ws://localhost:8192");
+var alertsock = new WebSocket("ws://localhost:8192","chat");
 alertsock.onmessage = function (event) {
     var dival = $("#alertbox");
     dival.append(event.data);

@@ -7,8 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api, cef3own, cef3gui,
-  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs,
-  WebSocket2;
+  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs;
 
 type
 
@@ -65,7 +64,8 @@ implementation
 {$R *.lfm}
 
 uses
-  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF;
+  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
+  uWebsockSimple;
 
 const
   MaxChecksum = 3;
@@ -85,8 +85,8 @@ var
   HttpServer:TBigFileLHTTPServerComponent;
   ImgPath:string;
 
-  WebSockChat:TWebSocketServer;
-  WebSockAlert:TWebSocketServer;
+  WebSockChat:TSimpleWebsocketServer;
+  WebSockAlert:TSimpleWebsocketServer;
 
 
 type
@@ -342,7 +342,7 @@ var
                 scheck:=Nodex.AsMarkup;
                 ChatScript.Add(UTF8Encode(scheck));
                 // websock send alert
-                WebSockAlert.BroadcastText(pchar(UTF8Encode(scheck)));
+                WebSockAlert.BroadcastMsg(pchar(UTF8Encode(scheck)));
                 s:=sbuf+s;
               end else begin
                 if RemoveSys and (Pos('txt_system',smarkup)<>0) then
@@ -379,7 +379,7 @@ var
           end;
           // send chat to websocket
           if sockchat<>'' then
-            WebSockChat.BroadcastText(pchar(UTF8Encode(sockchat)));
+            WebSockChat.BroadcastMsg(pchar(UTF8Encode(sockchat)));
 
           // set last checksum
           if chkCount>0 then begin
@@ -440,10 +440,8 @@ begin
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
-  WebSockChat:=TWebSocketServer.Create('0.0.0.0','8190');
-  WebSockChat.FreeOnTerminate:=True;
-  WebSockAlert:=TWebSocketServer.Create('0.0.0.0','8192');
-  WebSockAlert.FreeOnTerminate:=True;
+  WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:8190');
+  WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:8192');
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -467,10 +465,9 @@ end;
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  WebSockChat.TerminateThread;
-  WebSockAlert.TerminateThread;
+  WebSockChat.Free;
+  WebSockAlert.Free;
 
-  Sleep(1000);
 end;
 
 procedure TFormKakaoTVChat.FormShow(Sender: TObject);
@@ -515,9 +512,6 @@ begin
   HttpServer.RegisterHandler(x);
   HttpServer.Port:=8090;
   HttpServer.Listen(8090);
-  // websock
-  WebSockChat.Start;
-  WebSockAlert.Start;
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);

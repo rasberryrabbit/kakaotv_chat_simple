@@ -39,7 +39,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="7">
       <Unit0>
         <Filename Value="Kakaotv_chat.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -65,6 +65,15 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uKakaoCEF"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="uwebsocksimple.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uWebsockSimple"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="usimplewebsockcallback.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit6>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -75,7 +84,8 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;websocket\bauglir library 2.0.4;websocket\synapse 203;C:\development\extras\lnet\"/>
+      <Libraries Value="mormot\static\i386-win32"/>
+      <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;mormot;C:\development\extras\lnet\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

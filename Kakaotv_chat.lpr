@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package, uChatBuffer,
-  uKakaoCEF;
+  uKakaoCEF, uWebsockSimple, usimplewebsockcallback;
 
 {$R *.res}
 
