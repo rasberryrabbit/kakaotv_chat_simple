@@ -14,6 +14,4 @@ more usage infomation is on doc folder files.
 store emoticon images in doc/img folder.
 
 webserver by lnet.
-websocket by Bauglir websocket.
-
-
+websocket by moRMot.  https://github.com/synopse/mORMot
