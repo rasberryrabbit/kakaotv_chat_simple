@@ -6,8 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api, cef3own, cef3gui,
-  lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc, syncobjs;
+  Menus, ActnList, cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api,
+  cef3own, cef3gui, lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc,
+  syncobjs;
 
 type
 
@@ -29,14 +30,20 @@ type
   { TFormKakaoTVChat }
 
   TFormKakaoTVChat = class(TForm)
+    ActionPortSet: TAction;
+    ActionList1: TActionList;
     Button1: TButton;
     CheckBoxRemSyS: TCheckBox;
     CheckBoxDisableLog: TCheckBox;
     CheckBoxClearB: TCheckBox;
+    MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
     UniqueInstance1: TUniqueInstance;
+    procedure ActionPortSetExecute(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -65,7 +72,7 @@ implementation
 
 uses
   sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple;
+  uWebsockSimple, form_portset;
 
 const
   MaxChecksum = 3;
@@ -87,6 +94,10 @@ var
 
   WebSockChat:TSimpleWebsocketServer;
   WebSockAlert:TSimpleWebsocketServer;
+
+  PortHttp:string = '8090';
+  PortChat:string = '8092';
+  PortAlert:string= '8094';
 
 
 type
@@ -440,8 +451,8 @@ begin
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
-  WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:8190');
-  WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:8192');
+  WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
+  WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -450,6 +461,9 @@ begin
   ChatHead.Free;
   ChatBuffer.Free;
   FEventMain.Free;
+
+  WebSockChat.Free;
+  WebSockAlert.Free;
   Sleep(100);
 end;
 
@@ -462,12 +476,41 @@ begin
       Button1.Caption:='Activate';
 end;
 
+procedure TFormKakaoTVChat.ActionPortSetExecute(Sender: TObject);
+var
+  formPort:TFormPortSet;
+begin
+  formPort:=TFormPortSet.Create(self);
+  try
+    formPort.PortHTTP:=PortHttp;
+    formPort.PortChat:=PortChat;
+    formPort.PortAlert:=PortAlert;
+    if mrOK=formPort.ShowModal then begin
+      PortHttp:=formPort.PortHTTP;
+      PortChat:=formPort.PortChat;
+      PortAlert:=formPort.PortAlert;
+      try
+        HttpServer.Listen(StrToInt(PortHttp));
+        HttpServer.Port:=StrToInt(PortHttp);
+        WebSockChat.Free;
+        WebSockAlert.Free;
+        Sleep(100);
+        WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
+        WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
+      except
+        on e:Exception do begin
+          ShowMessage(e.Message);
+        end;
+      end;
+    end;
+  finally
+    formPort.Free;
+  end;
+end;
+
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
-  WebSockChat.Free;
-  WebSockAlert.Free;
-
 end;
 
 procedure TFormKakaoTVChat.FormShow(Sender: TObject);
@@ -510,8 +553,8 @@ begin
   x.ChatHead:=ChatHead;
   x.ChatScript:=ChatScript;
   HttpServer.RegisterHandler(x);
-  HttpServer.Port:=8090;
-  HttpServer.Listen(8090);
+  HttpServer.Port:=StrToInt(PortHttp);
+  HttpServer.Listen(StrToInt(PortHttp));
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);
