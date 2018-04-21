@@ -72,7 +72,7 @@ implementation
 
 uses
   sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple, form_portset;
+  uWebsockSimple, form_portset, IniFiles;
 
 const
   MaxChecksum = 3;
@@ -451,8 +451,6 @@ begin
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
-  WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
-  WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -510,13 +508,24 @@ end;
 
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
+var
+  config : TIniFile;
 begin
+  config:=TIniFile.Create(ChangeFileExt(Application.ExeName,'.ini'));
+  try
+    config.WriteString('PORT','HTTP',PortHttp);
+    config.WriteString('PORT','CHAT',PortChat);
+    config.WriteString('PORT','ALERT',PortAlert);
+  finally
+    config.Free
+  end;
 end;
 
 procedure TFormKakaoTVChat.FormShow(Sender: TObject);
 var
   x : TBigFileURIHandler;
   b : TStringObject;
+  config : TIniFile;
 begin
   //
   cefb.Load(UTF8Decode('https://tv.kakao.com'));
@@ -543,6 +552,16 @@ begin
   b:=TStringObject.Create;
   b.Str:='image';
   MimeList.AddObject('.png', b);
+
+  config:=TIniFile.Create(ChangeFileExt(Application.ExeName,'.ini'));
+  try
+    PortHttp:=config.ReadString('PORT','HTTP',PortHttp);
+    PortChat:=config.ReadString('PORT','CHAT',PortChat);
+    PortAlert:=config.ReadString('PORT','ALERT',PortAlert);
+  finally
+    config.Free
+  end;
+
   //
   HttpServer:=TBigFileLHTTPServerComponent.Create(self);
   HttpServer.OnError:=@HttpError;
@@ -554,7 +573,14 @@ begin
   x.ChatScript:=ChatScript;
   HttpServer.RegisterHandler(x);
   HttpServer.Port:=StrToInt(PortHttp);
-  HttpServer.Listen(StrToInt(PortHttp));
+  try
+    HttpServer.Listen(StrToInt(PortHttp));
+    WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
+    WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
+  except
+    on e:exception do
+      ShowMessage(e.Message);
+  end;
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);
