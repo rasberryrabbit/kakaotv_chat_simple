@@ -13,10 +13,19 @@ form, p, span {
     padding:0; }
    
 .link_id {
+    display: block;
     color: yellowgreen;
     text-decoration: none; 
-    margin-right: 10px;
     background-color: none; }
+
+.link_id:before{
+    content: "";
+    display: block;
+    background: url('chaticon_name.png') no-repeat;
+    width: 25px;
+    height: 25px;
+    float: left;
+}
 
 .my {
     color: blue;
