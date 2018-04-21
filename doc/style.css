@@ -21,7 +21,7 @@ form, p, span {
 .link_id:before{
     content: "";
     display: block;
-    background: url('chaticon_name.png') no-repeat;
+    background: url('chaticon_name.png') no-repeat center center;
     width: 25px;
     height: 25px;
     float: left;
@@ -70,6 +70,15 @@ em,.screen_out {
 strong,.screen_out {
     color: red;
     margin-right: 5px;    
+}
+
+.box_alert:before {
+    content: "";
+    display: block;
+    background: url('cookies_icon.png') no-repeat center center;
+    width: 40px;
+    height: 40px;
+    float: left;
 }
 
 .txt_name {
