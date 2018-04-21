@@ -15,3 +15,6 @@ store emoticon images in doc/img folder.
 
 webserver by lnet.
 websocket by moRMot.  https://github.com/synopse/mORMot
+
+![Screenshot](kakaochatlog.png)
+
