@@ -260,7 +260,7 @@ var
             NodeN:=Nodex;
             matched:=lastchkCount>0;
             i:=0;
-            dupCountChk:=lastDupChk+1;
+            dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
               scheck:=document.BaseUrl+NodeN.AsMarkup;
               checksumN:=SHA1Buffer(scheck[1],Length(scheck)*SizeOf(WideChar));
@@ -269,7 +269,7 @@ var
                 if SHA1Match(checksumN,lastchecksum[i]) then begin
                   if i=0 then
                     Dec(dupCountChk);
-                  if dupCountChk<1 then
+                  if dupCountChk=0 then
                     Inc(i);
                 end else
                   matched:=False;
@@ -280,11 +280,11 @@ var
                 // check duplication on first checksum
                 if (chkCount=1) and
                   SHA1Match(checksumN,bottomchecksum[0]) then
-                  Inc(dupCount)
-                  else begin
-                    bottomchecksum[chkCount]:=checksumN;
-                    Inc(chkCount);
-                  end;
+                    Inc(dupCount)
+                else begin
+                  bottomchecksum[chkCount]:=checksumN;
+                  Inc(chkCount);
+                end;
               end else
                 break;
 
@@ -397,7 +397,7 @@ var
             for i:=0 to chkCount-1 do
               lastchecksum[i]:=bottomchecksum[i];
             lastchkCount:=chkCount;
-            lastDupChk:=dupCount;
+            lastDupChk:=dupCount+1;
           end;
 
           break;
@@ -590,7 +590,7 @@ end;
 
 function TFormKakaoTVChat.TryEnter: Boolean;
 begin
-  Result:=FEventMain.WaitFor(0)=wrSignaled;
+  Result:=FEventMain.WaitFor(0)<>wrTimeout;
   if Result then
     FEventMain.ResetEvent;
 end;
