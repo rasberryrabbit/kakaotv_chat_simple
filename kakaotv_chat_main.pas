@@ -286,7 +286,8 @@ var
                   Inc(chkCount);
                 end;
               end else
-                break;
+                if i>=lastchkCount then
+                  break;
 
               NodeN:=NodeN.PreviousSibling;
             end;
