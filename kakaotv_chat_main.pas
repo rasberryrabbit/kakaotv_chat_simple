@@ -83,7 +83,7 @@ var
 
   lastchecksum : array[0..MaxChecksum] of TSHA1Digest;
   lastchkCount : Integer = 0;
-  lastDupChk : Integer = 0;
+  lastDupChk : array[0..MaxChecksum] of Integer;
 
   ChatBuffer:TCefChatBuffer;
   ChatHead:TCefChatBuffer;
@@ -231,7 +231,8 @@ var
     s, smarkup, sclass, sbuf, scheck, sockchat: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
-    chkCount, dupCount, dupCountChk, i, j, ItemCount : Integer;
+    dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
+    chkCount, i, j, ItemCount : Integer;
     matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
   begin
     if Assigned(ANode) then
@@ -244,7 +245,6 @@ var
           ItemCount:=0;
           Nodex:=Node.LastChild;
           chkCount:=0;
-          dupCount:=0;
           sockchat:='';
           while Assigned(Nodex) do begin
             sbuf:='';
@@ -267,9 +267,8 @@ var
 
               if matched and (i<lastchkCount) then begin
                 if SHA1Match(checksumN,lastchecksum[i]) then begin
-                  if i=0 then
-                    Dec(dupCountChk);
-                  if dupCountChk=0 then
+                  Dec(dupCountChk[i]);
+                  if dupCountChk[i]=0 then
                     Inc(i);
                 end else
                   matched:=False;
@@ -278,11 +277,11 @@ var
               // fill bottom checksum
               if chkCount<=MaxChecksum then begin
                 // check duplication on first checksum
-                if (chkCount=1) and
-                  SHA1Match(checksumN,bottomchecksum[0]) then
-                    Inc(dupCount)
+                if (chkCount>0) and SHA1Match(checksumN,bottomchecksum[chkCount-1]) then
+                  Inc(dupCount[chkCount-1])
                 else begin
                   bottomchecksum[chkCount]:=checksumN;
+                  dupCount[chkCount]:=1;
                   Inc(chkCount);
                 end;
               end else
@@ -291,7 +290,7 @@ var
 
               NodeN:=NodeN.PreviousSibling;
             end;
-            if matched and (dupCountChk>=0) then
+            if matched then
               break;
 
             smarkup:=Nodex.AsMarkup;
@@ -352,9 +351,9 @@ var
                   NodeChat:=NodeChat.NextSibling;
                 end;
                 scheck:=Nodex.AsMarkup;
-                ChatScript.Add(UTF8Encode(scheck));
                 // websock send alert
                 WebSockAlert.BroadcastMsg(pchar(UTF8Encode(scheck)));
+                ChatScript.Add(UTF8Encode(scheck));
                 s:=sbuf+s;
               end else begin
                 if RemoveSys and (Pos('txt_system',smarkup)<>0) then
@@ -397,8 +396,8 @@ var
           if chkCount>0 then begin
             for i:=0 to chkCount-1 do
               lastchecksum[i]:=bottomchecksum[i];
+            lastDupChk:=dupCount;
             lastchkCount:=chkCount;
-            lastDupChk:=dupCount+1;
           end;
 
           break;
