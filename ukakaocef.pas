@@ -54,7 +54,7 @@ type
         dataLength: TSize); override;
       procedure OnRequestComplete(const request: ICefUrlRequest); override;
     public
-      constructor Create(Handler:TKakaoResourceHandler); reintroduce;
+      constructor CreateHandle(Handler:TKakaoResourceHandler);
   end;
 
 var
@@ -77,7 +77,7 @@ begin
   FHandler.CompleteRequest(request);
 end;
 
-constructor TKakaoRequestClient.Create(Handler: TKakaoResourceHandler);
+constructor TKakaoRequestClient.CreateHandle(Handler: TKakaoResourceHandler);
 begin
   inherited Create;
   FHandler:=Handler;
@@ -93,7 +93,7 @@ begin
     try
       FOffset:=0;
       FCallback:=callback;
-      TCefUrlRequestRef.New(request,TKakaoRequestClient.Create(Self),FBrowser.Host.GetRequestContext);
+      TCefUrlRequestRef.New(request,TKakaoRequestClient.CreateHandle(Self),FBrowser.Host.GetRequestContext);
       Result:=True;
     except
       Result:=False;
