@@ -114,7 +114,7 @@ type
     constructor Create(const AId: string); reintroduce;
     destructor Destroy; override;
 
-    procedure Enter;
+    function TryEnter:Boolean;
     procedure Leave;
   end;
 
@@ -156,11 +156,6 @@ begin
     { thread-safe? }
     if FormKakaoTVChat.TryEnter then begin
       try
-        {
-        surl:='<iframe src="'+UTF8Encode(browser.MainFrame.Url)+'" ></iframe>';
-        if ChatScript.IndexOf(surl)=-1 then
-          ChatScript.Add(surl);
-        }
         fcount:=browser.GetFrameCount;
         SetLength(fid,fcount);
         try
@@ -205,15 +200,16 @@ end;
 
 destructor TElementIdVisitor.Destroy;
 begin
+  FEvent.SetEvent;
   FEvent.Free;
   inherited Destroy;
 end;
 
-procedure TElementIdVisitor.Enter;
+function TElementIdVisitor.TryEnter: Boolean;
 begin
-  while FEvent.WaitFor(0)=wrTimeout do
-    Sleep(0);
-  FEvent.ResetEvent;
+  Result:=FEvent.WaitFor(0)<>wrTimeout;
+  if Result then
+    FEvent.ResetEvent;
 end;
 
 procedure TElementIdVisitor.Leave;
@@ -410,16 +406,22 @@ var
   end;
 
 begin
-  if Assigned(document.Head) then begin
-    NodeH := document.Head.FirstChild;
-    while Assigned(NodeH) do begin
-      stemp:=UTF8Encode(NodeH.AsMarkup);
-      if ChatHead.IndexOf(stemp)=-1 then
-        ChatHead.Add(stemp);
-      NodeH:=NodeH.NextSibling;
+  if TryEnter then begin
+    try
+      if Assigned(document.Head) then begin
+        NodeH := document.Head.FirstChild;
+        while Assigned(NodeH) do begin
+          stemp:=UTF8Encode(NodeH.AsMarkup);
+          if ChatHead.IndexOf(stemp)=-1 then
+            ChatHead.Add(stemp);
+          NodeH:=NodeH.NextSibling;
+        end;
+      end;
+      ProcessNode(document.Body);
+    finally
+      Leave;
     end;
   end;
-  ProcessNode(document.Body);
 end;
 
 
