@@ -25,8 +25,12 @@ alertsock.onmessage = function (event) {
     $('#alertbox').animate({scrollTop: document.body.scrollHeight},"fast");
     new Audio('sound-alert.wav').play();
     setTimeout(function(){
-        document.querySelector('#alertbox').lastChild.style.display='none';
-    }, 5000);
+        var le=document.querySelector('#alertbox').lastChild;
+        while (le.style.display!='none') {
+          le.style.display='none';
+          le=le.previousElementSibling;
+        }
+    }, 8000);
 }
   setInterval(function() {
       var images = document.images;
