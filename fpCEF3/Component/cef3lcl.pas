@@ -191,144 +191,144 @@ Type
       procedure Resize; override;
     protected
       { Client }
-      function doOnProcessMessageReceived(const Browser: ICefBrowser;
+      function doOnProcessMessageReceived(const Browser_: ICefBrowser;
         sourceProcess: TCefProcessId; const Message: ICefProcessMessage): Boolean; virtual;
 
       { ContextMenuHandler }
-      procedure doOnBeforeContextMenu(const Browser: ICefBrowser; const Frame: ICefFrame;
+      procedure doOnBeforeContextMenu(const Browser_: ICefBrowser; const Frame: ICefFrame;
         const params: ICefContextMenuParams; const model: ICefMenuModel); virtual;
-      function doRunContextMenu(const browser: ICefBrowser; const frame: ICefFrame;
+      function doRunContextMenu(const browser_: ICefBrowser; const frame: ICefFrame;
         const params: ICefContextMenuParams; const model: ICefMenuModel;
         const callback: ICefRunContextMenuCallback): Boolean; virtual;
-      function doOnContextMenuCommand(const Browser: ICefBrowser; const Frame: ICefFrame;
+      function doOnContextMenuCommand(const Browser_: ICefBrowser; const Frame: ICefFrame;
         const params: ICefContextMenuParams; commandId: Integer;
         eventFlags: TCefEventFlags): Boolean; virtual;
-      procedure doOnContextMenuDismissed(const Browser: ICefBrowser; const Frame: ICefFrame); virtual;
+      procedure doOnContextMenuDismissed(const Browser_: ICefBrowser; const Frame: ICefFrame); virtual;
 
       { DialogHandler }
-      function doOnFileDialog(const browser: ICefBrowser; mode: TCefFileDialogMode;
+      function doOnFileDialog(const browser_: ICefBrowser; mode: TCefFileDialogMode;
         const title, defaultFileName: ustring; acceptFilters: TStrings; selectedAcceptFilter: Integer;
         const callback: ICefFileDialogCallback): Boolean; virtual;
 
       { DisplayHandler }
-      procedure doOnAddressChange(const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring); virtual;
-      procedure doOnTitleChange(const Browser: ICefBrowser; const title: ustring); virtual;
-      procedure doOnFaviconUrlchange(const browser: ICefBrowser; iconUrls: TStrings); virtual;
-      procedure doOnFullscreenModeChange(const browser: ICefBrowser; fullscreen: Boolean); virtual;
-      function doOnTooltip(const Browser: ICefBrowser; var atext: ustring): Boolean; virtual;
-      procedure doOnStatusMessage(const Browser: ICefBrowser; const value: ustring); virtual;
-      function doOnConsoleMessage(const Browser: ICefBrowser; const Message, Source: ustring; line: Integer): Boolean; virtual;
+      procedure doOnAddressChange(const Browser_: ICefBrowser; const Frame: ICefFrame; const url: ustring); virtual;
+      procedure doOnTitleChange(const Browser_: ICefBrowser; const title: ustring); virtual;
+      procedure doOnFaviconUrlchange(const browser_: ICefBrowser; iconUrls: TStrings); virtual;
+      procedure doOnFullscreenModeChange(const browser_: ICefBrowser; fullscreen: Boolean); virtual;
+      function doOnTooltip(const Browser_: ICefBrowser; var atext: ustring): Boolean; virtual;
+      procedure doOnStatusMessage(const Browser_: ICefBrowser; const value: ustring); virtual;
+      function doOnConsoleMessage(const Browser_: ICefBrowser; const Message, Source: ustring; line: Integer): Boolean; virtual;
 
       { DownloadHandler }
-      procedure doOnBeforeDownload(const Browser: ICefBrowser; const downloadItem: ICefDownloadItem;
+      procedure doOnBeforeDownload(const Browser_: ICefBrowser; const downloadItem: ICefDownloadItem;
         const suggestedName: ustring; const callback: ICefBeforeDownloadCallback); virtual;
-      procedure doOnDownloadUpdated(const Browser: ICefBrowser; const downloadItem: ICefDownloadItem;
+      procedure doOnDownloadUpdated(const Browser_: ICefBrowser; const downloadItem: ICefDownloadItem;
         const callback: ICefDownloadItemCallback); virtual;
 
       { DragHandler }
-      function doOnDragEnter(const Browser: ICefBrowser; const dragData: ICefDragData; mask: TCefDragOperationsMask): Boolean; virtual;
-      procedure doOnDraggableRegionsChanged(const browser: ICefBrowser; regionsCount: TSize; const regions: TCefDraggableRegionArray); virtual;
+      function doOnDragEnter(const Browser_: ICefBrowser; const dragData: ICefDragData; mask: TCefDragOperationsMask): Boolean; virtual;
+      procedure doOnDraggableRegionsChanged(const browser_: ICefBrowser; regionsCount: TSize; const regions: TCefDraggableRegionArray); virtual;
 
       { FindHandler }
-      procedure doOnFindResult(const browser: ICefBrowser; identifier, count: Integer; const selectionRect: TCefRect; activeMatchOridinal: Integer; finalUpdate: Boolean); virtual;
+      procedure doOnFindResult(const browser_: ICefBrowser; identifier, count: Integer; const selectionRect: TCefRect; activeMatchOridinal: Integer; finalUpdate: Boolean); virtual;
 
       { FocusHandler }
-      procedure doOnTakeFocus(const Browser: ICefBrowser; next_: Boolean); virtual;
-      function doOnSetFocus(const Browser: ICefBrowser; Source: TCefFocusSource): Boolean; virtual;
-      procedure doOnGotFocus(const Browser: ICefBrowser); virtual;
+      procedure doOnTakeFocus(const Browser_: ICefBrowser; next_: Boolean); virtual;
+      function doOnSetFocus(const Browser_: ICefBrowser; Source: TCefFocusSource): Boolean; virtual;
+      procedure doOnGotFocus(const Browser_: ICefBrowser); virtual;
 
       { GeolocationHandler }
-      function doOnRequestGeolocationPermission(const browser: ICefBrowser; const requestingUrl: ustring;
+      function doOnRequestGeolocationPermission(const browser_: ICefBrowser; const requestingUrl: ustring;
         requestId: Integer; const callback: ICefGeolocationCallback): Boolean; virtual;
-      procedure doOnCancelGeolocationPermission(const Browser: ICefBrowser; requestId: Integer); virtual;
+      procedure doOnCancelGeolocationPermission(const Browser_: ICefBrowser; requestId: Integer); virtual;
 
       { JsDialogHandler }
-      function doOnJsdialog(const Browser: ICefBrowser; const originUrl: ustring;
+      function doOnJsdialog(const Browser_: ICefBrowser; const originUrl: ustring;
         dialogType: TCefJsDialogType; const messageText, defaultPromptText: ustring;
         callback: ICefJsDialogCallback; out suppressMessage: Boolean): Boolean; virtual;
-      function doOnBeforeUnloadDialog(const Browser: ICefBrowser;
+      function doOnBeforeUnloadDialog(const Browser_: ICefBrowser;
         const messageText: ustring; isReload: Boolean;
         const callback: ICefJsDialogCallback): Boolean; virtual;
-      procedure doOnResetDialogState(const Browser: ICefBrowser); virtual;
-      procedure doOnDialogClosed(const browser: ICefBrowser); virtual;
+      procedure doOnResetDialogState(const Browser_: ICefBrowser); virtual;
+      procedure doOnDialogClosed(const browser_: ICefBrowser); virtual;
 
       { KeyboardHander }
-      function doOnPreKeyEvent(const Browser: ICefBrowser; const event: PCefKeyEvent;
+      function doOnPreKeyEvent(const Browser_: ICefBrowser; const event: PCefKeyEvent;
         osEvent: TCefEventHandle; out isKeyboardShortcut: Boolean): Boolean; virtual;
-      function doOnKeyEvent(const Browser: ICefBrowser; const event: PCefKeyEvent;
+      function doOnKeyEvent(const Browser_: ICefBrowser; const event: PCefKeyEvent;
         osEvent: TCefEventHandle): Boolean; virtual;
 
       { LiveSpanHandler }
-      function doOnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame;
+      function doOnBeforePopup(const browser_: ICefBrowser; const frame: ICefFrame;
         const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
         userGesture: Boolean; var popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo;
         var client: ICefClient; var settings: TCefBrowserSettings; var noJavascriptAccess: Boolean): Boolean; virtual;
-      procedure doOnAfterCreated(const Browser: ICefBrowser); virtual;
-      procedure doOnBeforeClose(const Browser: ICefBrowser); virtual;
-      function doOnClose(const Browser: ICefBrowser): Boolean; virtual;
+      procedure doOnAfterCreated(const Browser_: ICefBrowser); virtual;
+      procedure doOnBeforeClose(const Browser_: ICefBrowser); virtual;
+      function doOnClose(const Browser_: ICefBrowser): Boolean; virtual;
 
       { LoadHandler }
-      procedure doOnLoadingStateChange(const Browser: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean); virtual;
-      procedure doOnLoadStart(const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType); virtual;
-      procedure doOnLoadEnd(const Browser: ICefBrowser; const Frame: ICefFrame; httpStatusCode: Integer); virtual;
-      procedure doOnLoadError(const Browser: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
+      procedure doOnLoadingStateChange(const Browser_: ICefBrowser; isLoading, canGoBack, canGoForward: Boolean); virtual;
+      procedure doOnLoadStart(const Browser_: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType); virtual;
+      procedure doOnLoadEnd(const Browser_: ICefBrowser; const Frame: ICefFrame; httpStatusCode: Integer); virtual;
+      procedure doOnLoadError(const Browser_: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
         const errorText, failedUrl: ustring); virtual;
 
       { RenderHandler }
-      function doOnGetRootScreenRect(const Browser: ICefBrowser; rect: PCefRect): Boolean; virtual;
-      function doOnGetViewRect(const Browser: ICefBrowser; rect: PCefRect): Boolean; virtual;
-      function doOnGetScreenPoint(const Browser: ICefBrowser; viewX, viewY: Integer;
+      function doOnGetRootScreenRect(const Browser_: ICefBrowser; rect: PCefRect): Boolean; virtual;
+      function doOnGetViewRect(const Browser_: ICefBrowser; rect: PCefRect): Boolean; virtual;
+      function doOnGetScreenPoint(const Browser_: ICefBrowser; viewX, viewY: Integer;
         screenX, screenY: PInteger): Boolean; virtual;
-      function doOnGetScreenInfo(const browser: ICefBrowser; var screenInfo: TCefScreenInfo): Boolean; virtual;
-      procedure doOnPopupShow(const Browser: ICefBrowser; doshow: Boolean); virtual;
-      procedure doOnPopupSize(const Browser: ICefBrowser; const rect: PCefRect); virtual;
-      procedure doOnPaint(const Browser: ICefBrowser; kind: TCefPaintElementType;
+      function doOnGetScreenInfo(const browser_: ICefBrowser; var screenInfo: TCefScreenInfo): Boolean; virtual;
+      procedure doOnPopupShow(const Browser_: ICefBrowser; doshow: Boolean); virtual;
+      procedure doOnPopupSize(const Browser_: ICefBrowser; const rect: PCefRect); virtual;
+      procedure doOnPaint(const Browser_: ICefBrowser; kind: TCefPaintElementType;
         dirtyRectsCount: TSize; const dirtyRects: TCefRectArray;
         const buffer: Pointer; awidth, aheight: Integer); virtual;
-      procedure doOnCursorChange(const browser: ICefBrowser; aCursor: TCefCursorHandle; type_: TCefCursorType;
+      procedure doOnCursorChange(const browser_: ICefBrowser; aCursor: TCefCursorHandle; type_: TCefCursorType;
         const customCursorInfo: PCefCursorInfo); virtual;
-      function doOnStartDragging(const browser: ICefBrowser; const dragData: ICefDragData;
+      function doOnStartDragging(const browser_: ICefBrowser; const dragData: ICefDragData;
         allowedOps: TCefDragOperationsMask; x, y: Integer): Boolean; virtual;
-      procedure doOnUpdateDragCursor(const browser: ICefBrowser; operation: TCefDragOperationsMask); virtual;
-      procedure doOnScrollOffsetChanged(const browser: ICefBrowser; x,y: Double); virtual;
-      procedure doOnImeCompositionRangeChanged(const browser: ICefBrowser; const selectedRange: TCefRange;
+      procedure doOnUpdateDragCursor(const browser_: ICefBrowser; operation: TCefDragOperationsMask); virtual;
+      procedure doOnScrollOffsetChanged(const browser_: ICefBrowser; x,y: Double); virtual;
+      procedure doOnImeCompositionRangeChanged(const browser_: ICefBrowser; const selectedRange: TCefRange;
         characterBoundsCount: TSize; characterBounds: TCefRectArray); virtual;
 
       { RequestHandler }
-      function doOnBeforeBrowse(const browser: ICefBrowser; const frame: ICefFrame;
+      function doOnBeforeBrowse(const browser_: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; isRedirect: Boolean): Boolean; virtual;
-      function doOnOpenUrlFromTab(const browser: ICefBrowser; const frame: ICefFrame;
+      function doOnOpenUrlFromTab(const browser_: ICefBrowser; const frame: ICefFrame;
         const targetUrl: ustring; targetDisposition: TCefWindowOpenDisposition;
         useGesture: Boolean): Boolean; virtual;
-      function doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame;
+      function doOnBeforeResourceLoad(const browser_: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue; virtual;
       function doOnGetResourceHandler(const Browser_: ICefBrowser; const Frame: ICefFrame;
         const request: ICefRequest): ICefResourceHandler; virtual;
-      procedure doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame;
+      procedure doOnResourceRedirect(const browser_: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; const response: ICefResponse; var newUrl: ustring); virtual;
-      function doOnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame;
+      function doOnResourceResponse(const browser_: ICefBrowser; const frame: ICefFrame;
         const request: ICefRequest; const response: ICefResponse): Boolean; virtual;
-      function doOnGetResourceResponseFilter(const browser: ICefBrowser;
+      function doOnGetResourceResponseFilter(const browser_: ICefBrowser;
         const frame: ICefFrame; const request: ICefRequest;
         const response: ICefResponse): ICefResponseFilter; virtual;
-      procedure doOnResourceLoadComplete(const browser: ICefBrowser;
+      procedure doOnResourceLoadComplete(const browser_: ICefBrowser;
         const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse;
         status: TCefUrlRequestStatus; receivedContentLength: Int64); virtual;
-      function doOnGetAuthCredentials(const Browser: ICefBrowser; const Frame: ICefFrame;
+      function doOnGetAuthCredentials(const Browser_: ICefBrowser; const Frame: ICefFrame;
         isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring;
         const callback: ICefAuthCallback): Boolean; virtual;
-      function doOnQuotaRequest(const Browser: ICefBrowser; const originUrl: ustring;
+      function doOnQuotaRequest(const Browser_: ICefBrowser; const originUrl: ustring;
         newSize: Int64; const callback: ICefRequestCallback): Boolean; virtual;
-      procedure doOnProtocolExecution(const Browser: ICefBrowser;
+      procedure doOnProtocolExecution(const Browser_: ICefBrowser;
         const url: ustring; out allowOsExecution: Boolean); virtual;
-      function doOnCertificateError(const browser: ICefBrowser; certError: TCefErrorCode;
+      function doOnCertificateError(const browser_: ICefBrowser; certError: TCefErrorCode;
         const requestUrl: ustring; const sslInfo: ICefSslinfo; callback: ICefRequestCallback): Boolean;
-      function doOnSelectClientCertificate(const browser: ICefBrowser; isProxy: Boolean;
+      function doOnSelectClientCertificate(const browser_: ICefBrowser; isProxy: Boolean;
         const host: ustring; port: Integer; certificatesCount: TSize;
         certificates: ICefX509certificateArray; callback: ICefSelectClientCertificateCallback): Boolean;
-      procedure doOnPluginCrashed(const Browser: ICefBrowser; const pluginPath: ustring); virtual;
-      procedure doOnRenderViewReady(const browser: ICefBrowser); virtual;
-      procedure doOnRenderProcessTerminated(const Browser: ICefBrowser; Status: TCefTerminationStatus); virtual;
+      procedure doOnPluginCrashed(const Browser_: ICefBrowser; const pluginPath: ustring); virtual;
+      procedure doOnRenderViewReady(const browser_: ICefBrowser); virtual;
+      procedure doOnRenderProcessTerminated(const Browser_: ICefBrowser; Status: TCefTerminationStatus); virtual;
 
       { Client }
       property OnProcessMessageReceived: TOnProcessMessageReceived read fOnProcessMessageReceived write fOnProcessMessageReceived;
@@ -924,350 +924,380 @@ begin
   end;
 end;
 
-function TCustomChromium.doOnProcessMessageReceived(const Browser: ICefBrowser;
-  sourceProcess: TCefProcessId; const Message: ICefProcessMessage): Boolean;
+function TCustomChromium.doOnProcessMessageReceived(
+  const Browser_: ICefBrowser; sourceProcess: TCefProcessId;
+  const Message: ICefProcessMessage): Boolean;
 begin
   If Assigned(fOnProcessMessageReceived) then
-    fOnProcessMessageReceived(Self, Browser, sourceProcess, Message, Result)
+    fOnProcessMessageReceived(Self, Browser_, sourceProcess, Message, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnBeforeContextMenu(const Browser: ICefBrowser; const Frame: ICefFrame;
-  const params: ICefContextMenuParams; const model: ICefMenuModel);
+procedure TCustomChromium.doOnBeforeContextMenu(const Browser_: ICefBrowser;
+  const Frame: ICefFrame; const params: ICefContextMenuParams;
+  const model: ICefMenuModel);
 begin
-  If Assigned(fOnBeforeContextMenu) then fOnBeforeContextMenu(Self, Browser, Frame, params, model);
+  If Assigned(fOnBeforeContextMenu) then fOnBeforeContextMenu(Self, Browser_, Frame, params, model);
 end;
 
-function TCustomChromium.doRunContextMenu(const browser: ICefBrowser; const frame: ICefFrame;
-  const params: ICefContextMenuParams; const model: ICefMenuModel;
-  const callback: ICefRunContextMenuCallback): Boolean;
+function TCustomChromium.doRunContextMenu(const browser_: ICefBrowser;
+  const frame: ICefFrame; const params: ICefContextMenuParams;
+  const model: ICefMenuModel; const callback: ICefRunContextMenuCallback
+  ): Boolean;
 begin
   If Assigned(fOnRunContextMenu) then
-    fOnRunContextMenu(Self, browser, frame, params, model, callback, Result)
+    fOnRunContextMenu(Self, browser_, frame, params, model, callback, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnContextMenuCommand(const Browser: ICefBrowser; const Frame: ICefFrame;
-  const params: ICefContextMenuParams; commandId: Integer; eventFlags: TCefEventFlags): Boolean;
+function TCustomChromium.doOnContextMenuCommand(const Browser_: ICefBrowser;
+  const Frame: ICefFrame; const params: ICefContextMenuParams;
+  commandId: Integer; eventFlags: TCefEventFlags): Boolean;
 begin
   If Assigned(fOnContextMenuCommand) then
-    fOnContextMenuCommand(Self, Browser, Frame, params, commandId, eventFlags, Result)
+    fOnContextMenuCommand(Self, Browser_, Frame, params, commandId, eventFlags, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnContextMenuDismissed(const Browser: ICefBrowser; const Frame: ICefFrame);
+procedure TCustomChromium.doOnContextMenuDismissed(const Browser_: ICefBrowser;
+  const Frame: ICefFrame);
 begin
-  If Assigned(fOnContextMenuDismissed) then fOnContextMenuDismissed(Self, Browser, Frame);
+  If Assigned(fOnContextMenuDismissed) then fOnContextMenuDismissed(Self, Browser_, Frame);
 end;
 
-function TCustomChromium.doOnFileDialog(const browser: ICefBrowser; mode: TCefFileDialogMode;
-  const title, defaultFileName: ustring; acceptFilters: TStrings; selectedAcceptFilter: Integer;
+function TCustomChromium.doOnFileDialog(const browser_: ICefBrowser;
+  mode: TCefFileDialogMode; const title, defaultFileName: ustring;
+  acceptFilters: TStrings; selectedAcceptFilter: Integer;
   const callback: ICefFileDialogCallback): Boolean;
 begin
   If Assigned(fOnFileDialog) then
-    fOnFileDialog(Self, browser, mode, title, defaultFileName, acceptFilters, selectedAcceptFilter,
+    fOnFileDialog(Self, browser_, mode, title, defaultFileName, acceptFilters, selectedAcceptFilter,
       callback, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnAddressChange(const Browser: ICefBrowser;
+procedure TCustomChromium.doOnAddressChange(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const url: ustring);
 begin
-  If Assigned(fOnAddressChange) then fOnAddressChange(Self, Browser, Frame, url);
+  If Assigned(fOnAddressChange) then fOnAddressChange(Self, Browser_, Frame, url);
 end;
 
-procedure TCustomChromium.doOnTitleChange(const Browser: ICefBrowser; const title: ustring);
+procedure TCustomChromium.doOnTitleChange(const Browser_: ICefBrowser;
+  const title: ustring);
 begin
-  If Assigned(fOnTitleChange) then fOnTitleChange(Self, Browser, title);
+  If Assigned(fOnTitleChange) then fOnTitleChange(Self, Browser_, title);
 end;
 
-procedure TCustomChromium.doOnFaviconUrlchange(const browser: ICefBrowser; iconUrls: TStrings);
+procedure TCustomChromium.doOnFaviconUrlchange(const browser_: ICefBrowser;
+  iconUrls: TStrings);
 begin
-  If Assigned(fOnFaviconUrlchange) then fOnFaviconUrlchange(Self, browser, iconUrls);
+  If Assigned(fOnFaviconUrlchange) then fOnFaviconUrlchange(Self, browser_, iconUrls);
 end;
 
-procedure TCustomChromium.doOnFullscreenModeChange(const browser: ICefBrowser; fullscreen: Boolean);
+procedure TCustomChromium.doOnFullscreenModeChange(const browser_: ICefBrowser;
+  fullscreen: Boolean);
 begin
-  If Assigned(fOnFullscreenModeChange) then fOnFullscreenModeChange(Self, browser, fullscreen);
+  If Assigned(fOnFullscreenModeChange) then fOnFullscreenModeChange(Self, browser_, fullscreen);
 end;
 
-function TCustomChromium.doOnTooltip(const Browser: ICefBrowser; var atext: ustring): Boolean;
+function TCustomChromium.doOnTooltip(const Browser_: ICefBrowser;
+  var atext: ustring): Boolean;
 begin
   Result := False;
-  If Assigned(fOnTooltip) then fOnTooltip(Self, Browser, atext, Result);
+  If Assigned(fOnTooltip) then fOnTooltip(Self, Browser_, atext, Result);
 end;
 
-procedure TCustomChromium.doOnStatusMessage(const Browser: ICefBrowser; const value: ustring);
+procedure TCustomChromium.doOnStatusMessage(const Browser_: ICefBrowser;
+  const value: ustring);
 begin
-  If Assigned(fOnStatusMessage) then fOnStatusMessage(Self, Browser, value);
+  If Assigned(fOnStatusMessage) then fOnStatusMessage(Self, Browser_, value);
 end;
 
-function TCustomChromium.doOnConsoleMessage(const Browser: ICefBrowser;
+function TCustomChromium.doOnConsoleMessage(const Browser_: ICefBrowser;
   const Message, Source: ustring; line: Integer): Boolean;
 begin
   If Assigned(fOnConsoleMessage) then
-    fOnConsoleMessage(Self, Browser, Message, Source, line, Result)
+    fOnConsoleMessage(Self, Browser_, Message, Source, line, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnBeforeDownload(const Browser: ICefBrowser;
+procedure TCustomChromium.doOnBeforeDownload(const Browser_: ICefBrowser;
   const downloadItem: ICefDownloadItem; const suggestedName: ustring;
   const callback: ICefBeforeDownloadCallback);
 begin
   If Assigned(fOnBeforeDownload) then
-    fOnBeforeDownload(Self, Browser, downloadItem, suggestedName, callback);
+    fOnBeforeDownload(Self, Browser_, downloadItem, suggestedName, callback);
 end;
 
-procedure TCustomChromium.doOnDownloadUpdated(const Browser: ICefBrowser;
-  const downloadItem: ICefDownloadItem; const callback: ICefDownloadItemCallback);
+procedure TCustomChromium.doOnDownloadUpdated(const Browser_: ICefBrowser;
+  const downloadItem: ICefDownloadItem; const callback: ICefDownloadItemCallback
+  );
 begin
-  If Assigned(fOnDownloadUpdated) then fOnDownloadUpdated(Self, Browser, downloadItem, callback);
+  If Assigned(fOnDownloadUpdated) then fOnDownloadUpdated(Self, Browser_, downloadItem, callback);
 end;
 
-function TCustomChromium.doOnDragEnter(const Browser: ICefBrowser; const dragData: ICefDragData;
-  mask: TCefDragOperationsMask): Boolean;
+function TCustomChromium.doOnDragEnter(const Browser_: ICefBrowser;
+  const dragData: ICefDragData; mask: TCefDragOperationsMask): Boolean;
 begin
-  If Assigned(fOnDragEnter) then fOnDragEnter(Self, Browser, dragData, mask, Result)
+  If Assigned(fOnDragEnter) then fOnDragEnter(Self, Browser_, dragData, mask, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnDraggableRegionsChanged(const browser: ICefBrowser;
-  regionsCount: TSize; const regions: TCefDraggableRegionArray);
+procedure TCustomChromium.doOnDraggableRegionsChanged(
+  const browser_: ICefBrowser; regionsCount: TSize;
+  const regions: TCefDraggableRegionArray);
 begin
   If Assigned(fOnDraggableRegionsChanged) then
-    fOnDraggableRegionsChanged(Self, browser, regionsCount, regions);
+    fOnDraggableRegionsChanged(Self, browser_, regionsCount, regions);
 end;
 
-procedure TCustomChromium.doOnFindResult(const browser: ICefBrowser; identifier, count: Integer;
-  const selectionRect: TCefRect; activeMatchOridinal: Integer; finalUpdate: Boolean);
+procedure TCustomChromium.doOnFindResult(const browser_: ICefBrowser;
+  identifier, count: Integer; const selectionRect: TCefRect;
+  activeMatchOridinal: Integer; finalUpdate: Boolean);
 begin
-  If Assigned(fOnFindResult) then fOnFindResult(Self, browser, identifier, count, selectionRect,
+  If Assigned(fOnFindResult) then fOnFindResult(Self, browser_, identifier, count, selectionRect,
     activeMatchOridinal, finalUpdate);
 end;
 
-procedure TCustomChromium.doOnTakeFocus(const Browser: ICefBrowser; next_: Boolean);
+procedure TCustomChromium.doOnTakeFocus(const Browser_: ICefBrowser;
+  next_: Boolean);
 begin
-  If Assigned(fOnTakeFocus) then fOnTakeFocus(Self, Browser, next_);
+  If Assigned(fOnTakeFocus) then fOnTakeFocus(Self, Browser_, next_);
 end;
 
-function TCustomChromium.doOnSetFocus(const Browser: ICefBrowser; Source: TCefFocusSource): Boolean;
+function TCustomChromium.doOnSetFocus(const Browser_: ICefBrowser;
+  Source: TCefFocusSource): Boolean;
 begin
   Result := False;
-  If Assigned(fOnSetFocus) then fOnSetFocus(Self, Browser, Source, Result);
+  If Assigned(fOnSetFocus) then fOnSetFocus(Self, Browser_, Source, Result);
 end;
 
-procedure TCustomChromium.doOnGotFocus(const Browser: ICefBrowser);
+procedure TCustomChromium.doOnGotFocus(const Browser_: ICefBrowser);
 begin
   // Make Chromium the active control
   GetParentForm(Self).ActiveControl := Self;
 
-  If Assigned(fOnGotFocus) then fOnGotFocus(Self, Browser)
+  If Assigned(fOnGotFocus) then fOnGotFocus(Self, Browser_)
 end;
 
-function TCustomChromium.doOnRequestGeolocationPermission(const browser: ICefBrowser;
-  const requestingUrl: ustring; requestId: Integer;
-  const callback: ICefGeolocationCallback): Boolean;
+function TCustomChromium.doOnRequestGeolocationPermission(
+  const browser_: ICefBrowser; const requestingUrl: ustring;
+  requestId: Integer; const callback: ICefGeolocationCallback): Boolean;
 begin
   If Assigned(fOnRequestGeolocationPermission) then
-    fOnRequestGeolocationPermission(Self, Browser, requestingUrl, requestId, callback, Result)
+    fOnRequestGeolocationPermission(Self, Browser_, requestingUrl, requestId, callback, Result)
   Else Result := False;
 end;
 
 procedure TCustomChromium.doOnCancelGeolocationPermission(
-  const Browser: ICefBrowser; requestId: Integer);
+  const Browser_: ICefBrowser; requestId: Integer);
 begin
   If Assigned(fOnCancelGeolocationPermission) then
-    fOnCancelGeolocationPermission(Self, Browser, requestId);
+    fOnCancelGeolocationPermission(Self, Browser_, requestId);
 end;
 
-function TCustomChromium.doOnJsdialog(const Browser: ICefBrowser;
-  const originUrl: ustring; dialogType: TCefJsDialogType;
-  const messageText, defaultPromptText: ustring; callback: ICefJsDialogCallback;
-  out suppressMessage: Boolean): Boolean;
+function TCustomChromium.doOnJsdialog(const Browser_: ICefBrowser;
+  const originUrl: ustring; dialogType: TCefJsDialogType; const messageText,
+  defaultPromptText: ustring; callback: ICefJsDialogCallback; out
+  suppressMessage: Boolean): Boolean;
 begin
   Result := False;
   suppressMessage := False;
   If Assigned(fOnJsdialog) then
-    fOnJsdialog(Self, Browser, originUrl, dialogType, messageText, defaultPromptText, callback,
+    fOnJsdialog(Self, Browser_, originUrl, dialogType, messageText, defaultPromptText, callback,
       suppressMessage, Result);
 end;
 
-function TCustomChromium.doOnBeforeUnloadDialog(const Browser: ICefBrowser;
+function TCustomChromium.doOnBeforeUnloadDialog(const Browser_: ICefBrowser;
   const messageText: ustring; isReload: Boolean;
   const callback: ICefJsDialogCallback): Boolean;
 begin
   If Assigned(fOnBeforeUnloadDialog) then
-    fOnBeforeUnloadDialog(Self, Browser, messageText, isReload, callback, Result)
+    fOnBeforeUnloadDialog(Self, Browser_, messageText, isReload, callback, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnResetDialogState(const Browser: ICefBrowser);
+procedure TCustomChromium.doOnResetDialogState(const Browser_: ICefBrowser);
 begin
-  If Assigned(fOnResetDialogState) then fOnResetDialogState(Self, Browser);
+  If Assigned(fOnResetDialogState) then fOnResetDialogState(Self, Browser_);
 end;
 
-procedure TCustomChromium.doOnDialogClosed(const browser: ICefBrowser);
+procedure TCustomChromium.doOnDialogClosed(const browser_: ICefBrowser);
 begin
-  If Assigned(fOnDialogClosed) then fOnDialogClosed(Self, browser);
+  If Assigned(fOnDialogClosed) then fOnDialogClosed(Self, browser_);
 end;
 
-function TCustomChromium.doOnPreKeyEvent(const Browser: ICefBrowser; const event: PCefKeyEvent;
-  osEvent: TCefEventHandle; out isKeyboardShortcut: Boolean): Boolean;
+function TCustomChromium.doOnPreKeyEvent(const Browser_: ICefBrowser;
+  const event: PCefKeyEvent; osEvent: TCefEventHandle; out
+  isKeyboardShortcut: Boolean): Boolean;
 begin
   If Assigned(fOnPreKeyEvent) then
-    fOnPreKeyEvent(Self, Browser, event, osEvent, isKeyboardShortcut, Result)
+    fOnPreKeyEvent(Self, Browser_, event, osEvent, isKeyboardShortcut, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnKeyEvent(const Browser: ICefBrowser; const event: PCefKeyEvent;
-    osEvent: TCefEventHandle): Boolean;
+function TCustomChromium.doOnKeyEvent(const Browser_: ICefBrowser;
+  const event: PCefKeyEvent; osEvent: TCefEventHandle): Boolean;
 begin
-  If Assigned(fOnKeyEvent) then fOnKeyEvent(Self, Browser, event, osEvent, Result)
+  If Assigned(fOnKeyEvent) then fOnKeyEvent(Self, Browser_, event, osEvent, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnBeforePopup(const browser: ICefBrowser; const frame: ICefFrame;
-  const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
-  userGesture: Boolean; var popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo;
+function TCustomChromium.doOnBeforePopup(const browser_: ICefBrowser;
+  const frame: ICefFrame; const targetUrl, targetFrameName: ustring;
+  targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean;
+  var popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo;
   var client: ICefClient; var settings: TCefBrowserSettings;
   var noJavascriptAccess: Boolean): Boolean;
 begin
   If Assigned(fOnBeforePopup) then
-    fOnBeforePopup(Self, browser, frame, targetUrl, targetFrameName, targetDisposition, userGesture,
+    fOnBeforePopup(Self, browser_, frame, targetUrl, targetFrameName, targetDisposition, userGesture,
       popupFeatures, windowInfo, client, settings, noJavascriptAccess, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnAfterCreated(const Browser: ICefBrowser);
+procedure TCustomChromium.doOnAfterCreated(const Browser_: ICefBrowser);
 begin
-  If Assigned(fOnAfterCreated) then fOnAfterCreated(Self, Browser);
+  If Assigned(fOnAfterCreated) then fOnAfterCreated(Self, Browser_);
 end;
 
-procedure TCustomChromium.doOnBeforeClose(const Browser: ICefBrowser);
+procedure TCustomChromium.doOnBeforeClose(const Browser_: ICefBrowser);
 begin
-  If Assigned(fOnBeforeClose) then fOnBeforeClose(Self, Browser);
+  If Assigned(fOnBeforeClose) then fOnBeforeClose(Self, Browser_);
 end;
 
-function TCustomChromium.doOnClose(const Browser: ICefBrowser): Boolean;
+function TCustomChromium.doOnClose(const Browser_: ICefBrowser): Boolean;
 begin
-  If Assigned(fOnClose) then fOnClose(Self, Browser, Result)
+  If Assigned(fOnClose) then fOnClose(Self, Browser_, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnLoadingStateChange(const Browser: ICefBrowser;
+procedure TCustomChromium.doOnLoadingStateChange(const Browser_: ICefBrowser;
   isLoading, canGoBack, canGoForward: Boolean);
 begin
   If Assigned(fOnLoadingStateChange) then
-    fOnLoadingStateChange(Self, Browser, isLoading, canGoBack, canGoForward);
+    fOnLoadingStateChange(Self, Browser_, isLoading, canGoBack, canGoForward);
 end;
 
-procedure TCustomChromium.doOnLoadStart(const Browser: ICefBrowser; const Frame: ICefFrame;
+procedure TCustomChromium.doOnLoadStart(const Browser_: ICefBrowser; const Frame: ICefFrame;
   transitionType: TCefTransitionType);
 begin
-  If Assigned(fOnLoadStart) then fOnLoadStart(Self, Browser, Frame, transitionType);
+  If Assigned(fOnLoadStart) then fOnLoadStart(Self, Browser_, Frame, transitionType);
 end;
 
-procedure TCustomChromium.doOnLoadEnd(const Browser: ICefBrowser; const Frame: ICefFrame;
+procedure TCustomChromium.doOnLoadEnd(const Browser_: ICefBrowser; const Frame: ICefFrame;
     httpStatusCode: Integer);
 begin
-  If Assigned(fOnLoadEnd) then fOnLoadEnd(Self, Browser, Frame, httpStatusCode);
+  If Assigned(fOnLoadEnd) then fOnLoadEnd(Self, Browser_, Frame, httpStatusCode);
 end;
 
-procedure TCustomChromium.doOnLoadError(const Browser: ICefBrowser; const Frame: ICefFrame;
+procedure TCustomChromium.doOnLoadError(const Browser_: ICefBrowser; const Frame: ICefFrame;
   errorCode: TCefErrorCode; const errorText, failedUrl: ustring);
 begin
-  If Assigned(fOnLoadError) then fOnLoadError(Self, Browser, Frame, errorCode, errorText, failedUrl);
+  If Assigned(fOnLoadError) then fOnLoadError(Self, Browser_, Frame, errorCode, errorText, failedUrl);
 end;
 
-function TCustomChromium.doOnGetRootScreenRect(const Browser: ICefBrowser; rect: PCefRect): Boolean;
+function TCustomChromium.doOnGetRootScreenRect(const Browser_: ICefBrowser;
+  rect: PCefRect): Boolean;
 begin
   Result := False;
 end;
 
-function TCustomChromium.doOnGetViewRect(const Browser: ICefBrowser; rect: PCefRect): Boolean;
+function TCustomChromium.doOnGetViewRect(const Browser_: ICefBrowser;
+  rect: PCefRect): Boolean;
 begin
   Result := False;
 end;
 
-function TCustomChromium.doOnGetScreenPoint(const Browser: ICefBrowser; viewX,
+function TCustomChromium.doOnGetScreenPoint(const Browser_: ICefBrowser; viewX,
   viewY: Integer; screenX, screenY: PInteger): Boolean;
 begin
   Result := False;
 end;
 
-function TCustomChromium.doOnGetScreenInfo(const browser : ICefBrowser;
-  var screenInfo : TCefScreenInfo) : Boolean;
+function TCustomChromium.doOnGetScreenInfo(const browser_: ICefBrowser;
+  var screenInfo: TCefScreenInfo): Boolean;
 begin
   Result := False;
 end;
 
-procedure TCustomChromium.doOnPopupShow(const Browser: ICefBrowser; doshow: Boolean);
+procedure TCustomChromium.doOnPopupShow(const Browser_: ICefBrowser;
+  doshow: Boolean);
 begin
   { empty }
 end;
 
-procedure TCustomChromium.doOnPopupSize(const Browser: ICefBrowser; const rect: PCefRect);
+procedure TCustomChromium.doOnPopupSize(const Browser_: ICefBrowser;
+  const rect: PCefRect);
 begin
   { empty }
 end;
 
-procedure TCustomChromium.doOnPaint(const Browser: ICefBrowser; kind: TCefPaintElementType;
-  dirtyRectsCount: TSize; const dirtyRects: TCefRectArray; const buffer: Pointer; awidth, aheight: Integer);
+procedure TCustomChromium.doOnPaint(const Browser_: ICefBrowser;
+  kind: TCefPaintElementType; dirtyRectsCount: TSize;
+  const dirtyRects: TCefRectArray; const buffer: Pointer; awidth,
+  aheight: Integer);
 begin
   { empty }
 end;
 
-procedure TCustomChromium.doOnCursorChange(const browser: ICefBrowser; aCursor: TCefCursorHandle;
-  type_: TCefCursorType; const customCursorInfo: PCefCursorInfo);
+procedure TCustomChromium.doOnCursorChange(const browser_: ICefBrowser;
+  aCursor: TCefCursorHandle; type_: TCefCursorType;
+  const customCursorInfo: PCefCursorInfo);
 begin
   { empty }
 end;
 
-function TCustomChromium.doOnStartDragging(const browser: ICefBrowser;
-  const dragData: ICefDragData; allowedOps: TCefDragOperationsMask; x, y: Integer): Boolean;
+function TCustomChromium.doOnStartDragging(const browser_: ICefBrowser;
+  const dragData: ICefDragData; allowedOps: TCefDragOperationsMask; x,
+  y: Integer): Boolean;
 begin
   Result := False;
 end;
 
-procedure TCustomChromium.doOnUpdateDragCursor(const browser: ICefBrowser;
+procedure TCustomChromium.doOnUpdateDragCursor(const browser_: ICefBrowser;
   operation: TCefDragOperationsMask);
 begin
   { empty }
 end;
 
-procedure TCustomChromium.doOnScrollOffsetChanged(const browser: ICefBrowser; x, y: Double);
+procedure TCustomChromium.doOnScrollOffsetChanged(const browser_: ICefBrowser;
+  x, y: Double);
 begin
   { empty }
 end;
 
-procedure TCustomChromium.doOnImeCompositionRangeChanged(const browser: ICefBrowser;
-  const selectedRange: TCefRange; characterBoundsCount: TSize; characterBounds: TCefRectArray);
+procedure TCustomChromium.doOnImeCompositionRangeChanged(
+  const browser_: ICefBrowser; const selectedRange: TCefRange;
+  characterBoundsCount: TSize; characterBounds: TCefRectArray);
 begin
   { empty }
 end;
 
-function TCustomChromium.doOnBeforeBrowse(const browser: ICefBrowser;
-  const frame: ICefFrame; const request: ICefRequest; isRedirect: Boolean): Boolean;
+function TCustomChromium.doOnBeforeBrowse(const browser_: ICefBrowser;
+  const frame: ICefFrame; const request: ICefRequest; isRedirect: Boolean
+  ): Boolean;
 begin
   If Assigned(fOnBeforeBrowse) then
-    fOnBeforeBrowse(Self, browser, frame, request, isRedirect, Result)
+    fOnBeforeBrowse(Self, browser_, frame, request, isRedirect, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnOpenUrlFromTab(const browser: ICefBrowser; const frame: ICefFrame;
-  const targetUrl: ustring; targetDisposition: TCefWindowOpenDisposition;
-  useGesture: Boolean): Boolean;
+function TCustomChromium.doOnOpenUrlFromTab(const browser_: ICefBrowser;
+  const frame: ICefFrame; const targetUrl: ustring;
+  targetDisposition: TCefWindowOpenDisposition; useGesture: Boolean): Boolean;
 begin
   If Assigned(fOnOpenUrlFromTab) then
-    fOnOpenUrlFromTab(Self, browser, frame, targetUrl, targetDisposition, useGesture, Result)
+    fOnOpenUrlFromTab(Self, browser_, frame, targetUrl, targetDisposition, useGesture, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnBeforeResourceLoad(const browser: ICefBrowser; const frame: ICefFrame;
-  const request: ICefRequest; const callback: ICefRequestCallback): TCefReturnValue;
+function TCustomChromium.doOnBeforeResourceLoad(const browser_: ICefBrowser;
+  const frame: ICefFrame; const request: ICefRequest;
+  const callback: ICefRequestCallback): TCefReturnValue;
 begin
   If Assigned(fOnBeforeResourceLoad) then
-    fOnBeforeResourceLoad(Self, browser, frame, request, callback, Result)
+    fOnBeforeResourceLoad(Self, browser_, frame, request, callback, Result)
   Else Result := RV_CONTINUE;
 end;
 
@@ -1275,98 +1305,106 @@ function TCustomChromium.doOnGetResourceHandler(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
 begin
   If Assigned(fOnGetResourceHandler) then
-    fOnGetResourceHandler(Self, Browser, Frame, request, Result)
+    fOnGetResourceHandler(Self, Browser_, Frame, request, Result)
   Else Result := nil;
 end;
 
-procedure TCustomChromium.doOnResourceRedirect(const browser: ICefBrowser; const frame: ICefFrame;
-  const request: ICefRequest; const response: ICefResponse; var newUrl: ustring);
+procedure TCustomChromium.doOnResourceRedirect(const browser_: ICefBrowser;
+  const frame: ICefFrame; const request: ICefRequest;
+  const response: ICefResponse; var newUrl: ustring);
 begin
   If Assigned(fOnResourceRedirect) then
-    fOnResourceRedirect(Self, browser, frame, request, response, newUrl);
+    fOnResourceRedirect(Self, browser_, frame, request, response, newUrl);
 end;
 
-function TCustomChromium.doOnResourceResponse(const browser: ICefBrowser; const frame: ICefFrame;
-  const request: ICefRequest; const response: ICefResponse): Boolean;
+function TCustomChromium.doOnResourceResponse(const browser_: ICefBrowser;
+  const frame: ICefFrame; const request: ICefRequest;
+  const response: ICefResponse): Boolean;
 begin
   If Assigned(fOnResourceResponse) then
-    fOnResourceResponse(Self, browser, frame, request, response, Result)
+    fOnResourceResponse(Self, browser_, frame, request, response, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnGetResourceResponseFilter(const browser: ICefBrowser;
-  const frame: ICefFrame; const request: ICefRequest;
-  const response: ICefResponse): ICefResponseFilter;
+function TCustomChromium.doOnGetResourceResponseFilter(
+  const browser_: ICefBrowser; const frame: ICefFrame;
+  const request: ICefRequest; const response: ICefResponse): ICefResponseFilter;
 begin
   If Assigned(fOnGetResourceResponseFilter) then
-    fOnGetResourceResponseFilter(Self, browser, frame, request, response, Result)
+    fOnGetResourceResponseFilter(Self, browser_, frame, request, response, Result)
   Else Result := nil;
 end;
 
-procedure TCustomChromium.doOnResourceLoadComplete(const browser: ICefBrowser;
-  const frame: ICefFrame; const request: ICefRequest; const response: ICefResponse;
-  status: TCefUrlRequestStatus; receivedContentLength: Int64);
+procedure TCustomChromium.doOnResourceLoadComplete(const browser_: ICefBrowser;
+  const frame: ICefFrame; const request: ICefRequest;
+  const response: ICefResponse; status: TCefUrlRequestStatus;
+  receivedContentLength: Int64);
 begin
   If Assigned(fOnResourceLoadComplete) then
-    fOnResourceLoadComplete(Self, browser, frame, request, response, status, receivedContentLength);
+    fOnResourceLoadComplete(Self, browser_, frame, request, response, status, receivedContentLength);
 end;
 
-function TCustomChromium.doOnGetAuthCredentials(const Browser: ICefBrowser; const Frame: ICefFrame;
-  isProxy: Boolean; const host: ustring; port: Integer; const realm, scheme: ustring;
-  const callback: ICefAuthCallback): Boolean;
+function TCustomChromium.doOnGetAuthCredentials(const Browser_: ICefBrowser;
+  const Frame: ICefFrame; isProxy: Boolean; const host: ustring; port: Integer;
+  const realm, scheme: ustring; const callback: ICefAuthCallback): Boolean;
 begin
   If Assigned(fOnGetAuthCredentials) then
-    fOnGetAuthCredentials(Self, Browser, Frame, isProxy, host, port, realm, scheme, callback, Result)
+    fOnGetAuthCredentials(Self, Browser_, Frame, isProxy, host, port, realm, scheme, callback, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnQuotaRequest(const Browser: ICefBrowser; const originUrl: ustring;
-  newSize: Int64; const callback: ICefRequestCallback): Boolean;
+function TCustomChromium.doOnQuotaRequest(const Browser_: ICefBrowser;
+  const originUrl: ustring; newSize: Int64; const callback: ICefRequestCallback
+  ): Boolean;
 begin
   If Assigned(fOnQuotaRequest) then
-    fOnQuotaRequest(Self, Browser, originUrl, newSize, callback, Result)
+    fOnQuotaRequest(Self, Browser_, originUrl, newSize, callback, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnProtocolExecution(const Browser: ICefBrowser; const url: ustring;
-  out allowOsExecution: Boolean);
+procedure TCustomChromium.doOnProtocolExecution(const Browser_: ICefBrowser;
+  const url: ustring; out allowOsExecution: Boolean);
 begin
-  If Assigned(fOnProtocolExecution) then fOnProtocolExecution(Self, Browser, url, allowOsExecution)
+  If Assigned(fOnProtocolExecution) then fOnProtocolExecution(Self, Browser_, url, allowOsExecution)
   Else allowOsExecution := True;
 end;
 
-function TCustomChromium.doOnCertificateError(const browser: ICefBrowser; certError: TCefErrorCode;
-  const requestUrl: ustring; const sslInfo: ICefSslinfo; callback: ICefRequestCallback): Boolean;
+function TCustomChromium.doOnCertificateError(const browser_: ICefBrowser;
+  certError: TCefErrorCode; const requestUrl: ustring;
+  const sslInfo: ICefSslinfo; callback: ICefRequestCallback): Boolean;
 begin
   If Assigned(fOnCertificateError) then
-    fOnCertificateError(Self, browser, certError, requestUrl, sslInfo, callback, Result)
+    fOnCertificateError(Self, browser_, certError, requestUrl, sslInfo, callback, Result)
   Else Result := False;
 end;
 
-function TCustomChromium.doOnSelectClientCertificate(const browser: ICefBrowser; isProxy: Boolean;
-  const host: ustring; port: Integer; certificatesCount: TSize;
-  certificates: ICefX509certificateArray; callback: ICefSelectClientCertificateCallback): Boolean;
+function TCustomChromium.doOnSelectClientCertificate(
+  const browser_: ICefBrowser; isProxy: Boolean; const host: ustring;
+  port: Integer; certificatesCount: TSize;
+  certificates: ICefX509certificateArray;
+  callback: ICefSelectClientCertificateCallback): Boolean;
 begin
   If Assigned(fOnSelectClientCertificate) then
-    fOnSelectClientCertificate(Self, browser, isProxy, host, port, certificatesCount, certificates,
+    fOnSelectClientCertificate(Self, browser_, isProxy, host, port, certificatesCount, certificates,
       callback, Result)
   Else Result := False;
 end;
 
-procedure TCustomChromium.doOnPluginCrashed(const Browser: ICefBrowser; const pluginPath: ustring);
+procedure TCustomChromium.doOnPluginCrashed(const Browser_: ICefBrowser;
+  const pluginPath: ustring);
 begin
-  If Assigned(fOnPluginCrashed) then fOnPluginCrashed(Self, Browser, pluginPath);
+  If Assigned(fOnPluginCrashed) then fOnPluginCrashed(Self, Browser_, pluginPath);
 end;
 
-procedure TCustomChromium.doOnRenderViewReady(const browser: ICefBrowser);
+procedure TCustomChromium.doOnRenderViewReady(const browser_: ICefBrowser);
 begin
-  If Assigned(fOnRenderViewReady) then fOnRenderViewReady(Self, browser);
+  If Assigned(fOnRenderViewReady) then fOnRenderViewReady(Self, browser_);
 end;
 
-procedure TCustomChromium.doOnRenderProcessTerminated(const Browser: ICefBrowser;
-  Status: TCefTerminationStatus);
+procedure TCustomChromium.doOnRenderProcessTerminated(
+  const Browser_: ICefBrowser; Status: TCefTerminationStatus);
 begin
-  If Assigned(fOnRenderProcessTerminated) then fOnRenderProcessTerminated(Self, Browser, Status);
+  If Assigned(fOnRenderProcessTerminated) then fOnRenderProcessTerminated(Self, Browser_, Status);
 end;
 
 
