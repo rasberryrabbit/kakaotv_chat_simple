@@ -17,6 +17,12 @@ type
       function doOnGetResourceHandler(const Browser_: ICefBrowser;
         const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
         override;
+      procedure doOnLoadStart(const Browser_: ICefBrowser;
+        const Frame: ICefFrame; transitionType: TCefTransitionType); override;
+      procedure doOnLoadEnd(const Browser_: ICefBrowser; const Frame: ICefFrame;
+        httpStatusCode: Integer); override;
+    public
+      doOnLoadCompleted:Boolean;
   end;
 
   { TKakaoResourceHandler }
@@ -196,11 +202,26 @@ function TkakaoCEF.doOnGetResourceHandler(const Browser_: ICefBrowser;
   const Frame: ICefFrame; const request: ICefRequest): ICefResourceHandler;
 begin
   Result:=inherited doOnGetResourceHandler(Browser_,Frame,request);
-  if not Assigned(Result)
+  if doOnLoadCompleted
+    and (not Assigned(Result))
     and Assigned(Browser_)
     and (request.GetResourceType=RT_IMAGE)
     and (Pos('/dna/emoticons/',request.Url)<>0) then
     Result:=TKakaoResourceHandler.Create(Browser_,Frame,'KakaoImage',request);
+end;
+
+procedure TkakaoCEF.doOnLoadStart(const Browser_: ICefBrowser;
+  const Frame: ICefFrame; transitionType: TCefTransitionType);
+begin
+  inherited doOnLoadStart(Browser_, Frame, transitionType);
+  doOnLoadCompleted:=False;
+end;
+
+procedure TkakaoCEF.doOnLoadEnd(const Browser_: ICefBrowser;
+  const Frame: ICefFrame; httpStatusCode: Integer);
+begin
+  inherited doOnLoadEnd(Browser_, Frame, httpStatusCode);
+  doOnLoadCompleted:=True;
 end;
 
 initialization
