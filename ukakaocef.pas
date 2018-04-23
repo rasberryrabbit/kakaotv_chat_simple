@@ -99,6 +99,7 @@ begin
     try
       FOffset:=0;
       FCallback:=callback;
+      FResponse:=nil;
       TCefUrlRequestRef.New(request,TKakaoRequestClient.CreateHandle(Self),FBrowser.Host.GetRequestContext);
       Result:=True;
     except
@@ -114,9 +115,11 @@ procedure TKakaoResourceHandler.GetResponseHeaders(
 begin
   if Assigned(FStream) then
     responseLength:=FStream.Size;
-  response.Status:=FResponse.Status;
-  response.StatusText:=FResponse.StatusText;
-  response.MimeType:=FResponse.MimeType;
+  if Assigned(FResponse) then begin
+    response.Status:=FResponse.Status;
+    response.StatusText:=FResponse.StatusText;
+    response.MimeType:=FResponse.MimeType;
+  end;
   inherited GetResponseHeaders(response, responseLength, redirectUrl);
 end;
 
