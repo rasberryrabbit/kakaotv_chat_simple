@@ -224,12 +224,13 @@ var
   procedure ProcessNode(ANode: ICefDomNode);
   var
     Node, Nodex, NodeN, NodeName, NodeChat, NodeStart, NodeEnd: ICefDomNode;
-    s, smarkup, sclass, sbuf, scheck: UnicodeString;
+    s, smarkup, sclass, sbuf, scheck, ssocket: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, ItemCount : Integer;
     matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
+    stemp: string;
   begin
     if Assigned(ANode) then
     begin
@@ -290,6 +291,7 @@ var
 
           // add chat messages
           Nodex:=NodeStart;
+          //ssocket:='';
           while Nodex<>nil do begin
 
             s:='';
@@ -378,8 +380,10 @@ var
               if not skipAddMarkup then
                 scheck:=Nodex.AsMarkup;
 
-              WebSockChat.BroadcastMsg(pchar(UTF8Encode(scheck)));
-              ChatBuffer.Add(UTF8Encode(scheck));
+              stemp:=pchar(UTF8Encode(scheck));
+              WebSockChat.BroadcastMsg(stemp);
+              //ssocket:=ssocket+scheck;
+              ChatBuffer.Add(stemp);
               // log
               if not disLog then begin
                 FormKakaoTVChat.log.AddLog(UTF8Encode(s));
@@ -390,6 +394,7 @@ var
               break;
             Nodex:=Nodex.NextSibling;
           end;
+          //WebSockChat.BroadcastMsg(pchar(UTF8Encode(ssocket)));
 
           // set last checksum
           if chkCount>0 then begin
