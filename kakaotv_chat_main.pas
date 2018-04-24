@@ -438,7 +438,6 @@ begin
   log.Align:=alClient;
   FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
   CefSingleProcess:=True; //must be true
-  //CefNoSandbox:=False;
   CefLogSeverity:=LOGSEVERITY_ERROR_REPORT;
   // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
