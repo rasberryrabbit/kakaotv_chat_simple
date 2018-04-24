@@ -478,6 +478,7 @@ end;
 procedure TFormKakaoTVChat.ActionPortSetExecute(Sender: TObject);
 var
   formPort:TFormPortSet;
+  bTimer:Boolean;
 begin
   formPort:=TFormPortSet.Create(self);
   try
@@ -489,18 +490,21 @@ begin
       PortChat:=formPort.PortChat;
       PortAlert:=formPort.PortAlert;
       try
+        bTimer:=Timer1.Enabled;
+        Timer1.Enabled:=False;
         HttpServer.Listen(StrToInt(PortHttp));
         HttpServer.Port:=StrToInt(PortHttp);
         WebSockChat.Free;
         WebSockAlert.Free;
         Sleep(100);
-        WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
-        WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
+        WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat,ChatBuffer);
+        WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert,ChatScript);
       except
         on e:Exception do begin
           ShowMessage(e.Message);
         end;
       end;
+      Timer1.Enabled:=bTimer;
     end;
   finally
     formPort.Free;
@@ -576,8 +580,8 @@ begin
   HttpServer.Port:=StrToInt(PortHttp);
   try
     HttpServer.Listen(StrToInt(PortHttp));
-    WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat);
-    WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert);
+    WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat,ChatBuffer);
+    WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert,ChatScript);
   except
     on e:exception do
       ShowMessage(e.Message);
