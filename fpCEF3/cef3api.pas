@@ -5751,6 +5751,17 @@ Var
   cef_zip_directory: function(const src_dir, dest_file: PCefString; include_hidden_files: Integer): Integer; cdecl;
 
 
+  /// 3.3071
+  // Loads the existing "Certificate Revocation Lists" file that is managed by
+  // Google Chrome. This file can generally be found in Chrome's User Data
+  // directory (e.g. "C:\Users\[User]\AppData\Local\Google\Chrome\User Data\" on
+  // Windows) and is updated periodically by Chrome's component updater service.
+  // Must be called in the browser process after the context has been initialized.
+  // See https://dev.chromium.org/Home/chromium-security/crlsets for background.
+  ///
+  cef_load_crlsets_file: procedure (const path: PCefString); cdecl;
+
+
 { ***  cef_geolocation_capi.h  *** }
   // Request a one-time geolocation update. This function bypasses any user
   // permission checks so should only be used by code that is allowed to access
@@ -6841,6 +6852,8 @@ begin
     Pointer(cef_directory_exists)                    := GetProcAddress(LibHandle, 'cef_directory_exists');
     Pointer(cef_delete_file)                         := GetProcAddress(LibHandle, 'cef_delete_file');
     Pointer(cef_zip_directory)                       := GetProcAddress(LibHandle, 'cef_zip_directory');
+    // 3.3071
+    Pointer(cef_load_crlsets_file)                   := GetProcAddress(LibHandle, 'cef_load_crlsets_file');
 
     Pointer(cef_get_geolocation)                     := GetProcAddress(LibHandle, 'cef_get_geolocation');
 

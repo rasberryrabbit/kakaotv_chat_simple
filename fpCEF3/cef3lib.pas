@@ -660,6 +660,9 @@ end;
 
 function CefGetGeolocation(const callback: ICefGetGeolocationCallback): Boolean;
 begin
+  if @cef_get_geolocation=nil then
+    Result:=False
+    else
   Result := cef_get_geolocation(CefGetData(callback)) <> 0;
 end;
 
