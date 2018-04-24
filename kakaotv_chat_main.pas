@@ -223,8 +223,8 @@ var
   stemp : string;
   procedure ProcessNode(ANode: ICefDomNode);
   var
-    Node, Nodex, NodeN, NodeName, NodeChat: ICefDomNode;
-    s, smarkup, sclass, sbuf, scheck, sockchat: UnicodeString;
+    Node, Nodex, NodeN, NodeName, NodeChat, NodeStart, NodeEnd: ICefDomNode;
+    s, smarkup, sclass, sbuf, scheck: UnicodeString;
     checksumN : TSHA1Digest;
     bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
@@ -240,18 +240,9 @@ var
         if Node.GetElementAttribute('id')=FNameID then begin
           ItemCount:=0;
           Nodex:=Node.LastChild;
+          NodeEnd:=Nodex;
           chkCount:=0;
-          sockchat:='';
           while Assigned(Nodex) do begin
-            sbuf:='';
-            s:='';
-            doAddMsg:=True;
-            if Nodex.HasChildren then begin
-              NodeName:=Nodex.FirstChild;
-              NodeChat:=NodeName.NextSibling;
-            end else
-              NodeName:=nil;
-
             // check MaxChecksum+1 bottom lines
             NodeN:=Nodex;
             matched:=lastchkCount>0;
@@ -289,7 +280,30 @@ var
             if matched then
               break;
 
+            NodeStart:=Nodex;
+            Nodex:=Nodex.PreviousSibling;
+
+            Inc(ItemCount);
+            if ItemCount>=ChatBuffer.MaxLines then
+              break;
+          end;
+
+          // add chat messages
+          Nodex:=NodeStart;
+          while Nodex<>nil do begin
+
+            s:='';
+            sbuf:='';
+            doAddMsg:=True;
+
+            if Nodex.HasChildren then begin
+              NodeName:=Nodex.FirstChild;
+              NodeChat:=NodeName.NextSibling;
+            end else
+              NodeName:=nil;
+
             smarkup:=Nodex.AsMarkup;
+            scheck:=smarkup;
             skipAddMarkup:=False;
             // get chat message
             if Assigned(NodeName) and Assigned(NodeChat) then begin
@@ -307,7 +321,7 @@ var
                   sbuf:=sbuf+NodeChat.AsMarkup;
                 NodeChat:=NodeChat.NextSibling;
               end;
-              s:=sbuf+s;
+              s:=s+sbuf;
               // change img url
               if skipAddMarkup then begin
                 scheck:=Nodex.AsMarkup;
@@ -350,43 +364,32 @@ var
                 // websock send alert
                 WebSockAlert.BroadcastMsg(pchar(UTF8Encode(scheck)));
                 ChatScript.Add(UTF8Encode(scheck));
-                s:=sbuf+s;
+                s:=s+sbuf;
               end else begin
                 if RemoveSys and (Pos('txt_system',smarkup)<>0) then
                   doAddMsg:=False;
-                s:=smarkup+s;
+                s:=s+smarkup;
               end;
             end else
-              s:=smarkup+s;
+              s:=s+smarkup;
 
             if doAddMsg then begin
               // fill by markup
               if not skipAddMarkup then
                 scheck:=Nodex.AsMarkup;
 
-              // chat
-              i:=ChatBuffer.Count-ItemCount;
-              if i<0 then
-               i:=0;
-              ChatBuffer.Insert(i,UTF8Encode(scheck));
-              sockchat:=scheck+#13#10+sockchat;
+              WebSockChat.BroadcastMsg(pchar(UTF8Encode(scheck)));
+              ChatBuffer.Add(UTF8Encode(scheck));
               // log
               if not disLog then begin
-                j:=FormKakaoTVChat.log.Count-ItemCount;
-                if j<0 then
-                 j:=0;
-                FormKakaoTVChat.log.InsertLog(j,UTF8Encode(s));
+                FormKakaoTVChat.log.AddLog(UTF8Encode(s));
               end;
             end;
 
-            Nodex:=Nodex.PreviousSibling;
-            Inc(ItemCount);
-            if ItemCount>=ChatBuffer.MaxLines then
+            if Nodex=NodeEnd then
               break;
+            Nodex:=Nodex.NextSibling;
           end;
-          // send chat to websocket
-          if sockchat<>'' then
-            WebSockChat.BroadcastMsg(pchar(UTF8Encode(sockchat)));
 
           // set last checksum
           if chkCount>0 then begin
