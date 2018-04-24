@@ -18,3 +18,6 @@ websocket by moRMot.  https://github.com/synopse/mORMot
 
 ![Screenshot](kakaochatlog.png)
 
+CEF 3.3071
+http://opensource.spotify.com/cefbuilds/cef_binary_3.3071.1649.g98725e6_windows32.tar.bz2
+
