@@ -23,7 +23,7 @@ chatsock.onmessage = function (event) {
     if (div.children('li').length>500) {
       div.children('li')[0].remove();
     }
-    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"fast");
+    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
 }
   setInterval(function() {
       var images = document.images;

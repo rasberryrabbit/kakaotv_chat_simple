@@ -152,6 +152,7 @@ var
   surl:string;
 begin
   Result:=inherited OnProcessMessageReceived(browser, sourceProcess, message);
+  if not Result then
   if message.Name='visitdom' then begin
     { thread-safe? }
     if FormKakaoTVChat.TryEnter then begin
@@ -171,6 +172,7 @@ begin
         FormKakaoTVChat.Leave;
       end;
     end;
+    Result:=True;
   end;
 end;
 

@@ -28,7 +28,12 @@ alertsock.onmessage = function (event) {
     setTimeout(function () {
           le.style.display='none';    
     }, 8000);
-}
+    var voicesock = new WebSocket("ws://localhost:8300","tts");
+    voicesock.onopen = function (event) {
+      voicesock.send(event.data);
+      voicesock.close();
+    };
+};
   setInterval(function() {
       var images = document.images;
       for (var i=0; i<images.length; i++) {
