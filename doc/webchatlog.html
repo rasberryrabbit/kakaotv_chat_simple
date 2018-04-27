@@ -16,9 +16,9 @@
 $(document).ready(function(){
  
 });
-//
-var chatsock = new ReconnectingWebSocket("ws://localhost:8092","chat");
-chatsock.onmessage = function (event) {
+// kakao
+var kakaochat = new ReconnectingWebSocket("ws://localhost:8092","chat");
+kakaochat.onmessage = function (event) {
     var div = $("#chatbox");
     div.append(event.data);
     if (div.children('li').length>500) {
@@ -26,6 +26,17 @@ chatsock.onmessage = function (event) {
     }
     $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
 }
+// twitch
+var twitchchat = new ReconnectingWebSocket("ws://localhost:8096","chat");
+twitchchat.onmessage = function (event) {
+    var div = $("#chatbox");
+    div.append(event.data);
+    if (div.children('li').length>500) {
+      div.children('li')[0].remove();
+    }
+    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
+}
+// refresh image on local cache
   setInterval(function() {
       var images = document.images;
       for (var i=0; i<images.length; i++) {

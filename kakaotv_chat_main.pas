@@ -367,8 +367,12 @@ var
                 end;
                 scheck:=Nodex.AsMarkup;
                 // websock send alert
-                WebSockAlert.BroadcastMsg(pchar(UTF8Encode(scheck)));
-                ChatScript.Add(UTF8Encode(scheck));
+                stemp:=pchar(UTF8Encode(scheck));
+                i:=Pos('<li',stemp);
+                if i<>0 then
+                  Insert(' class="kakao_chat" ',stemp,i+3);
+                WebSockAlert.BroadcastMsg(stemp);
+                ChatScript.Add(stemp);
                 s:=s+sbuf;
               end else begin
                 if RemoveSys and (Pos('txt_system',smarkup)<>0) then
@@ -384,6 +388,9 @@ var
                 scheck:=Nodex.AsMarkup;
 
               stemp:=pchar(UTF8Encode(scheck));
+              i:=Pos('<li',stemp);
+              if i<>0 then
+                Insert(' class="kakao_chat" ',stemp,i+3);
               WebSockChat.BroadcastMsg(stemp);
               //ssocket:=ssocket+scheck;
               ChatBuffer.Add(stemp);
