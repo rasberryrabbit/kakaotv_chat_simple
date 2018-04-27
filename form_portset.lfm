@@ -1,11 +1,11 @@
 object FormPortSet: TFormPortSet
   Left = 274
-  Height = 190
+  Height = 205
   Top = 140
   Width = 275
   BorderStyle = bsDialog
   Caption = 'Port'
-  ClientHeight = 190
+  ClientHeight = 205
   ClientWidth = 275
   OnShow = FormShow
   Position = poOwnerFormCenter
@@ -37,21 +37,21 @@ object FormPortSet: TFormPortSet
   object ButtonOk: TButton
     Left = 40
     Height = 25
-    Top = 152
+    Top = 160
     Width = 75
     Caption = 'Ok'
     ModalResult = 1
     OnClick = ButtonOkClick
-    TabOrder = 3
+    TabOrder = 4
   end
   object ButtonCancel: TButton
     Left = 152
     Height = 25
-    Top = 153
+    Top = 160
     Width = 75
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 4
+    TabOrder = 5
   end
   object Label1: TLabel
     Left = 24
@@ -75,6 +75,22 @@ object FormPortSet: TFormPortSet
     Top = 99
     Width = 90
     Caption = 'Websocket Alert'
+    ParentColor = False
+  end
+  object EditInt: TEdit
+    Left = 136
+    Height = 23
+    Top = 120
+    Width = 80
+    TabOrder = 3
+    Text = '300'
+  end
+  object Label4: TLabel
+    Left = 24
+    Height = 12
+    Top = 128
+    Width = 88
+    Caption = 'Capture Interval'
     ParentColor = False
   end
 end

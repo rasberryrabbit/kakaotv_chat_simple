@@ -98,6 +98,7 @@ var
   PortHttp:string = '8090';
   PortChat:string = '8092';
   PortAlert:string= '8094';
+  cInterval:Integer= 300;
 
 
 type
@@ -495,13 +496,16 @@ begin
     formPort.PortHTTP:=PortHttp;
     formPort.PortChat:=PortChat;
     formPort.PortAlert:=PortAlert;
+    formPort.Interval:=cInterval;
     if mrOK=formPort.ShowModal then begin
       PortHttp:=formPort.PortHTTP;
       PortChat:=formPort.PortChat;
       PortAlert:=formPort.PortAlert;
+      cInterval:=formPort.Interval;
       try
         bTimer:=Timer1.Enabled;
         Timer1.Enabled:=False;
+        Timer1.Interval:=cInterval;
         HttpServer.Listen(StrToInt(PortHttp));
         HttpServer.Port:=StrToInt(PortHttp);
         WebSockChat.Free;
@@ -531,6 +535,7 @@ begin
     config.WriteString('PORT','HTTP',PortHttp);
     config.WriteString('PORT','CHAT',PortChat);
     config.WriteString('PORT','ALERT',PortAlert);
+    config.WriteInteger('URL','INT',cInterval);
   finally
     config.Free
   end;
@@ -573,10 +578,12 @@ begin
     PortHttp:=config.ReadString('PORT','HTTP',PortHttp);
     PortChat:=config.ReadString('PORT','CHAT',PortChat);
     PortAlert:=config.ReadString('PORT','ALERT',PortAlert);
+    cInterval:=config.ReadInteger('URL','INT',300);
   finally
     config.Free
   end;
 
+  Timer1.Interval:=cInterval;
   //
   HttpServer:=TBigFileLHTTPServerComponent.Create(self);
   HttpServer.OnError:=@HttpError;
