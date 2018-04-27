@@ -10,13 +10,14 @@
     <ul id="chatbox"></ul>
 </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+<script type="text/javascript" src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
 // jQuery Document
 $(document).ready(function(){
  
 });
 //
-var chatsock = new WebSocket("ws://localhost:8092","chat");
+var chatsock = new ReconnectingWebSocket("ws://localhost:8092","chat");
 chatsock.onmessage = function (event) {
     var div = $("#chatbox");
     div.append(event.data);

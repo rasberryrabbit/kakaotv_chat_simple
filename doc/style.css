@@ -9,7 +9,7 @@ body {
     color: none;
     padding: 2px; }
   
-form, p, span {
+form, p, span, div {
     margin:0;
     padding:0; 
 }
@@ -46,7 +46,8 @@ form, p, span {
 
 #chatbox, li {
     list-style-type: none;
-    padding: 3px;
+    padding: 0px;
+    padding-top: 1px;
 }
   
 #wrapper {
@@ -117,7 +118,7 @@ strong,.screen_out {
     display: none;
 }
 
-/* 트위치 CSS. todo: 아이디와 채팅글을 블럭으로 분리, 아이디 앞에 트위치 아이콘을 넣기. 채팅 통합시에 필요. */
+/* 트위치 CSS. todo: 아이디 앞에 트위치 아이콘을 넣기. 채팅 통합시에 필요. */
 
 /* 채팅글의 배경을 지정. 컬러는 RGBA값 */
 .chat-line__message {
@@ -125,11 +126,44 @@ strong,.screen_out {
     background-color: #333333e0;
     padding: 5px;
     border-radius: 5px;    
+    font-weight: bold;
 }
 
 a {
     color: #bbbbbb;
     text-decoration: none;
+}
+
+/* 영문 아이디. 보이지 않게 제거 */
+.chat-author__intl-login {
+    display: none;
+}
+
+/* icon to right, fix icon position */
+.chat-line__message > span:nth-of-type(1) {
+    float: right;
+    position: relative;
+    top: -5px;
+}
+
+/* remove : mark */
+.chat-line__message > span:nth-of-type(2) {
+    display: none;
+}
+
+/* ID, break newline */
+.chat-line__message > button {
+    display: block;
+    padding-bottom: 1px;
+}
+
+/* disable clip link
+.chat-card__link {
+    display: none;
+} */
+
+.chat-card__preview-img {
+    display: none;
 }
 
 /* 아이콘과 채팅글의 위치를 맞춤 */
@@ -142,13 +176,8 @@ a {
 .chat-line__username {
     border: 0px;
     background-color: transparent;
-    padding: 1px;
+    padding: 0px;
     font-weight: bold;
-}
-
-/* 영문 아이디. 보이지 않게 제거 */
-.chat-author__intl-login {
-    display: none;
 }
 
 /* 뱃지 및 아이콘. "display: none;" 을 넣으면 사라짐. */

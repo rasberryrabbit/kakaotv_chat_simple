@@ -10,12 +10,13 @@
     <ul id="alertbox"></ul>
 </div>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js"></script>
+<script type="text/javascript" src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
 // jQuery Document
 $(document).ready(function(){
  
 });
-var alertsock = new WebSocket("ws://localhost:8094","chat");
+var alertsock = new ReconnectingWebSocket("ws://localhost:8094","chat");
 alertsock.onmessage = function (event) {
     var dival = $("#alertbox");
     dival.append(event.data);
@@ -28,7 +29,7 @@ alertsock.onmessage = function (event) {
     setTimeout(function () {
           le.style.display='none';    
     }, 8000);
-    var voicesock = new WebSocket("ws://localhost:8300","tts");
+    var voicesock = new ReconnectingWebSocket("ws://localhost:8300","tts");
     voicesock.onopen = function (event) {
       voicesock.send(event.data);
       voicesock.close();
