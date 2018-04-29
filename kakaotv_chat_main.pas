@@ -627,7 +627,7 @@ begin
     LogAlertName:=config.ReadString('PARSER','LogAlertName',LogAlertName);
     LogAlertMsg:=config.ReadString('PARSER','LogAlertMsg',LogAlertMsg);
     LogSysValue:=config.ReadString('PARSER','LogSysValue',LogSysValue);
-    LogAddAttr:=config.ReadString('PARSER','LogAddAttr',LogAddAttr);
+    LogAddAttr:=' '+config.ReadString('PARSER','LogAddAttr',LogAddAttr)+' ';
   finally
     config.Free
   end;
