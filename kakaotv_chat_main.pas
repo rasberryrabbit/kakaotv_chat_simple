@@ -100,6 +100,22 @@ var
   PortAlert:string= '8094';
   cInterval:Integer= 300;
 
+  LogAttrName : UnicodeString = 'id';
+  LogAttrValue : UnicodeString = 'chatArea';
+
+  LogChatClass : UnicodeString = 'CLASS';
+  LogChatValue : UnicodeString = 'txt_talk';
+  LogChatEmoti : UnicodeString = 'kakao_emoticon';
+
+  LogAlertClass : UnicodeString = 'CLASS';
+  LogAlertValue : UnicodeString = 'box_alert';
+  LogAlertCookie: UnicodeString = 'txt_cookie';
+  LogAlertName  : UnicodeString = 'txt_name';
+  LogAlertMsg   : UnicodeString = 'txt_msg';
+  LogSysValue   : UnicodeString = 'txt_system';
+
+  LogAddAttr    : string = ' class="kakao_chat" ';
+
 
 type
 
@@ -164,7 +180,7 @@ begin
           browser.GetFrameIdentifiers(@fcount,@fid[0]);
           for i:=0 to fcount-1 do begin
             chatframe:=browser.GetFrameByident(fid[i]);
-            ProcessElementsById(chatframe,'chatArea');
+            ProcessElementsById(chatframe,LogAttrValue);
           end;
         finally
           SetLength(fid,0);
@@ -241,7 +257,7 @@ var
       disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
       Node := ANode.FirstChild;
       while Assigned(Node) do begin
-        if Node.GetElementAttribute('id')=FNameID then begin
+        if Node.GetElementAttribute(LogAttrName)=LogAttrValue then begin
           ItemCount:=0;
           Nodex:=Node.LastChild;
           NodeEnd:=Nodex;
@@ -315,11 +331,11 @@ var
               sbuf:=sbuf+NodeName.ElementInnerText+' : ';
               while Assigned(NodeChat) do begin
                 // make log message
-                sclass:=NodeChat.GetElementAttribute('CLASS');
-                if sclass='txt_talk' then
+                sclass:=NodeChat.GetElementAttribute(LogChatClass);
+                if sclass=LogChatValue then
                   sbuf:=sbuf+NodeChat.ElementInnerText
                 else
-                if Pos('kakao_emoticon',sclass)<>0 then begin
+                if Pos(LogChatEmoti,sclass)<>0 then begin
                   skipAddMarkup:=True;
                   sbuf:=sbuf+NodeChat.AsMarkup;
                 end else
@@ -353,15 +369,15 @@ var
               end;
             end else if Assigned(NodeName) then begin
               // cookie alert
-              if NodeName.GetElementAttribute('CLASS')='box_alert' then begin
+              if NodeName.GetElementAttribute(LogAlertClass)=LogAlertValue then begin
                 NodeChat:=NodeName.FirstChild;
                 while Assigned(NodeChat) do begin
-                  sclass:=NodeChat.GetElementAttribute('CLASS');
-                  if sclass='txt_cookie' then
+                  sclass:=NodeChat.GetElementAttribute(LogAlertClass);
+                  if sclass=LogAlertCookie then
                     sbuf:=sbuf+'<< '+NodeChat.ElementInnerText+' >>'
-                    else if sclass='txt_name' then
+                    else if sclass=LogAlertName then
                       sbuf:=sbuf+' '+NodeChat.ElementInnerText
-                      else if sclass='txt_msg' then
+                      else if sclass=LogAlertMsg then
                         sbuf:=sbuf+' : '+NodeChat.ElementInnerText;
                   NodeChat:=NodeChat.NextSibling;
                 end;
@@ -370,12 +386,12 @@ var
                 stemp:=pchar(UTF8Encode(scheck));
                 i:=Pos('<li',stemp);
                 if i<>0 then
-                  Insert(' class="kakao_chat" ',stemp,i+3);
+                  Insert(LogAddAttr,stemp,i+3);
                 WebSockAlert.BroadcastMsg(stemp);
                 ChatScript.Add(stemp);
                 s:=s+sbuf;
               end else begin
-                if RemoveSys and (Pos('txt_system',smarkup)<>0) then
+                if RemoveSys and (Pos(LogSysValue,smarkup)<>0) then
                   doAddMsg:=False;
                 s:=s+smarkup;
               end;
@@ -390,7 +406,7 @@ var
               stemp:=pchar(UTF8Encode(scheck));
               i:=Pos('<li',stemp);
               if i<>0 then
-                Insert(' class="kakao_chat" ',stemp,i+3);
+                Insert(LogAddAttr,stemp,i+3);
               WebSockChat.BroadcastMsg(stemp);
               //ssocket:=ssocket+scheck;
               ChatBuffer.Add(stemp);
@@ -543,6 +559,19 @@ begin
     config.WriteString('PORT','CHAT',PortChat);
     config.WriteString('PORT','ALERT',PortAlert);
     config.WriteInteger('URL','INT',cInterval);
+
+    config.WriteString('PARSER','LogAttrName',LogAttrName);
+    config.WriteString('PARSER','LogAttrValue',LogAttrValue);
+    config.WriteString('PARSER','LogChatClass',LogChatClass);
+    config.WriteString('PARSER','LogChatValue',LogChatValue);
+    config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
+    config.WriteString('PARSER','LogAlertClass',LogAlertClass);
+    config.WriteString('PARSER','LogAlertValue',LogAlertValue);
+    config.WriteString('PARSER','LogAlertCookie',LogAlertCookie);
+    config.WriteString('PARSER','LogAlertName',LogAlertName);
+    config.WriteString('PARSER','LogAlertMsg',LogAlertMsg);
+    config.WriteString('PARSER','LogSysValue',LogSysValue);
+    config.WriteString('PARSER','LogAddAttr',LogAddAttr);
   finally
     config.Free
   end;
@@ -586,6 +615,19 @@ begin
     PortChat:=config.ReadString('PORT','CHAT',PortChat);
     PortAlert:=config.ReadString('PORT','ALERT',PortAlert);
     cInterval:=config.ReadInteger('URL','INT',300);
+
+    LogAttrName:=config.ReadString('PARSER','LogAttrName',LogAttrName);
+    LogAttrValue:=config.ReadString('PARSER','LogAttrValue',LogAttrValue);
+    LogChatClass:=config.ReadString('PARSER','LogChatClass',LogChatClass);
+    LogChatValue:=config.ReadString('PARSER','LogChatValue',LogChatValue);
+    LogChatEmoti:=config.ReadString('PARSER','LogChatEmoti',LogChatEmoti);
+    LogAlertClass:=config.ReadString('PARSER','LogAlertClass',LogAlertClass);
+    LogAlertValue:=config.ReadString('PARSER','LogAlertValue',LogAlertValue);
+    LogAlertCookie:=config.ReadString('PARSER','LogAlertCookie',LogAlertCookie);
+    LogAlertName:=config.ReadString('PARSER','LogAlertName',LogAlertName);
+    LogAlertMsg:=config.ReadString('PARSER','LogAlertMsg',LogAlertMsg);
+    LogSysValue:=config.ReadString('PARSER','LogSysValue',LogSysValue);
+    LogAddAttr:=config.ReadString('PARSER','LogAddAttr',LogAddAttr);
   finally
     config.Free
   end;
