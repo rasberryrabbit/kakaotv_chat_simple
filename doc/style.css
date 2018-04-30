@@ -83,6 +83,7 @@ em,.screen_out {
 strong,.screen_out {
     color: red;
     margin-right: 5px;    
+    display: none;
 }
 
 /* 카카오 쿠키 알림 아이콘 */
