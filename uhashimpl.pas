@@ -28,7 +28,7 @@ begin
 end;
 
 initialization
-  HashDesc:=FindHash_by_ID(_RIPEMD160);
+  HashDesc:=FindHash_by_ID(_RMD160);
 
 end.
 

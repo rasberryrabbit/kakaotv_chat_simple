@@ -269,7 +269,8 @@ var
             i:=0;
             dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
-              scheck:=document.BaseUrl+NodeN.AsMarkup;
+              // not full html
+              scheck:=NodeN.Name+NodeN.GetElementAttribute('CLASS')+NodeN.ElementInnerText;
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               if matched and (i<lastchkCount) then begin
