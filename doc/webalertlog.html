@@ -28,7 +28,7 @@ alertsock.onmessage = function (event) {
     var le=document.querySelector('#alertbox').lastChild;    
     setTimeout(function () {
           le.style.display='none';    
-    }, 8000);
+    }, 60000);
     var voicesock = new ReconnectingWebSocket("ws://localhost:8300","tts");
     voicesock.onopen = function (event) {
       voicesock.send(event.data);
