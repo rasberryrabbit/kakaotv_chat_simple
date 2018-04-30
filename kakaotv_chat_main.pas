@@ -269,8 +269,15 @@ var
             i:=0;
             dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
-              // not full html
-              scheck:=NodeN.Name+NodeN.GetElementAttribute('CLASS')+NodeN.ElementInnerText;
+              // checksum
+              scheck:=NodeN.ElementInnerText;
+              NodeName:=NodeN.FirstChild;
+              if Assigned(NodeName) then begin
+                scheck:=scheck+NodeName.ElementInnerText;
+                NodeChat:=NodeName.NextSibling;
+                if Assigned(NodeChat) then
+                  scheck:=scheck+NodeChat.ElementInnerText;
+              end;
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               if matched and (i<lastchkCount) then begin
