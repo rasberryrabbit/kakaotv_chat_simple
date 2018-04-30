@@ -26,6 +26,14 @@ kakaochat.onmessage = function (event) {
     }
     $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
 }
+// refresh image on local cache
+  setInterval(function() {
+      var images = document.images;
+      for (var i=0; i<images.length; i++) {
+          images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+      }
+  }, 1200); // 10000 milliseconds = 10 seconds
+/*
 // twitch
 var twitchchat = new ReconnectingWebSocket("ws://localhost:8096","chat");
 twitchchat.onmessage = function (event) {
@@ -36,13 +44,7 @@ twitchchat.onmessage = function (event) {
     }
     $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
 }
-// refresh image on local cache
-  setInterval(function() {
-      var images = document.images;
-      for (var i=0; i<images.length; i++) {
-          images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
-      }
-  }, 1200); // 10000 milliseconds = 10 seconds
+*/
 </script>
 </body>
 </html>
