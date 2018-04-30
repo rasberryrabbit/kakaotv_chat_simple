@@ -71,8 +71,8 @@ implementation
 {$R *.lfm}
 
 uses
-  sha1, uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple, form_portset, IniFiles;
+  uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
+  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl;
 
 const
   MaxChecksum = 3;
@@ -81,7 +81,7 @@ var
   cefb : TkakaoCEF;
   MainBrowser : ICefBrowser;
 
-  lastchecksum : array[0..MaxChecksum] of TSHA1Digest;
+  lastchecksum : array[0..MaxChecksum] of THashDigest;
   lastchkCount : Integer = 0;
   lastDupChk : array[0..MaxChecksum] of Integer;
 
@@ -244,8 +244,8 @@ var
   var
     Node, Nodex, NodeN, NodeName, NodeChat, NodeStart, NodeEnd: ICefDomNode;
     s, smarkup, sclass, sbuf, scheck, ssocket: UnicodeString;
-    checksumN : TSHA1Digest;
-    bottomchecksum : array[0..MaxChecksum] of TSHA1Digest;
+    checksumN : THashDigest;
+    bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, ItemCount : Integer;
     matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
@@ -270,10 +270,10 @@ var
             dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
               scheck:=document.BaseUrl+NodeN.AsMarkup;
-              checksumN:=SHA1Buffer(scheck[1],Length(scheck)*SizeOf(WideChar));
+              checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               if matched and (i<lastchkCount) then begin
-                if SHA1Match(checksumN,lastchecksum[i]) then begin
+                if CompareHash(checksumN,lastchecksum[i]) then begin
                   Dec(dupCountChk[i]);
                   if dupCountChk[i]=0 then
                     Inc(i);
@@ -284,7 +284,7 @@ var
               // fill bottom checksum
               if chkCount<=MaxChecksum then begin
                 // check duplication on first checksum
-                if (chkCount>0) and SHA1Match(checksumN,bottomchecksum[chkCount-1]) then
+                if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
                   Inc(dupCount[chkCount-1])
                 else begin
                   bottomchecksum[chkCount]:=checksumN;

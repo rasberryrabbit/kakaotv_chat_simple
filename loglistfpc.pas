@@ -68,6 +68,8 @@ type
       constructor Create;
       destructor Destroy; override;
 
+      function GetStrObj(Index, MaxLen:Integer; out obj:TLogStringData):string;
+
       property TCol : TColor read DefaultTCol write DefaultTCol;
       property BCol : TColor read DefaultBCol write DefaultBCol;
   end;
@@ -231,8 +233,7 @@ begin
   cPointY:=cPos*tHeight+BorderWidth;
   cPointX:=BorderWidth-FLastPosX;
   while cPos<Count do begin
-    cstr:=Copy(LogData.Strings[cPos],1,_LogMaxCharLen);
-    temp:=TLogStringData(LogData.Objects[cPos]);
+    cstr:=LogData.GetStrObj(cPos,_LogMaxCharLen,temp);
     Canvas.Brush.Color:=temp.B;
     Canvas.Font.Color:=temp.F;
     Canvas.TextRect(SRect,cPointX,cPointY,cstr);
@@ -672,6 +673,18 @@ destructor TLogStringList.Destroy;
 begin
   fEvent.Free;
   inherited Destroy;
+end;
+
+function TLogStringList.GetStrObj(Index, MaxLen: Integer; out
+  obj: TLogStringData): string;
+begin
+  Enter;
+  try
+    Result:=Copy(inherited Get(Index),1,MaxLen);
+    obj:=TLogStringData(inherited GetObject(Index));
+  finally
+    Leave;
+  end;
 end;
 
 
