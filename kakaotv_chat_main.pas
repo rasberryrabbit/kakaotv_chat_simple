@@ -274,9 +274,10 @@ var
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
                 scheck:=scheck+NodeName.ElementInnerText;
-                NodeChat:=NodeName.NextSibling;
-                if Assigned(NodeChat) then
-                  scheck:=scheck+NodeChat.ElementInnerText;
+                // chat - skip it that modified by banned
+                //NodeChat:=NodeName.NextSibling;
+                //if Assigned(NodeChat) then
+                //  scheck:=scheck+NodeChat.ElementInnerText;
               end else
                 scheck:=NodeN.ElementInnerText;
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
