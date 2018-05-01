@@ -273,7 +273,7 @@ var
               scheck:='';
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
-                scheck:=scheck+NodeName.ElementInnerText;
+                scheck:=scheck+NodeName.AsMarkup;
                 // chat - skip it that modified by banned
                 //NodeChat:=NodeName.NextSibling;
                 //if Assigned(NodeChat) then
