@@ -270,14 +270,15 @@ var
             dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
               // checksum
-              scheck:=NodeN.ElementInnerText;
+              scheck:='';
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
                 scheck:=scheck+NodeName.ElementInnerText;
                 NodeChat:=NodeName.NextSibling;
                 if Assigned(NodeChat) then
                   scheck:=scheck+NodeChat.ElementInnerText;
-              end;
+              end else
+                scheck:=NodeN.ElementInnerText;
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               if matched and (i<lastchkCount) then begin
