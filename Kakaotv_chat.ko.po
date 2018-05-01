@@ -1,0 +1,75 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: tformkakaotvchat.actionportset.caption
+msgid "Port Setting"
+msgstr "포트 설정"
+
+#: tformkakaotvchat.button1.caption
+msgid "Activate"
+msgstr "활성화"
+
+#: tformkakaotvchat.caption
+msgid "Kakao Chat"
+msgstr "카카오 채팅"
+
+#: tformkakaotvchat.checkboxclearb.caption
+msgid "Clear on Load"
+msgstr "로드시 지우기"
+
+#: tformkakaotvchat.checkboxdisablelog.caption
+msgid "Disable log"
+msgstr "로그 사용 안함"
+
+#: tformkakaotvchat.checkboxremsys.caption
+msgid "Remove system"
+msgstr "시스템 제거"
+
+#: tformkakaotvchat.menuitem1.caption
+msgid "Setting"
+msgstr "설정"
+
+#: tformportset.buttoncancel.caption
+msgid "Cancel"
+msgstr "취소"
+
+#: tformportset.buttonok.caption
+msgid "Ok"
+msgstr "확인"
+
+#: tformportset.caption
+msgid "Port"
+msgstr "포트"
+
+#: tformportset.editalert.text
+msgid "8094"
+msgstr ""
+
+#: tformportset.editchat.text
+msgid "8092"
+msgstr ""
+
+#: tformportset.edithttp.text
+msgid "8090"
+msgstr ""
+
+#: tformportset.editint.text
+msgid "300"
+msgstr ""
+
+#: tformportset.label1.caption
+msgid "HTTP"
+msgstr ""
+
+#: tformportset.label2.caption
+msgid "Websocket Chat"
+msgstr "웹 소켓 채팅"
+
+#: tformportset.label3.caption
+msgid "Websocket Alert"
+msgstr "웹 소켓 알림"
+
+#: tformportset.label4.caption
+msgid "Capture Interval"
+msgstr "캡처 간격"
+

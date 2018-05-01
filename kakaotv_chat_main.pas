@@ -72,7 +72,7 @@ implementation
 
 uses
   uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl;
+  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator;
 
 const
   MaxChecksum = 3;

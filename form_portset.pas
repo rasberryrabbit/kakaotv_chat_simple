@@ -38,6 +38,8 @@ implementation
 
 {$R *.lfm}
 
+uses DefaultTranslator;
+
 function CheckAssign(const s, defvalue:string):string;
 var
   x:Integer;

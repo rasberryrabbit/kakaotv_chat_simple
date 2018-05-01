@@ -1,0 +1,75 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: tformkakaotvchat.actionportset.caption
+msgid "Port Setting"
+msgstr ""
+
+#: tformkakaotvchat.button1.caption
+msgid "Activate"
+msgstr ""
+
+#: tformkakaotvchat.caption
+msgid "Kakao Chat"
+msgstr ""
+
+#: tformkakaotvchat.checkboxclearb.caption
+msgid "Clear on Load"
+msgstr ""
+
+#: tformkakaotvchat.checkboxdisablelog.caption
+msgid "Disable log"
+msgstr ""
+
+#: tformkakaotvchat.checkboxremsys.caption
+msgid "Remove system"
+msgstr ""
+
+#: tformkakaotvchat.menuitem1.caption
+msgid "Setting"
+msgstr ""
+
+#: tformportset.buttoncancel.caption
+msgid "Cancel"
+msgstr ""
+
+#: tformportset.buttonok.caption
+msgid "Ok"
+msgstr ""
+
+#: tformportset.caption
+msgid "Port"
+msgstr ""
+
+#: tformportset.editalert.text
+msgid "8094"
+msgstr ""
+
+#: tformportset.editchat.text
+msgid "8092"
+msgstr ""
+
+#: tformportset.edithttp.text
+msgid "8090"
+msgstr ""
+
+#: tformportset.editint.text
+msgid "300"
+msgstr ""
+
+#: tformportset.label1.caption
+msgid "HTTP"
+msgstr ""
+
+#: tformportset.label2.caption
+msgid "Websocket Chat"
+msgstr ""
+
+#: tformportset.label3.caption
+msgid "Websocket Alert"
+msgstr ""
+
+#: tformportset.label4.caption
+msgid "Capture Interval"
+msgstr ""
+
