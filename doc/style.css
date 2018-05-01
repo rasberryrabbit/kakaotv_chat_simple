@@ -94,6 +94,13 @@ strong,.screen_out {
     width: 40px;
     height: 40px;
     float: left;
+    position: relative;
+    top: -10px;
+}
+
+.thumb_img {
+    width: 40px;
+    height: 40px;
 }
 
 .txt_name {
@@ -116,7 +123,7 @@ strong,.screen_out {
 
 /* 카카오 이모티콘 */
 .kakao_emoticon {
-    padding: 10px;
+    padding: 1px;
 }
 
 .kakao_chat {
