@@ -33,9 +33,11 @@ type
     ActionPortSet: TAction;
     ActionList1: TActionList;
     Button1: TButton;
+    ButtonBrowse: TButton;
     CheckBoxRemSyS: TCheckBox;
     CheckBoxDisableLog: TCheckBox;
     CheckBoxClearB: TCheckBox;
+    EditURL: TEdit;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -45,6 +47,7 @@ type
     UniqueInstance1: TUniqueInstance;
     procedure ActionPortSetExecute(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure ButtonBrowseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -60,6 +63,7 @@ type
 
     procedure HttpError(const msg: string; aSocket: TLSocket);
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
+    procedure CefAddressChange(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
 
   end;
 
@@ -496,6 +500,7 @@ begin
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
+  cefb.OnAddressChange:=@CefAddressChange;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -517,6 +522,11 @@ begin
     Button1.Caption:='Stop'
     else
       Button1.Caption:='Activate';
+end;
+
+procedure TFormKakaoTVChat.ButtonBrowseClick(Sender: TObject);
+begin
+  cefb.Load(UTF8Decode(EditURL.Text));
 end;
 
 procedure TFormKakaoTVChat.ActionPortSetExecute(Sender: TObject);
@@ -700,6 +710,12 @@ begin
       Leave;
     end;
   end;
+end;
+
+procedure TFormKakaoTVChat.CefAddressChange(Sender: TObject;
+  const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
+begin
+  EditURL.Text:=UTF8Encode(url);
 end;
 
 procedure AppExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);

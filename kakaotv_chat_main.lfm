@@ -2,10 +2,10 @@ object FormKakaoTVChat: TFormKakaoTVChat
   Left = 274
   Height = 679
   Top = 140
-  Width = 1280
+  Width = 1248
   Caption = 'Kakao Chat'
   ClientHeight = 659
-  ClientWidth = 1280
+  ClientWidth = 1248
   Menu = MainMenu1
   OnClose = FormClose
   OnCreate = FormCreate
@@ -14,29 +14,29 @@ object FormKakaoTVChat: TFormKakaoTVChat
   LCLVersion = '1.9.0.0'
   object Panel1: TPanel
     Left = 8
-    Height = 455
-    Top = 16
-    Width = 1264
+    Height = 439
+    Top = 32
+    Width = 1232
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabOrder = 0
+    TabOrder = 2
   end
   object Button1: TButton
-    Left = 552
+    Left = 505
     Height = 25
     Top = 479
     Width = 152
     Anchors = [akBottom]
     Caption = 'Activate'
     OnClick = Button1Click
-    TabOrder = 4
+    TabOrder = 6
   end
   object Panel2: TPanel
     Left = 8
     Height = 138
     Top = 511
-    Width = 1264
+    Width = 1232
     Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 5
+    TabOrder = 7
   end
   object CheckBoxClearB: TCheckBox
     Left = 8
@@ -45,7 +45,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 95
     Anchors = [akLeft, akBottom]
     Caption = 'Clear on Load'
-    TabOrder = 1
+    TabOrder = 3
   end
   object CheckBoxDisableLog: TCheckBox
     Left = 144
@@ -54,7 +54,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 80
     Anchors = [akLeft, akBottom]
     Caption = 'Disable log'
-    TabOrder = 2
+    TabOrder = 4
   end
   object CheckBoxRemSyS: TCheckBox
     Left = 256
@@ -65,7 +65,26 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Caption = 'Remove system'
     Checked = True
     State = cbChecked
-    TabOrder = 3
+    TabOrder = 5
+  end
+  object EditURL: TEdit
+    Left = 8
+    Height = 23
+    Top = 0
+    Width = 1168
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 0
+    Text = 'about:blank'
+  end
+  object ButtonBrowse: TButton
+    Left = 1181
+    Height = 23
+    Top = 0
+    Width = 59
+    Anchors = [akTop, akRight]
+    Caption = '>>'
+    OnClick = ButtonBrowseClick
+    TabOrder = 1
   end
   object Timer1: TTimer
     Enabled = False

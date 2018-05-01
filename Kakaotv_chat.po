@@ -9,6 +9,10 @@ msgstr ""
 msgid "Activate"
 msgstr ""
 
+#: tformkakaotvchat.buttonbrowse.caption
+msgid ">>"
+msgstr ""
+
 #: tformkakaotvchat.caption
 msgid "Kakao Chat"
 msgstr ""
@@ -23,6 +27,10 @@ msgstr ""
 
 #: tformkakaotvchat.checkboxremsys.caption
 msgid "Remove system"
+msgstr ""
+
+#: tformkakaotvchat.editurl.text
+msgid "about:blank"
 msgstr ""
 
 #: tformkakaotvchat.menuitem1.caption

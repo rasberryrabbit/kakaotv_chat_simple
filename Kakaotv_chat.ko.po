@@ -9,6 +9,10 @@ msgstr "포트 설정"
 msgid "Activate"
 msgstr "활성화"
 
+#: tformkakaotvchat.buttonbrowse.caption
+msgid ">>"
+msgstr ""
+
 #: tformkakaotvchat.caption
 msgid "Kakao Chat"
 msgstr "카카오 채팅"
@@ -24,6 +28,10 @@ msgstr "로그 사용 안함"
 #: tformkakaotvchat.checkboxremsys.caption
 msgid "Remove system"
 msgstr "시스템 제거"
+
+#: tformkakaotvchat.editurl.text
+msgid "about:blank"
+msgstr ""
 
 #: tformkakaotvchat.menuitem1.caption
 msgid "Setting"
