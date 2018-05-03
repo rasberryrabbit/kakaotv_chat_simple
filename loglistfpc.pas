@@ -218,7 +218,7 @@ end;
 
 procedure TLogListFPC.Paint;
 var
-  cPos, cPointY, cPointX : Integer;
+  cPos, cPointY, cPointX, ViewHeight : Integer;
   cstr : string;
   temp : TLogStringData;
   SRect : TRect;
@@ -232,6 +232,7 @@ begin
   cPos := GetItemIndex; // FLastPosY updated
   cPointY:=cPos*tHeight+BorderWidth;
   cPointX:=BorderWidth-FLastPosX;
+  ViewHeight:=HorzScrollBar.ClientSizeWithBar;
   while cPos<Count do begin
     cstr:=LogData.GetStrObj(cPos,_LogMaxCharLen,temp);
     Canvas.Brush.Color:=temp.B;
@@ -242,7 +243,7 @@ begin
       Canvas.DrawFocusRect(Rect(cPointX-1,cPointY-1,cPointX+MaxTextWidth+1,cPointY+tHeight-1));
     *)
     Inc(cPointY,tHeight);
-    if (cPointY-FLastPosY)>ClientHeight then Break;
+    if (cPointY-FLastPosY)>ViewHeight then Break;
     Inc(cPos);
   end;
   Canvas.Brush.Color:=Color;
