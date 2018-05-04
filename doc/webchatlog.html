@@ -8,8 +8,18 @@
 <script src = "./jquery/jquery-3.3.1.min.js"></script>
 <script src = "./jquery/jquery-ui.js"></script>
 <script>
+var chatsize = JSON.parse(sessionStorage.chatsize || "{}");
 $(document).ready(function(){
-  $("#wrapper").resizable({autoHide: true}); 
+  // load/save size
+  if(chatsize.wrapper) {
+    $("#wrapper").width(chatsize.wrapper.width);
+    $("#wrapper").height(chatsize.wrapper.height);
+  }
+  // make resizable
+  $("#wrapper").resizable({autoHide: true, stop: function (event, ui) {
+            chatsize[this.id] = ui.size
+            sessionStorage.chatsize = JSON.stringify(chatsize);
+        }}); 
 });
 </script>
 </head> 
