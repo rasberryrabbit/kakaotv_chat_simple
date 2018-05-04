@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title>Chat - Customer Module</title>
+<link rel="stylesheet" href="./jquery/jquery-ui.css" />
+<link type="text/css" rel="stylesheet" href="style.css" />
+<script src = "./jquery/jquery-3.3.1.min.js"></script>
+<script src = "./jquery/jquery-ui.js"></script>
+<script>
+try {
+var chatsize = JSON.parse(localStorage.chatsize || "{}");
+} catch(e) {
+var chatsize = JSON.parse("{}");
+}
+var windowname='chatwindowkakao';    // 단일 이름을 지정.
+$(document).ready(function(){
+  // load/save size
+  if(chatsize[windowname]) {
+    $("#wrapper").width(chatsize[windowname].width);
+    $("#wrapper").height(chatsize[windowname].height);
+  }
+  // make resizable
+  $("#wrapper").resizable({autoHide: true, stop: function (event, ui) {
+            chatsize[windowname] = ui.size;
+            localStorage.chatsize = JSON.stringify(chatsize);
+        }}); 
+});
+</script>
+</head> 
+<body>
+<div id="wrapper">   
+    <ul id="chatbox"></ul>
+</div>
+<script type="text/javascript" src="reconnecting-websocket.min.js"></script>
+<script type="text/javascript">
+// kakao
+var kakaochat = new ReconnectingWebSocket("ws://localhost:8092","chat");
+kakaochat.onmessage = function (event) {
+    var div = $("#chatbox");
+    div.append(event.data);
+    if (div.children('li').length>500) {
+      div.children('li')[0].remove();
+    }
+    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
+    // disappear 
+    var le=document.querySelector('#chatbox').lastChild;
+    setTimeout(function () {
+          le.style.display='none';    
+    }, 30000);
+}
+// refresh image on local cache
+  setInterval(function() {
+      var images = document.images;
+      for (var i=0; i<images.length; i++) {
+          images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+      }
+  }, 1200); // 10000 milliseconds = 10 seconds
+/*
+// twitch
+var randomcolor=1;
+var chatsock = new ReconnectingWebSocket("ws://localhost:8096","chat");
+chatsock.reconnectInterval=2000;
+chatsock.onmessage = function (event) {
+    var div = $("#chatbox");
+    chatline=$(event.data);
+    // disable random color
+    if(!randomcolor) {
+      chatline.find('.chat-author__display-name').attr('style','');
+    }
+    div.append(chatline);
+    if (div.children('li').length>500) {
+      div.children('li')[0].remove();
+    }
+    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
+    // disappear 
+    var le=document.querySelector('#chatbox').lastChild;
+    setTimeout(function () {
+          le.style.display='none';    
+    }, 30000);
+*/
+</script>
+</body>
+</html>
