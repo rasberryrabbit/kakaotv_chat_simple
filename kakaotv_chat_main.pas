@@ -30,9 +30,10 @@ type
   { TFormKakaoTVChat }
 
   TFormKakaoTVChat = class(TForm)
+    ActionAutoStart: TAction;
     ActionPortSet: TAction;
     ActionList1: TActionList;
-    Button1: TButton;
+    ButtonStart: TButton;
     ButtonBrowse: TButton;
     CheckBoxRemSyS: TCheckBox;
     CheckBoxDisableLog: TCheckBox;
@@ -41,12 +42,14 @@ type
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
     Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
     UniqueInstance1: TUniqueInstance;
+    procedure ActionAutoStartExecute(Sender: TObject);
     procedure ActionPortSetExecute(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure ButtonStartClick(Sender: TObject);
     procedure ButtonBrowseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -515,13 +518,13 @@ begin
   Sleep(100);
 end;
 
-procedure TFormKakaoTVChat.Button1Click(Sender: TObject);
+procedure TFormKakaoTVChat.ButtonStartClick(Sender: TObject);
 begin
   Timer1.Enabled:=not Timer1.Enabled;
   if Timer1.Enabled then
-    Button1.Caption:='Stop'
+    ButtonStart.Caption:='Stop'
     else
-      Button1.Caption:='Activate';
+      ButtonStart.Caption:='Activate';
 end;
 
 procedure TFormKakaoTVChat.ButtonBrowseClick(Sender: TObject);
@@ -568,6 +571,11 @@ begin
   end;
 end;
 
+procedure TFormKakaoTVChat.ActionAutoStartExecute(Sender: TObject);
+begin
+  ActionAutoStart.Checked:=not ActionAutoStart.Checked;
+end;
+
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 var
@@ -580,6 +588,7 @@ begin
     config.WriteString('PORT','ALERT',PortAlert);
     config.WriteInteger('URL','INT',cInterval);
 
+    config.WriteBool('PARSER','START',ActionAutoStart.Checked);
     config.WriteString('PARSER','LogAttrName',LogAttrName);
     config.WriteString('PARSER','LogAttrValue',LogAttrValue);
     config.WriteString('PARSER','LogChatClass',LogChatClass);
@@ -636,6 +645,7 @@ begin
     PortAlert:=config.ReadString('PORT','ALERT',PortAlert);
     cInterval:=config.ReadInteger('URL','INT',300);
 
+    ActionAutoStart.Checked:=config.ReadBool('PARSER','START',ActionAutoStart.Checked);
     LogAttrName:=config.ReadString('PARSER','LogAttrName',LogAttrName);
     LogAttrValue:=config.ReadString('PARSER','LogAttrValue',LogAttrValue);
     LogChatClass:=config.ReadString('PARSER','LogChatClass',LogChatClass);
@@ -672,6 +682,8 @@ begin
     on e:exception do
       ShowMessage(e.Message);
   end;
+  if ActionAutoStart.Checked then
+    ButtonStart.Click;
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);

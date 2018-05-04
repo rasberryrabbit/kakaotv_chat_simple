@@ -1,16 +1,21 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: tformkakaotvchat.actionautostart.caption
+msgid "Auto Start"
+msgstr ""
+
 #: tformkakaotvchat.actionportset.caption
 msgid "Port Setting"
 msgstr ""
 
-#: tformkakaotvchat.button1.caption
-msgid "Activate"
-msgstr ""
-
 #: tformkakaotvchat.buttonbrowse.caption
 msgid ">>"
+msgstr ""
+
+#: tformkakaotvchat.buttonstart.caption
+msgctxt "tformkakaotvchat.buttonstart.caption"
+msgid "Activate"
 msgstr ""
 
 #: tformkakaotvchat.caption

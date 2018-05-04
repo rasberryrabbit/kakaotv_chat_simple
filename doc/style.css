@@ -59,14 +59,15 @@ form, p, span, div {
 #wrapper {
     position: relative;
     height: 300px;
-}  
+    width: 300px;
+}
 
 /* 전체 글상자. 속성 조정으로 하단부터 시작하는 채팅글이 표현 */
 #chatbox {
     text-align: left;
     position: absolute;
     bottom: 0;
-    width: 300px;
+    width: 100%;
 }
 
 /* 카카오 쿠키 알림 */

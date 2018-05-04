@@ -20,14 +20,14 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 2
   end
-  object Button1: TButton
-    Left = 505
+  object ButtonStart: TButton
+    Left = 536
     Height = 25
     Top = 479
     Width = 152
     Anchors = [akBottom]
     Caption = 'Activate'
-    OnClick = Button1Click
+    OnClick = ButtonStartClick
     TabOrder = 6
   end
   object Panel2: TPanel
@@ -107,6 +107,9 @@ object FormKakaoTVChat: TFormKakaoTVChat
       object MenuItem2: TMenuItem
         Action = ActionPortSet
       end
+      object MenuItem3: TMenuItem
+        Action = ActionAutoStart
+      end
     end
   end
   object ActionList1: TActionList
@@ -115,6 +118,11 @@ object FormKakaoTVChat: TFormKakaoTVChat
     object ActionPortSet: TAction
       Caption = 'Port Setting'
       OnExecute = ActionPortSetExecute
+    end
+    object ActionAutoStart: TAction
+      Caption = 'Auto Start'
+      Checked = True
+      OnExecute = ActionAutoStartExecute
     end
   end
 end

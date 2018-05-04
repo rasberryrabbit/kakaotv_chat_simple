@@ -1,17 +1,23 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: tformkakaotvchat.actionautostart.caption
+msgid "Auto Start"
+msgstr ""
+
 #: tformkakaotvchat.actionportset.caption
 msgid "Port Setting"
 msgstr "포트 설정"
 
-#: tformkakaotvchat.button1.caption
-msgid "Activate"
-msgstr "활성화"
-
 #: tformkakaotvchat.buttonbrowse.caption
 msgid ">>"
 msgstr ""
+
+#: tformkakaotvchat.buttonstart.caption
+#, fuzzy
+msgctxt "tformkakaotvchat.buttonstart.caption"
+msgid "Activate"
+msgstr "활성화"
 
 #: tformkakaotvchat.caption
 msgid "Kakao Chat"
