@@ -161,11 +161,12 @@ a {
     display: none;
 }
 
-/* icon to right, fix icon position */
+/* icon to right, fix icon position, fix height */
 .chat-line__message > span:nth-of-type(1) {
     float: right;
     position: relative;
     top: -5px;
+    height: 10px;
 }
 
 /* remove : mark */
