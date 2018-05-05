@@ -81,7 +81,7 @@ type
     private
       PrevCount : Integer;
       LogData : TLogStringList;
-      tHeight, tWidth, MaxTextWidth, tItems : Integer;
+      tHeight, tWidth, MaxTextWidth, tItems, FLineSpace : Integer;
       FLineLimit, FLastPosY, FLastPosX : Integer;
       FEvent : TEvent;
       FOnDeleteLimit : TEventLogDeleteLimit;
@@ -94,6 +94,7 @@ type
       procedure SetHPos(Pos : Integer);
       procedure OnTimer(Sender : TObject);
       procedure CheckTextLen(const s: string);
+      procedure SetLineSpace(AValue: Integer);
     protected
       procedure Paint; override;
       procedure FontChanged(Sender: TObject); override;
@@ -133,6 +134,7 @@ type
 
       property Count: Integer read GetCount;
       property SkipMoveLast : Boolean read FSkipLast write FSkipLast;
+      property LineSpace: Integer read FLineSpace write SetLineSpace;
 
     published
       property List : TLogStringList read LogData;
@@ -215,6 +217,17 @@ begin
   end;
 end;
 
+procedure TLogListFPC.SetLineSpace(AValue: Integer);
+begin
+  if FLineSpace=AValue then Exit;
+  FLineSpace:=AValue;
+  tHeight:=Canvas.TextHeight('hj');
+  Inc(tHeight,FLineSpace);
+  if tHeight=0 then tHeight:=1;
+  tItems:=ClientHeight div tHeight;
+  FUpdated:=True;
+end;
+
 
 procedure TLogListFPC.Paint;
 var
@@ -262,6 +275,7 @@ procedure TLogListFPC.FontChanged(Sender: TObject);
 begin
   inherited FontChanged(Sender);
   tHeight:=Canvas.TextHeight('hj');
+  Inc(tHeight,FLineSpace);
   if tHeight=0 then tHeight:=1;
   tWidth:=Canvas.TextWidth('F');
   tItems:=ClientHeight div tHeight;
@@ -330,6 +344,7 @@ constructor TLogListFPC.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   if Parent=nil then Parent:=TWinControl(AOwner);
+  FLineSpace:=2;
   BorderWidth:=5;
   FAddFlag:=False;
   FSkipLast:=False;
