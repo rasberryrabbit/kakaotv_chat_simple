@@ -1,17 +1,17 @@
 object FormPortSet: TFormPortSet
   Left = 274
-  Height = 205
+  Height = 235
   Top = 140
   Width = 275
   BorderStyle = bsDialog
   Caption = 'Port'
-  ClientHeight = 205
+  ClientHeight = 235
   ClientWidth = 275
   OnShow = FormShow
   Position = poOwnerFormCenter
   LCLVersion = '1.9.0.0'
   object EditHttp: TEdit
-    Left = 136
+    Left = 168
     Height = 23
     Top = 24
     Width = 80
@@ -19,7 +19,7 @@ object FormPortSet: TFormPortSet
     Text = '8090'
   end
   object EditChat: TEdit
-    Left = 136
+    Left = 168
     Height = 23
     Top = 56
     Width = 80
@@ -27,7 +27,7 @@ object FormPortSet: TFormPortSet
     Text = '8092'
   end
   object EditAlert: TEdit
-    Left = 136
+    Left = 168
     Height = 23
     Top = 88
     Width = 80
@@ -37,21 +37,21 @@ object FormPortSet: TFormPortSet
   object ButtonOk: TButton
     Left = 40
     Height = 25
-    Top = 160
+    Top = 192
     Width = 75
     Caption = 'Ok'
     ModalResult = 1
     OnClick = ButtonOkClick
-    TabOrder = 4
+    TabOrder = 5
   end
   object ButtonCancel: TButton
     Left = 152
     Height = 25
-    Top = 160
+    Top = 192
     Width = 75
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 5
+    TabOrder = 6
   end
   object Label1: TLabel
     Left = 24
@@ -78,19 +78,35 @@ object FormPortSet: TFormPortSet
     ParentColor = False
   end
   object EditInt: TEdit
-    Left = 136
+    Left = 168
     Height = 23
-    Top = 120
+    Top = 152
     Width = 80
-    TabOrder = 3
+    TabOrder = 4
     Text = '300'
   end
   object Label4: TLabel
     Left = 24
     Height = 12
-    Top = 128
+    Top = 163
     Width = 88
     Caption = 'Capture Interval'
+    ParentColor = False
+  end
+  object EditRChat: TEdit
+    Left = 168
+    Height = 23
+    Top = 120
+    Width = 80
+    TabOrder = 3
+    Text = '8088'
+  end
+  object Label5: TLabel
+    Left = 24
+    Height = 12
+    Top = 131
+    Width = 99
+    Caption = 'Websocket RChat'
     ParentColor = False
   end
 end

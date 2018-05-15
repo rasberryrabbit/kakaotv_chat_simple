@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title>Chat - Customer Module</title>
+<link rel="stylesheet" href="./jquery/jquery-ui.css" />
+<link type="text/css" rel="stylesheet" href="style.css" />
+<script src = "./jquery/jquery-3.3.1.min.js"></script>
+<script src = "./jquery/jquery-ui.js"></script>
+<script>
+try {
+var chatsize = JSON.parse(localStorage.chatsize || "{}");
+} catch(e) {
+var chatsize = JSON.parse("{}");
+}
+var windowname='chatwindowkakaovote';    // 단일 이름을 지정.
+$(document).ready(function(){
+  // load/save size
+  if(chatsize[windowname]) {
+    $("#alertdiv").width(chatsize[windowname].width);
+    $("#alertdiv").height(chatsize[windowname].height);
+  }
+  // make resizable
+  $("#alertdiv").resizable({autoHide: true, stop: function (event, ui) {
+            chatsize[windowname] = ui.size;
+            localStorage.chatsize = JSON.stringify(chatsize);
+        }}); 
+});
+</script>
+</head> 
+<body>
+<div id="alertdiv">
+    <ul id="alertbox"></ul>
+</div>
+<div id="result">
+    <ul id="resultul">
+      <li id="item1"><p>ㅋ</p><p id="label1">0</p></li>
+      <li id="item2"><p>?</p><p id="label2">0</p></li>
+      <li id="item3"><p>ㅎ</p><p id="label3">0</p></li>
+    </ul>
+</div>
+<script type="text/javascript" src="reconnecting-websocket.min.js"></script>
+<script type="text/javascript">
+var idlist={};
+var randomcolor=1;
+var makedisappear=0;
+var chatsock = new ReconnectingWebSocket("ws://localhost:8088","chat");
+chatsock.reconnectInterval=2000;
+chatsock.onmessage = function (event) {
+    var div = $("#alertbox");
+    var temp=event.data;
+    // id and chat
+    var rex="([^\\:]+)\\:\\s(.+)";
+    res=temp.match(rex);
+    if(res) {
+        temp=res[1]+' '+res[2];
+    }
+    // unique id
+    if(idlist[res[1]]===undefined) {
+        idlist[res[1]]='0';
+        var check=res[2];
+        // 문자열 유무를 체크.
+        if(check.indexOf("ㅋ")!=-1) {
+          var item=$("#label1");
+          if(item) {
+            setTimeout(function(){
+            var nval=parseInt(item.text());
+            nval++;
+            item.html(nval.toString());
+            },100);
+          }
+        }
+        if(check.indexOf("?")!=-1) {
+          var item=$("#label2");
+          if(item) {
+            setTimeout(function(){
+            var nval=parseInt(item.text());
+            nval++;
+            item.html(nval.toString());
+            },100);
+          }
+        }
+        if(check.indexOf("ㅎ")!=-1) {
+          var item=$("#label3");
+          if(item) {
+            setTimeout(function(){
+            var nval=parseInt(item.text());
+            nval++;
+            item.html(nval.toString());
+            },100);
+          }
+        }
+    }
+    // show chat message
+    chatline=$('<li>'+temp+'</li>');
+    div.append(chatline);
+    if (div.children('li').length>500) {
+      div.children('li')[0].remove();
+    }
+    $('#alertbox').animate({scrollTop: document.body.scrollHeight},"slow");
+    // disappear
+    if(makedisappear) {
+        var le=document.querySelector('#alertbox').lastChild;
+        setTimeout(function () {
+              le.style.display='none';
+        }, 30000);
+    }
+}
+</script>
+</body>
+</html>

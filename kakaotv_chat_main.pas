@@ -101,10 +101,12 @@ var
 
   WebSockChat:TSimpleWebsocketServer;
   WebSockAlert:TSimpleWebsocketServer;
+  WebSockRChat:TSimpleWebsocketServer;
 
   PortHttp:string = '8090';
   PortChat:string = '8092';
   PortAlert:string= '8094';
+  PortRChat:string= '8088';
   cInterval:Integer= 300;
 
   LogAttrName : UnicodeString = 'id';
@@ -250,7 +252,7 @@ var
   procedure ProcessNode(ANode: ICefDomNode);
   var
     Node, Nodex, NodeN, NodeName, NodeChat, NodeStart, NodeEnd: ICefDomNode;
-    s, smarkup, sclass, sbuf, scheck, ssocket: UnicodeString;
+    s, smarkup, sclass, sbuf, srawbuf, scheck, ssocket, utemp: UnicodeString;
     checksumN : THashDigest;
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
@@ -332,6 +334,7 @@ var
 
             s:='';
             sbuf:='';
+            srawbuf:='';
             doAddMsg:=True;
 
             if Nodex.HasChildren then begin
@@ -345,12 +348,16 @@ var
             skipAddMarkup:=False;
             // get chat message
             if Assigned(NodeName) and Assigned(NodeChat) then begin
-              sbuf:=sbuf+NodeName.ElementInnerText+' : ';
+              sbuf:=sbuf+NodeName.ElementInnerText+': ';
+              srawbuf:=sbuf;
               while Assigned(NodeChat) do begin
                 // make log message
                 sclass:=NodeChat.GetElementAttribute(LogChatClass);
-                if sclass=LogChatValue then
-                  sbuf:=sbuf+NodeChat.ElementInnerText
+                if sclass=LogChatValue then begin
+                  utemp:=NodeChat.ElementInnerText;
+                  sbuf:=sbuf+utemp;
+                  srawbuf:=srawbuf+utemp;
+                end
                 else
                 if Pos(LogChatEmoti,sclass)<>0 then begin
                   skipAddMarkup:=True;
@@ -425,6 +432,7 @@ var
               if i<>0 then
                 Insert(LogAddAttr,stemp,i+3);
               WebSockChat.BroadcastMsg(stemp);
+              WebSockRChat.BroadcastMsg(UTF8Encode(srawbuf));
               //ssocket:=ssocket+scheck;
               ChatBuffer.Add(stemp);
               // log
@@ -515,6 +523,7 @@ begin
 
   WebSockChat.Free;
   WebSockAlert.Free;
+  WebSockRChat.Free;
   Sleep(100);
 end;
 
@@ -542,11 +551,13 @@ begin
     formPort.PortHTTP:=PortHttp;
     formPort.PortChat:=PortChat;
     formPort.PortAlert:=PortAlert;
+    formPort.PortRChat:=PortRChat;
     formPort.Interval:=cInterval;
     if mrOK=formPort.ShowModal then begin
       PortHttp:=formPort.PortHTTP;
       PortChat:=formPort.PortChat;
       PortAlert:=formPort.PortAlert;
+      PortRChat:=formPort.PortRChat;
       cInterval:=formPort.Interval;
       try
         bTimer:=Timer1.Enabled;
@@ -556,9 +567,11 @@ begin
         HttpServer.Port:=StrToInt(PortHttp);
         WebSockChat.Free;
         WebSockAlert.Free;
+        WebSockRChat.Free;
         Sleep(100);
         WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat,ChatBuffer);
         WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert,ChatScript);
+        WebSockRChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortRChat);
       except
         on e:Exception do begin
           ShowMessage(e.Message);
@@ -586,6 +599,7 @@ begin
     config.WriteString('PORT','HTTP',PortHttp);
     config.WriteString('PORT','CHAT',PortChat);
     config.WriteString('PORT','ALERT',PortAlert);
+    config.WriteString('PORT','RAWCHAT',PortRChat);
     config.WriteInteger('URL','INT',cInterval);
 
     config.WriteBool('PARSER','START',ActionAutoStart.Checked);
@@ -643,6 +657,7 @@ begin
     PortHttp:=config.ReadString('PORT','HTTP',PortHttp);
     PortChat:=config.ReadString('PORT','CHAT',PortChat);
     PortAlert:=config.ReadString('PORT','ALERT',PortAlert);
+    PortRChat:=config.ReadString('PORT','RAWCHAT',PortRChat);
     cInterval:=config.ReadInteger('URL','INT',300);
 
     ActionAutoStart.Checked:=config.ReadBool('PARSER','START',ActionAutoStart.Checked);
@@ -678,6 +693,7 @@ begin
     HttpServer.Listen(StrToInt(PortHttp));
     WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat,ChatBuffer);
     WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert,ChatScript);
+    WebSockRChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortRChat);
   except
     on e:exception do
       ShowMessage(e.Message);

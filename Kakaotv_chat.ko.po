@@ -71,6 +71,10 @@ msgstr ""
 msgid "300"
 msgstr ""
 
+#: tformportset.editrchat.text
+msgid "8088"
+msgstr ""
+
 #: tformportset.label1.caption
 msgid "HTTP"
 msgstr ""
@@ -86,4 +90,8 @@ msgstr "웹 소켓 알림"
 #: tformportset.label4.caption
 msgid "Capture Interval"
 msgstr "캡처 간격"
+
+#: tformportset.label5.caption
+msgid "Websocket RChat"
+msgstr ""
 
