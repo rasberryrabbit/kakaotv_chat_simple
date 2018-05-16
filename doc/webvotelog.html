@@ -46,9 +46,11 @@ function initlabels() {
 }
 // 카운터 업데이트
 function updateitem(item) {
+    var updated=false;
     $("li").each(function() {
         var itn=$(this).find("#itemname").text();
         if(itn!="" && item.indexOf(itn)!=-1) {
+            updated=true;
             var itl=$(this).find("#labelc");
             setTimeout(function() {
                 var nval=itemlist[itn];
@@ -58,6 +60,7 @@ function updateitem(item) {
             }, 200);
         }
     });
+    return(updated);
 }
 // 유저 리스트 리셋
 function resetuser() {
@@ -135,10 +138,11 @@ chatsock.onmessage = function (event) {
     }
     // unique id
     if(res && idlist[res[1]]===undefined) {
-        idlist[res[1]]='0';
         var check=res[2];
         // 문자열을 체크하고 카운터를 올림
-        updateitem(check);
+        if(updateitem(check)) {
+            idlist[res[1]]='0';
+        }
     }
     // show chat message. for debugging.
     chatline=$('<li>'+temp+'</li>');
