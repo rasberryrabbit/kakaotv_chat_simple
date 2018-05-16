@@ -5,15 +5,18 @@
 <title>Chat - Customer Module</title>
 <link rel="stylesheet" href="./jquery/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="style.css" />
+<link type="text/css" rel="stylesheet" href="stylevote.css" />
 <script src = "./jquery/jquery-3.3.1.min.js"></script>
 <script src = "./jquery/jquery-ui.js"></script>
 <script>
+// 채팅 스크립트 준비
 try {
 var chatsize = JSON.parse(localStorage.chatsize || "{}");
 } catch(e) {
 var chatsize = JSON.parse("{}");
 }
-var windowname='chatwindowkakaovote';    // 단일 이름을 지정.
+var windowname='chatwindowtwitchvote';    // 단일 이름을 지정.
+// 초기화
 $(document).ready(function(){
   // load/save size
   if(chatsize[windowname]) {
@@ -26,25 +29,100 @@ $(document).ready(function(){
             localStorage.chatsize = JSON.stringify(chatsize);
         }}); 
 });
+// 카운터 스크립트 준비
+var idlist={};
+var itemlist={};
+function initlabels() {
+    idlist={};
+    $("li").each(function() {
+        var itn=$(this).find("#itemname").text();
+        itemlist[itn]=0;
+        var itl=$(this).find("#labelc");
+        setTimeout(function() {
+            var nval=0;
+            itl.html(nval.toString());
+        }, 100);
+    });
+}
+// 카운터 업데이트
+function updateitem(item) {
+    $("li").each(function() {
+        var itn=$(this).find("#itemname").text();
+        if(itn!="" && item.indexOf(itn)!=-1) {
+            var itl=$(this).find("#labelc");
+            setTimeout(function() {
+                var nval=itemlist[itn];
+                nval++;
+                itemlist[itn]=nval;
+                itl.html(nval.toString());
+            }, 200);
+        }
+    });
+}
+// 유저 리스트 리셋
+function resetuser() {
+    idlist={};
+}
+// 중복 검사
+function CheckDup(name) {
+    var retbool=false;
+    $("li").each(function() {
+        var itn=$(this).find("#itemname").text();
+        if(itn==name) {
+            retbool=true;
+        }
+    });
+    return(retbool);
+}
+// 아이템 추가
+function AddVoteItem(form) {
+    var itn=form.name.value;
+    var desc=form.desc.value;
+    if(itn!="" && !CheckDup(itn)) {
+        var tag="<li id=\"item\"><span id=\"itemname\">"+itn+"</span><span>";
+        tag=tag+desc+"</span><span id=\"labelc\">0</span><button id=\"removebtn\" type=\"button\" onclick=\"javascript: RemoveItem(";
+        tag=tag+itn+");\">-</button></li>"
+        $("#resultul").append(tag);
+        itemlist[itn]=0;
+        form.reset();
+    }
+}
+// 아이템 제거
+function RemoveItem(name) {
+    $("li").each(function() {
+        var itn=$(this).find("#itemname").text();
+        if(itn==name) {
+            itemlist[itn]=0;
+            $(this).remove();
+        }
+    });
+}
 </script>
 </head> 
 <body>
 <div id="alertdiv">
     <ul id="alertbox"></ul>
 </div>
+<div id="ItemDiv">
+<p>아이템 추가하기. 이름은 서로 다른 값이어야 합니다.</p>
+<form name="newlabel">
+이름: <input type="text" name="name">
+설명: <input type="text" name="desc">
+<button type="button" onclick="javascript: AddVoteItem(this.form);">추가</button>
+</form>
+</div>
+<div></div>
 <div id="result">
     <ul id="resultul">
-      <li id="item1"><p>ㅋ</p><p id="label1">0</p></li>
-      <li id="item2"><p>?</p><p id="label2">0</p></li>
-      <li id="item3"><p>ㅎ</p><p id="label3">0</p></li>
     </ul>
+<button type="button" onclick="javascript: initlabels();">초기화</button>
 </div>
 <script type="text/javascript" src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
-var idlist={};
+initlabels();
 var randomcolor=1;
 var makedisappear=0;
-var chatsock = new ReconnectingWebSocket("ws://localhost:8088","chat");
+var chatsock = new ReconnectingWebSocket("ws://localhost:8100","chat");
 chatsock.reconnectInterval=2000;
 chatsock.onmessage = function (event) {
     var div = $("#alertbox");
@@ -56,42 +134,13 @@ chatsock.onmessage = function (event) {
         temp=res[1]+' '+res[2];
     }
     // unique id
-    if(idlist[res[1]]===undefined) {
+    if(res && idlist[res[1]]===undefined) {
         idlist[res[1]]='0';
         var check=res[2];
-        // 문자열 유무를 체크.
-        if(check.indexOf("ㅋ")!=-1) {
-          var item=$("#label1");
-          if(item) {
-            setTimeout(function(){
-            var nval=parseInt(item.text());
-            nval++;
-            item.html(nval.toString());
-            },100);
-          }
-        }
-        if(check.indexOf("?")!=-1) {
-          var item=$("#label2");
-          if(item) {
-            setTimeout(function(){
-            var nval=parseInt(item.text());
-            nval++;
-            item.html(nval.toString());
-            },100);
-          }
-        }
-        if(check.indexOf("ㅎ")!=-1) {
-          var item=$("#label3");
-          if(item) {
-            setTimeout(function(){
-            var nval=parseInt(item.text());
-            nval++;
-            item.html(nval.toString());
-            },100);
-          }
-        }
+        // 문자열을 체크하고 카운터를 올림
+        updateitem(check);
     }
-    // show chat message
+    // show chat message. for debugging.
     chatline=$('<li>'+temp+'</li>');
     div.append(chatline);
     if (div.children('li').length>500) {
