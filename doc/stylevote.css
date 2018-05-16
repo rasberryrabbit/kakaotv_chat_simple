@@ -1,5 +1,22 @@
+li span {
+  display: inline-block;  
+  width: 140px;
+}
+
+#resultul {
+  width: 500px;
+}
+
+#resultul :nth-child(even) {
+  background-color: #cccccc44;
+}
+
+#resultul :nth-child(odd) {
+  background-color: #cccccc22;
+}
+
 #itemname {
-  margin: 10px;
+
 }
 
 #removebtn {
@@ -8,5 +25,5 @@
 }
 
 #labelc {
-  margin: 10px;
+  text-align: right;
 }
