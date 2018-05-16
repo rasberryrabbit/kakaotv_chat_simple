@@ -79,7 +79,7 @@ function AddVoteItem(form) {
     var itn=form.name.value;
     var desc=form.desc.value;
     if(itn!="" && !CheckDup(itn)) {
-        var tag="<li id=\"item\"><span id=\"itemname\">"+itn+"</span><span>"+desc+
+        var tag="<li id=\"item\"><span id=\"itemname\">"+itn+"</span><span id=\"itemdesc\">"+desc+
         "</span><span id=\"labelc\">0</span><button id=\"removebtn\" type=\"button\" onclick=\"javascript: RemoveItem('"+
         itn+"');\">-</button></li>";
         $("#resultul").append(tag);
