@@ -59,12 +59,12 @@ function updateitem(item, nid) {
             if(itid.children().length<maxcount[itn]) {
                 // 카운터 증가
                 var itl=$(this).find("#labelc");
-                setTimeout(function() {
+                //setTimeout(function() {
                     var nval=itemlist[itn];
                     nval++;
                     itemlist[itn]=nval;
                     itl.html(nval.toString());
-                }, 200);
+                //}, 200);
                 // 아이디 목록, 중복 불가
                 idlist[nid]=itn;
                 var newli="<li id=\"idlistli\">"+nid+"</li>";
