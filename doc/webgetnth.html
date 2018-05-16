@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-<title>투표하기</title>
+<title>순위 추첨하기</title>
 <link rel="stylesheet" href="./jquery/jquery-ui.css" />
 <link type="text/css" rel="stylesheet" href="style.css" />
 <link type="text/css" rel="stylesheet" href="stylevote.css" />
@@ -15,7 +15,7 @@ var chatsize = JSON.parse(localStorage.chatsize || "{}");
 } catch(e) {
 var chatsize = JSON.parse("{}");
 }
-var windowname='chatwindowkakaovote';    // 단일 이름을 지정.
+var windowname='chatwindowkakaonth';    // 단일 이름을 지정.
 // 초기화
 $(document).ready(function(){
   // load/save size
@@ -30,9 +30,12 @@ $(document).ready(function(){
         }}); 
 });
 // 카운터 스크립트 준비
+var script_debug=0;
 var idlist={};
 var itemlist={};
-function initlabels() {
+var maxcount={};
+// 초기화
+function initlabels(conf) {
     if(conf || confirm("모든 항목을 삭제합니까?")) {
         idlist={};
         $("li").each(function() {
@@ -43,26 +46,32 @@ function initlabels() {
                 var nval=0;
                 itl.html(nval.toString());
             }, 100);
+            $(this).find("#idlistul").html("");
         });
     }
 }
 // 카운터 업데이트
-function updateitem(item) {
-    var updated=false;
+function updateitem(item, nid) {
     $("li").each(function() {
         var itn=$(this).find("#itemname").text();
         if(itn!="" && item.indexOf(itn)!=-1) {
-            updated=true;
-            var itl=$(this).find("#labelc");
-            setTimeout(function() {
-                var nval=itemlist[itn];
-                nval++;
-                itemlist[itn]=nval;
-                itl.html(nval.toString());
-            }, 200);
+            var itid=$(this).find("#idlistul");
+            if(itid.children().length<maxcount[itn]) {
+                // 카운터 증가
+                var itl=$(this).find("#labelc");
+                setTimeout(function() {
+                    var nval=itemlist[itn];
+                    nval++;
+                    itemlist[itn]=nval;
+                    itl.html(nval.toString());
+                }, 200);
+                // 아이디 목록, 중복 불가
+                idlist[nid]=itn;
+                var newli="<li id=\"idlistli\">"+nid+"</li>";
+                itid.append(newli);
+            }
         }
     });
-    return(updated);
 }
 // 유저 리스트 리셋
 function resetuser() {
@@ -83,18 +92,21 @@ function CheckDup(name) {
 function AddVoteItem(form) {
     var itn=form.name.value;
     var desc=form.desc.value;
+    var max=form.max.value;
     if(itn!="" && !CheckDup(itn)) {
+        maxcount[itn]=parseInt(max);
         var tag="<li id=\"item\"><span id=\"itemname\">"+itn+"</span><span id=\"itemdesc\">"+desc+
         "</span><span id=\"labelc\">0</span><button id=\"removebtn\" type=\"button\" onclick=\"javascript: RemoveItem('"+
-        itn+"');\">-</button></li>";
+        itn+"');\">-</button><div id=\"idlist\"><ul id=\"idlistul\"></ul></div></li>";
         $("#resultul").append(tag);
         itemlist[itn]=0;
         form.reset();
+        form.max.value=10;
     }
 }
 // 아이템 제거
 function RemoveItem(name) {
-    if(confirm(name+" 항목을 삭제합니까?")) {
+    if(confirm(name+" 항목을 지웁니까?")) {
         $("li").each(function() {
             var itn=$(this).find("#itemname").text();
             if(itn==name) {
@@ -111,10 +123,12 @@ function RemoveItem(name) {
     <ul id="alertbox"></ul>
 </div>
 <div id="ItemDiv">
-<p>아이템 추가하기. 이름은 서로 다른 값이어야 합니다.</p>
+<p><b>아이템 추가하기. 이름은 서로 다른 값이어야 합니다. 유저는 전체 리스트에서 딱 1번만 목록에 나타납니다.</b></p>
+<p><b>초기화를 누르기 전까지 항목이 지워져도 목록에 포함되어 있었던 아이디는 중복 검사 목록에서 사라지지 않습니다.</b></p>
 <form name="newlabel">
 이름: <input type="text" name="name">
 설명: <input type="text" name="desc">
+최대: <input type="text" name="max" value=10>
 <button type="button" onclick="javascript: AddVoteItem(this.form);">추가</button>
 </form>
 </div>
@@ -122,11 +136,15 @@ function RemoveItem(name) {
 <div id="result">
     <ul id="resultul">
     </ul>
-<button type="button" onclick="javascript: initlabels();">초기화</button>
+<button type="button" onclick="javascript: initlabels(false);">초기화</button>
+</div>
+<div id="idlist">
+    <ul id="idlistul">
+    </ul>
 </div>
 <script type="text/javascript" src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
-initlabels();
+initlabels(true);
 var randomcolor=1;
 var makedisappear=0;
 var chatsock = new ReconnectingWebSocket("ws://localhost:8088","chat");
@@ -136,31 +154,33 @@ chatsock.onmessage = function (event) {
     var temp=event.data;
     // id and chat
     var rex="([^\\:]+)\\:\\s(.+)";
+    var newid;
     res=temp.match(rex);
     if(res) {
         temp=res[1]+' '+res[2];
+        newid=res[1];
     }
     // unique id
-    if(res && idlist[res[1]]===undefined) {
+    if(res && idlist[newid]===undefined) {
         var check=res[2];
         // 문자열을 체크하고 카운터를 올림
-        if(updateitem(check)) {
-            idlist[res[1]]='0';
-        }
+        updateitem(check,newid);
     }
     // show chat message. for debugging.
-    chatline=$('<li>'+temp+'</li>');
-    div.append(chatline);
-    if (div.children('li').length>500) {
-      div.children('li')[0].remove();
-    }
-    $('#alertbox').animate({scrollTop: document.body.scrollHeight},"slow");
-    // disappear
-    if(makedisappear) {
-        var le=document.querySelector('#alertbox').lastChild;
-        setTimeout(function () {
-              le.style.display='none';
-        }, 30000);
+    if(script_debug) {
+        chatline=$('<li>'+temp+'</li>');
+        div.append(chatline);
+        if (div.children('li').length>500) {
+          div.children('li')[0].remove();
+        }
+        $('#alertbox').animate({scrollTop: document.body.scrollHeight},"slow");
+        // disappear
+        if(makedisappear) {
+            var le=document.querySelector('#alertbox').lastChild;
+            setTimeout(function () {
+                  le.style.display='none';
+            }, 30000);
+        }
     }
 }
 </script>

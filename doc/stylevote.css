@@ -27,3 +27,7 @@ li span {
 #labelc {
   text-align: right;
 }
+
+#idlistli {
+  list-style-type: decimal;
+}
