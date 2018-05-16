@@ -122,7 +122,7 @@ function RemoveItem(name) {
 initlabels();
 var randomcolor=1;
 var makedisappear=0;
-var chatsock = new ReconnectingWebSocket("ws://localhost:8100","chat");
+var chatsock = new ReconnectingWebSocket("ws://localhost:8088","chat");
 chatsock.reconnectInterval=2000;
 chatsock.onmessage = function (event) {
     var div = $("#alertbox");
