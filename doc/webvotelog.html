@@ -29,11 +29,12 @@ $(document).ready(function(){
             localStorage.chatsize = JSON.stringify(chatsize);
         }}); 
 });
+var script_debug=0;
 // 카운터 스크립트 준비
 var idlist={};
 var itemlist={};
-function initlabels() {
-    if(conf || confirm("모든 항목을 삭제합니까?")) {
+function initlabels(conf) {
+    if(conf || confirm("모든 항목을 초기화 합니까?")) {
         idlist={};
         $("li").each(function() {
             var itn=$(this).find("#itemname").text();
@@ -126,7 +127,7 @@ function RemoveItem(name) {
 </div>
 <script type="text/javascript" src="reconnecting-websocket.min.js"></script>
 <script type="text/javascript">
-initlabels();
+initlabels(true);
 var randomcolor=1;
 var makedisappear=0;
 var chatsock = new ReconnectingWebSocket("ws://localhost:8088","chat");
@@ -149,18 +150,20 @@ chatsock.onmessage = function (event) {
         }
     }
     // show chat message. for debugging.
-    chatline=$('<li>'+temp+'</li>');
-    div.append(chatline);
-    if (div.children('li').length>500) {
-      div.children('li')[0].remove();
-    }
-    $('#alertbox').animate({scrollTop: document.body.scrollHeight},"slow");
-    // disappear
-    if(makedisappear) {
-        var le=document.querySelector('#alertbox').lastChild;
-        setTimeout(function () {
-              le.style.display='none';
-        }, 30000);
+    if(script_debug) {
+        chatline=$('<li>'+temp+'</li>');
+        div.append(chatline);
+        if (div.children('li').length>500) {
+          div.children('li')[0].remove();
+        }
+        $('#alertbox').animate({scrollTop: document.body.scrollHeight},"slow");
+        // disappear
+        if(makedisappear) {
+            var le=document.querySelector('#alertbox').lastChild;
+            setTimeout(function () {
+                  le.style.display='none';
+            }, 30000);
+        }
     }
 }
 </script>
