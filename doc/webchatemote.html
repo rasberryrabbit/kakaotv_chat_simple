@@ -138,7 +138,7 @@ chatsock.onmessage = function (event) {
             var errorcnt=0;
             img.onerror = function() {
                 errorcnt++;
-                if(errorcnt<30) {
+                if(errorcnt<=120) {
                     img.src=imgtag;
                 }
             }
