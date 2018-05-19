@@ -113,6 +113,7 @@ var
   LogAttrValue : UnicodeString = 'chatArea';
 
   LogChatClass : UnicodeString = 'CLASS';
+  LogSessionAttr : UnicodeString = 'data-sessionid';
   LogChatValue : UnicodeString = 'txt_talk';
   LogChatEmoti : UnicodeString = 'kakao_emoticon';
 
@@ -348,7 +349,7 @@ var
             skipAddMarkup:=False;
             // get chat message
             if Assigned(NodeName) and Assigned(NodeChat) then begin
-              sbuf:=sbuf+NodeName.ElementInnerText+': ';
+              sbuf:=sbuf+NodeName.ElementInnerText+' ('+NodeName.GetElementAttribute(LogSessionAttr)+'): ';
               srawbuf:=sbuf;
               while Assigned(NodeChat) do begin
                 // make log message
@@ -606,6 +607,7 @@ begin
     config.WriteString('PARSER','LogAttrName',LogAttrName);
     config.WriteString('PARSER','LogAttrValue',LogAttrValue);
     config.WriteString('PARSER','LogChatClass',LogChatClass);
+    config.WriteString('PARSER','LogSessionAttr',LogSessionAttr);
     config.WriteString('PARSER','LogChatValue',LogChatValue);
     config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
     config.WriteString('PARSER','LogAlertClass',LogAlertClass);
@@ -664,6 +666,7 @@ begin
     LogAttrName:=config.ReadString('PARSER','LogAttrName',LogAttrName);
     LogAttrValue:=config.ReadString('PARSER','LogAttrValue',LogAttrValue);
     LogChatClass:=config.ReadString('PARSER','LogChatClass',LogChatClass);
+    LogSessionAttr:=config.ReadString('PARSER','LogSessionAttr',LogSessionAttr);
     LogChatValue:=config.ReadString('PARSER','LogChatValue',LogChatValue);
     LogChatEmoti:=config.ReadString('PARSER','LogChatEmoti',LogChatEmoti);
     LogAlertClass:=config.ReadString('PARSER','LogAlertClass',LogAlertClass);
