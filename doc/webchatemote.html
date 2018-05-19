@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title>분수 같은 움직임의 이모트 렌더링-카카오</title>
+<link rel="stylesheet" href="./jquery/jquery-ui.css" />
+<link type="text/css" rel="stylesheet" href="style.css" />
+<script src = "./jquery/jquery-3.3.1.min.js"></script>
+<script src = "./jquery/jquery-ui.js"></script>
+<script>
+var chatsize = JSON.parse(sessionStorage.chatsize || "{}");
+$(document).ready(function(){
+/*
+  // load/save size
+  if(chatsize.wrapper) {
+    $("#wrapper").width(chatsize.wrapper.width);
+    $("#wrapper").height(chatsize.wrapper.height);
+  }
+  // make resizable
+  $("#wrapper").resizable({autoHide: true, stop: function (event, ui) {
+            chatsize[this.id] = ui.size
+            sessionStorage.chatsize = JSON.stringify(chatsize);
+        }});
+*/        
+});
+</script>
+</head> 
+<body>
+<!-- <div id="wrapper">   
+    <ul id="chatbox"></ul>
+</div>  -->
+<div id="emotedraw" style="width: 600px; height: 400px;">
+<canvas id="imgcanvas" style="display: block;" ></canvas>
+</div>
+<script type="text/javascript" src="reconnecting-websocket.min.js"></script>
+<script type="text/javascript">
+// 캔바스 준비
+images = {};
+imgx = {};
+imgy = {};
+imgvx = {};
+imgvy = {};
+gravity = 0.08;
+maximages = 50;
+
+
+var canvas = document.getElementById("imgcanvas");
+var ctx = document.getElementById("imgcanvas").getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function draw(key,image) {
+    imgvy[key]+=gravity;
+    imgx[key]+=imgvx[key];
+    imgy[key]+=imgvy[key];
+
+    // 범위 체크
+    if( (imgx[key] - image.width) > canvas.width ||
+        (imgx[key] + image.width) < 0 ||
+        (imgy[key] - image.height) > canvas.height ||
+        (imgy[key] + image.height) < 0 
+    ) {
+        // 리스트에서 제거
+        delete images[key];
+        delete imgx[key];
+        delete imgy[key];
+        delete imgvx[key];
+        delete imgvy[key];
+    } else {
+        // 캔버스에 그리기, 70x70 -> 48x48
+        ctx.drawImage(image, imgx[key], imgy[key], 48, 48);
+    }
+}
+
+// 프레임 렌더링 부분. 모니터의 수직 동기에 맞춰집니다.
+(function drawFrame() {
+    requestAnimationFrame(drawFrame);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for(var key in images) {
+        var img=images[key];
+        draw(key,img);
+    }
+    //console.log(Object.keys(images).length); /* 디버그 */
+})();
+//
+// var randomcolor=1;
+var lastlink;
+var chatsock = new ReconnectingWebSocket("ws://localhost:8092","chat");
+chatsock.reconnectInterval=2000;
+chatsock.onmessage = function (event) {
+    var div = $("#chatbox");
+    chatline=$(event.data);
+    /*
+    // 채팅을 보여주는 부분
+    // disable random color
+    if(!randomcolor) {
+      chatline.find('.chat-author__display-name').attr('style','');
+    }
+    div.append(chatline);
+    if (div.children('li').length>500) {
+      div.children('li')[0].remove();
+    }
+    $('#chatbox').animate({scrollTop: document.body.scrollHeight},"slow");
+    // disappear 
+    var le=document.querySelector('#chatbox').lastChild;
+    setTimeout(function () {
+          le.style.display='none';    
+    }, 30000);
+    */
+    // 이모트 이미지 각각을 얻기.
+    lastlink="";
+    chatline.find(".thumb_img").each(function() {
+        var imgtag=$(this).attr("src");
+        //console.log(imgtag);
+        /*
+        // 태그와 anijs로 하는 방법론이지만 미완성
+        var newimg="<img id=\"newimg\" src=\""+imgtag+"\" >";
+        setTimeout(function() {        
+            $("#emotedraw").append(newimg);
+            var ni=$("#emotedraw :last-child");
+            ni.toggleClass("fadeOutUp animated");
+            ni.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(e){
+                $(e.target).removeClass('fadeOutUp animated');
+                ni.remove();
+            });
+        }, 100);
+        */
+        // 이미지를 로딩하고 그리기 큐에 넣는다.
+        if(Object.keys(images).length<maximages || lastlink!=imgtag) {
+            linkdup=0;
+            if(Object.keys(images).length>=maximages) {
+                var fi=Object.keys(images)[0];
+                imgx[fi]=-100;
+            }
+            var img=new Image();
+            var errorcnt=0;
+            img.onerror = function() {
+                errorcnt++;
+                if(errorcnt<30) {
+                    img.src=imgtag;
+                }
+            }
+            img.onload = function() {
+                var i=1;
+                var imgname=imgtag+i.toString();
+                // 이미지 별로 단일한 이름을 만든다.
+                while(images[imgname]!==undefined) {
+                    imgname=imgtag+i.toString();
+                    i++;
+                }
+                imgx[imgname] = Math.random() * (canvas.width - (canvas.width / 8) );
+                imgy[imgname] = Math.random() * (canvas.height / 2) + (canvas.height / 8);
+                imgvx[imgname] = -3 + Math.random() * 6;
+                imgvy[imgname] = Math.random() * -3;
+                images[imgname]=img;
+            }
+            img.src=imgtag;
+            lastlink=imgtag;
+        }
+    });
+}
+window.addEventListener('resize', function () {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
