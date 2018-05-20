@@ -52,7 +52,8 @@ kakaochat.onmessage = function (event) {
 // refresh image on local cache
   setInterval(function() {
     $('.kakao_chat img').each(function () {
-        $(this).src = $(this).src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+        var urlsrc=$(this).attr('src');
+        $(this).attr('src',urlsrc.replace(/\btime=[^&]*/, 'time=' + new Date().getTime()));
     });
 //     var images = document.images;
 //    for (var i=0; i<images.length; i++) {
