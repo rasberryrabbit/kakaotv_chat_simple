@@ -36,10 +36,13 @@ alertsock.onmessage = function (event) {
     };
 };
   setInterval(function() {
-      var images = document.images;
-      for (var i=0; i<images.length; i++) {
-          images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
-      }
+    $('.kakao_chat img').each(function () {
+        $(this).src = $(this).src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+    });
+//     var images = document.images;
+//    for (var i=0; i<images.length; i++) {
+//        images[i].src = images[i].src.replace(/\btime=[^&]*/, 'time=' + new Date().getTime());
+//    }
   }, 1200); // 10000 milliseconds = 10 seconds
 </script>
 </body>
