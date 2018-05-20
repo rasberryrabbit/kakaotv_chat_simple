@@ -637,6 +637,7 @@ begin
     config.WriteString('PARSER','LogChatValue',LogChatValue);
     config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
     config.WriteString('PARSER','ImgPathHeader',ImgPathHeader);
+    config.WriteString('PARSER','ImagePathCheck',ImagePathCheck);
     config.WriteString('PARSER','LogAlertClass',LogAlertClass);
     config.WriteString('PARSER','LogAlertValue',LogAlertValue);
     config.WriteString('PARSER','LogAlertCookie',LogAlertCookie);
@@ -697,6 +698,7 @@ begin
     LogChatValue:=config.ReadString('PARSER','LogChatValue',LogChatValue);
     LogChatEmoti:=config.ReadString('PARSER','LogChatEmoti',LogChatEmoti);
     ImgPathHeader:=config.ReadString('PARSER','ImgPathHeader',ImgPathHeader);
+    ImagePathCheck:=config.ReadString('PARSER','ImagePathCheck',ImagePathCheck);
     LogAlertClass:=config.ReadString('PARSER','LogAlertClass',LogAlertClass);
     LogAlertValue:=config.ReadString('PARSER','LogAlertValue',LogAlertValue);
     LogAlertCookie:=config.ReadString('PARSER','LogAlertCookie',LogAlertCookie);

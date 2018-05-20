@@ -66,6 +66,7 @@ type
 
 var
   cefImageFolder:string='';
+  ImagePathCheck:UnicodeString='/dna/emoticons/';
 
 implementation
 
@@ -216,7 +217,7 @@ begin
     and (not Assigned(Result))
     and Assigned(Browser_)
     and (request.GetResourceType=RT_IMAGE)
-    and (Pos('/dna/emoticons/',request.Url)<>0) then
+    and (Pos(ImagePathCheck,request.Url)<>0) then
     Result:=TKakaoResourceHandler.Create(Browser_,Frame,'KakaoImage',request);
 end;
 
