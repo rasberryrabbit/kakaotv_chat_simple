@@ -23,6 +23,12 @@ $(document).ready(function(){
         }});
 */        
 });
+function sleep_(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function sleep(ms) {
+    await sleep_(ms);
+}
 </script>
 </head> 
 <body>
@@ -147,10 +153,12 @@ chatsock.onmessage = function (event) {
             }
             var img=new Image();
             var errorcnt=0;
-            img.onerror = function() {
+            img.onerror = function(e) {
                 errorcnt++;
-                if(errorcnt<=120) {
-                    img.src=imgtag;
+                var oldurl=e.target.src;
+                sleep(50);
+                if(errorcnt<=40) {
+                    e.target.src=oldurl;
                 }
             }
             img.onload = function() {
