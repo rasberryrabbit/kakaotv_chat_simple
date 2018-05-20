@@ -194,6 +194,9 @@ begin
           if not FileExists(cefImageFolder+PathDelim+newName) then
             FStream.SaveToFile(cefImageFolder+PathDelim+newName);
         except
+          on e:exception do begin
+            FormKakaoTVChat.log.AddLog(e.Message);
+          end;
         end;
       end;
     end;
