@@ -40,7 +40,8 @@ imgx = {};
 imgy = {};
 imgvx = {};
 imgvy = {};
-gravity = 0.08;
+var fps = 40;
+gravity = 60 / fps * 0.095;
 maximages = 50;
 
 
@@ -72,17 +73,27 @@ function draw(key,image) {
         ctx.drawImage(image, imgx[key], imgy[key], 48, 48);
     }
 }
+// FPS 제한
+var now;
+var then = Date.now();
+var interval = 1000/fps;
+var delta;
 
 // 프레임 렌더링 부분. 모니터의 수직 동기에 맞춰집니다.
 (function drawFrame() {
     requestAnimationFrame(drawFrame);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    now = Date.now();
+    delta = now - then;
+    if(delta>interval) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for(var key in images) {
-        var img=images[key];
-        draw(key,img);
+        for(var key in images) {
+            var img=images[key];
+            draw(key,img);
+        }
+        then = now - (delta % interval);
+        //console.log(Object.keys(images).length); /* 디버그 */
     }
-    //console.log(Object.keys(images).length); /* 디버그 */
 })();
 //
 // var randomcolor=1;
