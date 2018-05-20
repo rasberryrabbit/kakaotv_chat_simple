@@ -30,6 +30,7 @@ type
   { TFormKakaoTVChat }
 
   TFormKakaoTVChat = class(TForm)
+    ActionDoImgLog: TAction;
     ActionAutoStart: TAction;
     ActionPortSet: TAction;
     ActionList1: TActionList;
@@ -43,11 +44,14 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
     Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
     UniqueInstance1: TUniqueInstance;
     procedure ActionAutoStartExecute(Sender: TObject);
+    procedure ActionDoImgLogExecute(Sender: TObject);
     procedure ActionPortSetExecute(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
     procedure ButtonBrowseClick(Sender: TObject);
@@ -79,7 +83,8 @@ implementation
 
 uses
   uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator;
+  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
+  StrUtils;
 
 const
   MaxChecksum = 3;
@@ -116,6 +121,7 @@ var
   LogSessionAttr : UnicodeString = 'data-sessionid';
   LogChatValue : UnicodeString = 'txt_talk';
   LogChatEmoti : UnicodeString = 'kakao_emoticon';
+  ImgPathHeader: UnicodeString = '//mk.';
 
   LogAlertClass : UnicodeString = 'CLASS';
   LogAlertValue : UnicodeString = 'box_alert';
@@ -257,14 +263,15 @@ var
     checksumN : THashDigest;
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
-    chkCount, i, j, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
+    chkCount, i, j, k, l, ItemCount : Integer;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, doAddImgLog : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
     begin
       RemoveSys:=FormKakaoTVChat.CheckBoxRemSyS.Checked;
       disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
+      doAddImgLog:=FormKakaoTVChat.ActionDoImgLog.Checked;
       Node := ANode.FirstChild;
       while Assigned(Node) do begin
         if Node.GetElementAttribute(LogAttrName)=LogAttrValue then begin
@@ -371,26 +378,42 @@ var
               // change img url
               if skipAddMarkup then begin
                 scheck:=Nodex.AsMarkup;
-                i:=Pos('?',scheck);
-                j:=i;
-                while i>0 do begin
-                  if scheck[i]='/' then
-                    break;
-                  Dec(i);
-                end;
-                if i>0 then begin
-                  Dec(i);
-                  while i>0 do begin
-                    if scheck[i]='/' then
-                      break;
-                    Dec(i);
+                k:=1;
+                while k>0 do begin
+                  // find image tag position
+                  k:=PosEx(UnicodeString('<img'),scheck,k);
+                  if(k>0) then begin
+                    // find patameter position
+                    i:=PosEx(UnicodeString('?'),scheck,k);
+                    j:=i;
+                    // emoticon sub id + id
+                    while i>0 do begin
+                      if scheck[i]='/' then
+                        break;
+                      Dec(i);
+                    end;
+                    l:=i;
+                    if i>0 then begin
+                      Dec(i);
+                      while i>0 do begin
+                        if scheck[i]='/' then
+                          break;
+                        Dec(i);
+                      end;
+                    end;
+                    Inc(i);
+                    if (i>k) and (l-i>0) then begin
+                      sclass:=UnicodeStringReplace(Copy(scheck,i,j-i),'/','_',[rfReplaceAll]);
+                      // find img src header loc
+                      i:=PosEx(ImgPathHeader,scheck,k);
+                      if i<>0 then
+                        scheck:=Copy(scheck,1,i-1)+UnicodeString('img/')+sclass+Copy(scheck,j);
+                    end;
+                    Inc(k);
+                    if doAddImgLog then
+                      FormKakaoTVChat.log.AddLog('>>> '+pchar(UTF8Encode(Copy(scheck,k,j-k))));
                   end;
                 end;
-                Inc(i);
-                sclass:=UnicodeStringReplace(Copy(scheck,i,j-i),'/','_',[rfReplaceAll]);
-                i:=Pos('//',scheck);
-                if i<>0 then
-                  scheck:=Copy(scheck,1,i-1)+'img/'+sclass+Copy(scheck,j);
               end;
             end else if Assigned(NodeName) then begin
               // cookie alert
@@ -590,6 +613,11 @@ begin
   ActionAutoStart.Checked:=not ActionAutoStart.Checked;
 end;
 
+procedure TFormKakaoTVChat.ActionDoImgLogExecute(Sender: TObject);
+begin
+  ActionDoImgLog.Checked:=not ActionDoImgLog.Checked;
+end;
+
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 var
@@ -610,6 +638,7 @@ begin
     config.WriteString('PARSER','LogSessionAttr',LogSessionAttr);
     config.WriteString('PARSER','LogChatValue',LogChatValue);
     config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
+    config.WriteString('PARSER','ImgPathHeader',ImgPathHeader);
     config.WriteString('PARSER','LogAlertClass',LogAlertClass);
     config.WriteString('PARSER','LogAlertValue',LogAlertValue);
     config.WriteString('PARSER','LogAlertCookie',LogAlertCookie);
@@ -669,6 +698,7 @@ begin
     LogSessionAttr:=config.ReadString('PARSER','LogSessionAttr',LogSessionAttr);
     LogChatValue:=config.ReadString('PARSER','LogChatValue',LogChatValue);
     LogChatEmoti:=config.ReadString('PARSER','LogChatEmoti',LogChatEmoti);
+    ImgPathHeader:=config.ReadString('PARSER','ImgPathHeader',ImgPathHeader);
     LogAlertClass:=config.ReadString('PARSER','LogAlertClass',LogAlertClass);
     LogAlertValue:=config.ReadString('PARSER','LogAlertValue',LogAlertValue);
     LogAlertCookie:=config.ReadString('PARSER','LogAlertCookie',LogAlertCookie);

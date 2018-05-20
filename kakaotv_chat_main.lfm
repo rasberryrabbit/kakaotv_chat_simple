@@ -110,6 +110,12 @@ object FormKakaoTVChat: TFormKakaoTVChat
       object MenuItem3: TMenuItem
         Action = ActionAutoStart
       end
+      object MenuItem4: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem5: TMenuItem
+        Action = ActionDoImgLog
+      end
     end
   end
   object ActionList1: TActionList
@@ -123,6 +129,10 @@ object FormKakaoTVChat: TFormKakaoTVChat
       Caption = 'Auto Start'
       Checked = True
       OnExecute = ActionAutoStartExecute
+    end
+    object ActionDoImgLog: TAction
+      Caption = 'Show Image debug log'
+      OnExecute = ActionDoImgLogExecute
     end
   end
 end

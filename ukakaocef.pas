@@ -161,7 +161,7 @@ end;
 procedure TKakaoResourceHandler.CompleteRequest(const Request: ICefUrlRequest);
 var
   newName:string;
-  i, j : Integer;
+  i, j, l : Integer;
 begin
   if Assigned(FStream) then
     FStream.Position:=0;
@@ -178,6 +178,7 @@ begin
           break;
         Dec(i);
       end;
+      l:=i;
       if i>0 then begin
         Dec(i);
         while i>0 do begin
@@ -187,11 +188,13 @@ begin
         end;
       end;
       Inc(i);
-      newName:=StringReplace(Copy(newName,i,j-i),'/','_',[rfReplaceAll]);
-      try
-        if not FileExists(cefImageFolder+PathDelim+newName) then
-          FStream.SaveToFile(cefImageFolder+PathDelim+newName);
-      except
+      if l-i>0 then begin
+        newName:=StringReplace(Copy(newName,i,j-i),'/','_',[rfReplaceAll]);
+        try
+          if not FileExists(cefImageFolder+PathDelim+newName) then
+            FStream.SaveToFile(cefImageFolder+PathDelim+newName);
+        except
+        end;
       end;
     end;
   end;
