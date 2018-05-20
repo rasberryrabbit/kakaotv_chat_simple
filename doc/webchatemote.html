@@ -156,9 +156,9 @@ chatsock.onmessage = function (event) {
             img.onerror = function(e) {
                 errorcnt++;
                 var oldurl=e.target.src;
-                // re-try until 2000 msec
+                // re-try until 4000 msec
                 sleep(50);
-                if(errorcnt<=40) {
+                if(errorcnt<=80) {
                     e.target.src=oldurl;
                 }
             }
