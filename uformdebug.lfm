@@ -1,0 +1,20 @@
+object FormDebug: TFormDebug
+  Left = 274
+  Height = 171
+  Top = 140
+  Width = 680
+  Caption = 'FormDebug'
+  ClientHeight = 171
+  ClientWidth = 680
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '1.9.0.0'
+  object Panel1: TPanel
+    Left = 8
+    Height = 154
+    Top = 8
+    Width = 666
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabOrder = 0
+  end
+end

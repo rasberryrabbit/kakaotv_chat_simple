@@ -1,12 +1,16 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
+#: tformdebug.caption
+msgid "FormDebug"
+msgstr ""
+
 #: tformkakaotvchat.actionautostart.caption
 msgid "Auto Start"
 msgstr ""
 
 #: tformkakaotvchat.actiondoimglog.caption
-msgid "Show Image debug log"
+msgid "Show debug log"
 msgstr ""
 
 #: tformkakaotvchat.actionportset.caption

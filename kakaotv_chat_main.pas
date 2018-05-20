@@ -84,7 +84,7 @@ implementation
 uses
   uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
   uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
-  StrUtils;
+  StrUtils, uformDebug;
 
 const
   MaxChecksum = 3;
@@ -264,14 +264,13 @@ var
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, k, l, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, doAddImgLog : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
     begin
       RemoveSys:=FormKakaoTVChat.CheckBoxRemSyS.Checked;
       disLog:=FormKakaoTVChat.CheckBoxDisableLog.Checked;
-      doAddImgLog:=FormKakaoTVChat.ActionDoImgLog.Checked;
       Node := ANode.FirstChild;
       while Assigned(Node) do begin
         if Node.GetElementAttribute(LogAttrName)=LogAttrValue then begin
@@ -402,7 +401,7 @@ var
                       end;
                     end;
                     Inc(i);
-                    if (i>k) and (l-i>0) then begin
+                    if (i>k) and (l-i>1) then begin
                       sclass:=UnicodeStringReplace(Copy(scheck,i,j-i),'/','_',[rfReplaceAll]);
                       // find img src header loc
                       i:=PosEx(ImgPathHeader,scheck,k);
@@ -410,8 +409,7 @@ var
                         scheck:=Copy(scheck,1,i-1)+UnicodeString('img/')+sclass+Copy(scheck,j);
                     end;
                     Inc(k);
-                    if doAddImgLog then
-                      FormKakaoTVChat.log.AddLog('>>> '+pchar(UTF8Encode(Copy(scheck,k,j-k))));
+                    FormDebug.logdebug('(image) '+pchar(UTF8Encode(Copy(scheck,k,j-k))));
                   end;
                 end;
               end;
@@ -615,7 +613,7 @@ end;
 
 procedure TFormKakaoTVChat.ActionDoImgLogExecute(Sender: TObject);
 begin
-  ActionDoImgLog.Checked:=not ActionDoImgLog.Checked;
+  FormDebug.Show;
 end;
 
 procedure TFormKakaoTVChat.FormClose(Sender: TObject;

@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package, uChatBuffer,
-  uKakaoCEF, uWebsockSimple, form_portset;
+  uKakaoCEF, uWebsockSimple, form_portset, uformDebug;
 
 {$R *.res}
 
@@ -17,6 +17,7 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TFormKakaoTVChat, FormKakaoTVChat);
+  Application.CreateForm(TFormDebug, FormDebug);
   Application.Run;
 end.
 

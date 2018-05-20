@@ -5,7 +5,8 @@ unit uKakaoCEF;
 interface
 
 uses
-  Classes, SysUtils, cef3lcl, cef3intf, cef3own, cef3ref, cef3lib, cef3types;
+  Classes, SysUtils, cef3lcl, cef3intf, cef3own, cef3ref, cef3lib, cef3types,
+  LazUTF8Classes;
 
 
 type
@@ -40,7 +41,7 @@ type
       FOffset:TSize;
       FCallback:ICefCallback;
       FResponse:ICefResponse;
-      FStream:TMemoryStream;
+      FStream:TMemoryStreamUTF8;
       FBrowser:ICefBrowser;
 
       constructor Create(const browser: ICefBrowser; const frame: ICefFrame;
@@ -68,7 +69,7 @@ var
 
 implementation
 
-uses kakaotv_chat_main;
+uses kakaotv_chat_main, uformDebug;
 
 { TKakaoRequestClient }
 
@@ -141,7 +142,7 @@ constructor TKakaoResourceHandler.Create(const browser: ICefBrowser;
   );
 begin
   inherited Create(browser, frame, schemeName, request);
-  FStream:=TMemoryStream.Create;
+  FStream:=TMemoryStreamUTF8.Create;
   FBrowser:=browser;
 end;
 
@@ -160,7 +161,7 @@ end;
 
 procedure TKakaoResourceHandler.CompleteRequest(const Request: ICefUrlRequest);
 var
-  newName:string;
+  newName:UnicodeString;
   i, j, l : Integer;
 begin
   if Assigned(FStream) then
@@ -168,9 +169,9 @@ begin
   FResponse:=Request.GetResponse;
   if cefImageFolder<>'' then begin
     // save image files
-    newName:=pchar(UTF8Encode(CefUriDecode(Request.GetRequest.Url,False,[UU_PATH_SEPARATORS])));
+    newName:=CefUriDecode(Request.GetRequest.Url,False,[UU_PATH_SEPARATORS]);
 
-    i:=Pos('?',newName);
+    i:=Pos(UnicodeString('?'),newName);
     if i<>0 then begin
       j:=i;
       while i>0 do begin
@@ -188,14 +189,14 @@ begin
         end;
       end;
       Inc(i);
-      if l-i>0 then begin
+      if l-i>1 then begin
         newName:=StringReplace(Copy(newName,i,j-i),'/','_',[rfReplaceAll]);
         try
-          if not FileExists(cefImageFolder+PathDelim+newName) then
-            FStream.SaveToFile(cefImageFolder+PathDelim+newName);
+          if not FileExists(UTF8Decode(cefImageFolder)+UnicodeString(PathDelim)+newName) then
+            FStream.SaveToFile(cefImageFolder+PathDelim+pchar(UTF8Encode(newName)));
         except
           on e:exception do begin
-            FormKakaoTVChat.log.AddLog(e.Message);
+            FormDebug.logdebug(e.Message);
           end;
         end;
       end;

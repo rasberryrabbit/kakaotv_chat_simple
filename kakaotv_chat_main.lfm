@@ -131,7 +131,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
       OnExecute = ActionAutoStartExecute
     end
     object ActionDoImgLog: TAction
-      Caption = 'Show Image debug log'
+      Caption = 'Show debug log'
       OnExecute = ActionDoImgLogExecute
     end
   end
