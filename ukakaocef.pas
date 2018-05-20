@@ -164,6 +164,7 @@ procedure TKakaoResourceHandler.CompleteRequest(const Request: ICefUrlRequest);
 var
   newName:UnicodeString;
   i, j, l : Integer;
+  FFileStream:TFileStreamUTF8;
 begin
   if Assigned(FStream) then
     FStream.Position:=0;
@@ -193,8 +194,14 @@ begin
       if l-i>1 then begin
         newName:=StringReplace(Copy(newName,i,j-i),'/','_',[rfReplaceAll]);
         try
-          if not FileExists(UTF8Decode(cefImageFolder)+UnicodeString(PathDelim)+newName) then
-            FStream.SaveToFile(cefImageFolder+PathDelim+pchar(UTF8Encode(newName)));
+          if not FileExists(UTF8Decode(cefImageFolder)+UnicodeString(PathDelim)+newName) then begin
+            FFileStream:=TFileStreamUTF8.Create(cefImageFolder+PathDelim+pchar(UTF8Encode(newName)),fmCreate or fmShareDenyWrite);
+            try
+               FFileStream.CopyFrom(FStream,-1);
+            finally
+              FFileStream.Free;
+            end;
+          end;
         except
           on e:exception do begin
             FormDebug.logdebug(e.Message);
