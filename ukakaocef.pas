@@ -197,7 +197,7 @@ begin
           if not FileExists(UTF8Decode(cefImageFolder)+UnicodeString(PathDelim)+newName) then begin
             FFileStream:=TFileStreamUTF8.Create(cefImageFolder+PathDelim+pchar(UTF8Encode(newName)),fmCreate or fmShareDenyWrite);
             try
-               FFileStream.CopyFrom(FStream,-1);
+               FFileStream.Write(FStream.Memory^,FStream.Size);
             finally
               FFileStream.Free;
             end;
