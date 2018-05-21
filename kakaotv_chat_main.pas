@@ -368,7 +368,8 @@ var
                 else
                 if Pos(LogChatEmoti,sclass)<>0 then begin
                   skipAddMarkup:=True;
-                  sbuf:=sbuf+NodeChat.AsMarkup;
+                  sbuf:=sbuf+NodeChat.ElementInnerText;
+                  FormDebug.logdebug(UTF8Encode(NodeChat.AsMarkup));
                 end else
                   sbuf:=sbuf+NodeChat.AsMarkup;
                 NodeChat:=NodeChat.NextSibling;
