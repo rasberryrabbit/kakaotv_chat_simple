@@ -23,12 +23,6 @@ $(document).ready(function(){
         }});
 */        
 });
-function sleep_(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-async function sleep(ms) {
-    await sleep_(ms);
-}
 </script>
 </head> 
 <body>
@@ -103,6 +97,7 @@ var delta;
 })();
 //
 // var randomcolor=1;
+var errorcnt={};
 var lastlink;
 var chatsock = new ReconnectingWebSocket("ws://localhost:8092","chat");
 chatsock.reconnectInterval=2000;
@@ -152,18 +147,21 @@ chatsock.onmessage = function (event) {
                 imgx[fi]=-100;
             }
             var img=new Image();
-            var errorcnt=0;
+            errorcnt[imgtag]=new Date().getTime();
             img.onerror = function(e) {
-                errorcnt++;
-                var oldurl=e.target.src;
                 // re-try until 6000 msec
-                sleep(100);
-                if(errorcnt<=60) {
-                    e.target.src=oldurl;
+                var elm=e.target;
+                var timediff=new Date().getTime()-errorcnt[elm.src];
+                var oldurl=elm.src;
+                if(timediff<=6000) {
+                    elm.src=oldurl;
+                } else {
+                    console.log("fail "+elm.src+" -> "+timediff.toString());
                 }
             }
-            img.onload = function() {
+            img.onload = function(e) {
                 var i=1;
+                errorcnt[this.src]=0;
                 var imgname=imgtag+i.toString();
                 // 이미지 별로 단일한 이름을 만든다.
                 while(images[imgname]!==undefined) {
