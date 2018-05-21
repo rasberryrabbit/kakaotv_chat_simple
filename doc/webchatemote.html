@@ -121,7 +121,7 @@ function ImageLoad(url) {
             imgname=this.src+i.toString();
             i++;
         }
-        imgx[imgname] = Math.random() * (canvas.width - (canvas.width / 4) ) + (canvas.width / 4);
+        imgx[imgname] = Math.random() * (canvas.width / 2) + (canvas.width / 4);
         imgy[imgname] = Math.random() * (canvas.height / 2) + (canvas.height / 8);
         imgvx[imgname] = -3 + Math.random() * 6;
         imgvy[imgname] = Math.random() * -3;
