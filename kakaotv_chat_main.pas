@@ -404,7 +404,7 @@ var
                   k:=PosEx(UnicodeString('<img'),scheck,k);
                   if(k>0) then begin
                     // find patameter position
-                    i:=PosEx(UnicodeString('?'),scheck,k);
+                    i:=PosEx(UnicodeString(ImageExtPos),scheck,k);
                     j:=i;
                     // emoticon sub id + id
                     while i>0 do begin
@@ -658,7 +658,8 @@ begin
     config.WriteString('PARSER','LogChatValue',LogChatValue);
     config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
     config.WriteString('PARSER','ImgPathHeader',ImgPathHeader);
-    config.WriteString('PARSER','ImagePathCheck',ImagePathCheck);
+    config.WriteString('PARSER','ImagePathCheckN',ImagePathCheck);
+    config.WriteString('PARSER','ImageExtPos',ImageExtPos);
     config.WriteString('PARSER','LogAlertClass',LogAlertClass);
     config.WriteString('PARSER','LogAlertValue',LogAlertValue);
     config.WriteString('PARSER','LogAlertCookie',LogAlertCookie);
@@ -719,7 +720,8 @@ begin
     LogChatValue:=config.ReadString('PARSER','LogChatValue',LogChatValue);
     LogChatEmoti:=config.ReadString('PARSER','LogChatEmoti',LogChatEmoti);
     ImgPathHeader:=config.ReadString('PARSER','ImgPathHeader',ImgPathHeader);
-    ImagePathCheck:=config.ReadString('PARSER','ImagePathCheck',ImagePathCheck);
+    ImagePathCheck:=config.ReadString('PARSER','ImagePathCheckN',ImagePathCheck);
+    ImageExtPos:=config.ReadString('PARSER','ImageExtPos',ImageExtPos);
     LogAlertClass:=config.ReadString('PARSER','LogAlertClass',LogAlertClass);
     LogAlertValue:=config.ReadString('PARSER','LogAlertValue',LogAlertValue);
     LogAlertCookie:=config.ReadString('PARSER','LogAlertCookie',LogAlertCookie);

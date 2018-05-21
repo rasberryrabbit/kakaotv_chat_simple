@@ -66,7 +66,8 @@ type
 
 var
   cefImageFolder:string='';
-  ImagePathCheck:UnicodeString='/dna/emoticons/';
+  ImagePathCheck:UnicodeString='.png?credential';
+  ImageExtPos:UnicodeString='?credential';
 
 implementation
 
@@ -173,7 +174,7 @@ begin
     // save image files
     newName:=CefUriDecode(Request.GetRequest.Url,False,[UU_PATH_SEPARATORS]);
 
-    i:=Pos(UnicodeString('?'),newName);
+    i:=Pos(UnicodeString(ImageExtPos),newName);
     if i<>0 then begin
       j:=i;
       while i>0 do begin
