@@ -89,8 +89,8 @@ type
       FAddFlag, FSkipLast, FIsViewHorz, FUpdated : Boolean;
 
       function GetCount:Integer;
-      procedure SetItemIndex(Value : Integer);
-      function GetItemIndex:Integer;
+      procedure SetTopItemIndex(Value : Integer);
+      function GetTopItemIndex:Integer;
       procedure SetHPos(Pos : Integer);
       procedure OnTimer(Sender : TObject);
       procedure CheckTextLen(const s: string);
@@ -140,7 +140,7 @@ type
       property List : TLogStringList read LogData;
       property LineLimit : Integer read FLineLimit write FLineLimit;
       property OnDeleteLimit : TEventLogDeleteLimit read FOnDeleteLimit write FOnDeleteLimit;
-      property ItemIndex : Integer read GetItemIndex write SetItemIndex;
+      property ItemIndex : Integer read GetTopItemIndex write SetTopItemIndex;
       property IsViewHorz : Boolean read FIsViewHorz;
   end;
 
@@ -156,12 +156,12 @@ begin
   Result:=LogData.Count;
 end;
 
-procedure TLogListFPC.SetItemIndex(Value: Integer);
+procedure TLogListFPC.SetTopItemIndex(Value: Integer);
 begin
   SetItemPos(Value);
 end;
 
-function TLogListFPC.GetItemIndex: Integer;
+function TLogListFPC.GetTopItemIndex: Integer;
 begin
   if Assigned(VertScrollBar) then begin
     FLastPosY:=VertScrollBar.Position;
@@ -242,7 +242,7 @@ begin
   SRect:=GetScrolledClientRect;
   Canvas.FillRect(SRect);
   FLastPosX:=HorzScrollBar.Position;
-  cPos := GetItemIndex; // FLastPosY updated
+  cPos := GetTopItemIndex; // FLastPosY updated
   cPointY:=cPos*tHeight+BorderWidth;
   cPointX:=BorderWidth-FLastPosX;
   ViewHeight:=HorzScrollBar.ClientSizeWithBar;
