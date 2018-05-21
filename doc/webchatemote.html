@@ -104,13 +104,14 @@ function ImageLoad(url) {
     var img=new Image();
     img.onerror = function(e) {
         var eurl=this.src;
-        /* setTimeout(function () {
+        setTimeout(function () {
             ImageLoad(eurl);
-        }, 100); */
-        sleep(100).then(() => {
+        }, 100);
+        /* sleep(100).then(() => {
             console.log("retry");
             ImageLoad(eurl);
         });
+        */
     }
     img.onload = function(e) {
         var i=1;
@@ -125,6 +126,7 @@ function ImageLoad(url) {
         imgvx[imgname] = -3 + Math.random() * 6;
         imgvy[imgname] = Math.random() * -3;
         images[imgname]=img;
+        console.log(this.src);
     }
     img.src=url;
 }
@@ -159,7 +161,13 @@ chatsock.onmessage = function (event) {
             var fi=Object.keys(images)[0];
             imgx[fi]=-100;
         }
+        setTimeout(function () {
+            ImageLoad(imgtag);
+        }, 100);
+        /* sleep(100).then(() => {
         ImageLoad(imgtag);
+        });
+        */
     });
 }
 window.addEventListener('resize', function () {
