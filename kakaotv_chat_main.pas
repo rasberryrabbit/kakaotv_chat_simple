@@ -118,6 +118,7 @@ var
   LogAttrValue : UnicodeString = 'chatArea';
 
   LogChatClass : UnicodeString = 'CLASS';
+  LogChatID : UnicodeString = 'link_id';
   LogSessionAttr : UnicodeString = 'data-sessionid';
   LogChatValue : UnicodeString = 'txt_talk';
   LogChatEmoti : UnicodeString = 'kakao_emoticon';
@@ -264,7 +265,7 @@ var
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, k, l, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsSysMsg, stopChk : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown, stopChk : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
@@ -287,22 +288,29 @@ var
             stopChk:=False;
             while Assigned(NodeN) do begin
               // checksum
-              scheck:=NodeN.AsMarkup;
-              // sys msg?
-              IsSysMsg:=Pos(LogSysValue,scheck)<>0;
-              if IsSysMsg then begin
-                // checksum check stop on sys msg
-                stopChk:=True;
-              end;
+              scheck:='';
+              // check known patterns, chat + cookie alert
+              IsUnknown:=True;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
                 scheck:=scheck+NodeName.AsMarkup;
-                // chat - skip it that modified by banned
-                //NodeChat:=NodeName.NextSibling;
-                //if Assigned(NodeChat) then
-                //  scheck:=scheck+NodeChat.ElementInnerText;
+                // always valid, chat message
+                NodeChat:=NodeName.NextSibling;
+                if Assigned(NodeChat) then
+                  IsUnknown:=False
+                else begin
+                  // check cookie alert
+                  if NodeName.HasElementAttribute(LogAlertClass) then begin
+                    sclass:=NodeName.GetElementAttribute(LogAlertClass);
+                    IsUnknown:=sclass<>LogAlertValue;
+                  end
+                end;
               end else
                 scheck:=NodeN.ElementInnerText;
+
+              if IsUnknown then
+                 stopChk:=True;
+
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               // check, skip at sys msg
@@ -316,7 +324,7 @@ var
               end;
 
               // fill bottom checksum, skip sys msg
-              if (not IsSysMsg) and (chkCount<=MaxChecksum) then begin
+              if (not IsUnknown) and (chkCount<=MaxChecksum) then begin
                 // find dup check on last checksum
                 if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
                   Inc(dupCount[chkCount-1])
