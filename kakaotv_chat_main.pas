@@ -311,23 +311,25 @@ var
                   Dec(dupCountChk[i]);
                   if dupCountChk[i]=0 then
                     Inc(i);
-                end else begin
+                end else
                   matched:=False;
-                end;
               end;
 
               // fill bottom checksum, skip sys msg
               if (not IsSysMsg) and (chkCount<=MaxChecksum) then begin
-                // check duplication on first checksum
+                // find dup check on last checksum
                 if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
                   Inc(dupCount[chkCount-1])
                 else begin
+                // find new checksum
                   bottomchecksum[chkCount]:=checksumN;
                   dupCount[chkCount]:=1;
                   Inc(chkCount);
                 end;
               end else
+                // compares all old checksum list
                 if (i>=lastchkCount) or
+                // or stopped by sys msg and full new checksum list
                   (stopChk and (chkCount>MaxChecksum)) then
                   break;
 
