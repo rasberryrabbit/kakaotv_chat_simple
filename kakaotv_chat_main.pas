@@ -293,7 +293,6 @@ var
               if IsSysMsg then begin
                 // checksum check stop on sys msg
                 stopChk:=True;
-                FormDebug.logdebug(UTF8Encode(scheck));
               end;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
@@ -328,7 +327,8 @@ var
                   Inc(chkCount);
                 end;
               end else
-                if i>=lastchkCount then
+                if (i>=lastchkCount) or
+                  (stopChk and (chkCount>MaxChecksum)) then
                   break;
 
               NodeN:=NodeN.PreviousSibling;

@@ -105,8 +105,8 @@ function ImageLoad(url) {
     img.onerror = function(e) {
         var eurl=this.src;
         setTimeout(function () {
-            ImageLoad(eurl);
             console.log(eurl);
+            ImageLoad(eurl);
         }, 100);
         /* sleep(100).then(() => {
             console.log("retry");
