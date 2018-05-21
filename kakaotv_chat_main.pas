@@ -264,7 +264,7 @@ var
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, k, l, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsSysMsg, stopChk : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
@@ -284,9 +284,17 @@ var
             matched:=lastchkCount>0;
             i:=0;
             dupCountChk:=lastDupChk;
+            stopChk:=False;
             while Assigned(NodeN) do begin
               // checksum
-              scheck:='';
+              scheck:=NodeN.AsMarkup;
+              // sys msg?
+              IsSysMsg:=Pos(LogSysValue,scheck)<>0;
+              if IsSysMsg then begin
+                // checksum check stop on sys msg
+                stopChk:=True;
+                FormDebug.logdebug(UTF8Encode(scheck));
+              end;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
                 scheck:=scheck+NodeName.AsMarkup;
@@ -298,17 +306,19 @@ var
                 scheck:=NodeN.ElementInnerText;
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
-              if matched and (i<lastchkCount) then begin
+              // check, skip at sys msg
+              if (not stopChk) and matched and (i<lastchkCount) then begin
                 if CompareHash(checksumN,lastchecksum[i]) then begin
                   Dec(dupCountChk[i]);
                   if dupCountChk[i]=0 then
                     Inc(i);
-                end else
+                end else begin
                   matched:=False;
+                end;
               end;
 
-              // fill bottom checksum
-              if chkCount<=MaxChecksum then begin
+              // fill bottom checksum, skip sys msg
+              if (not IsSysMsg) and (chkCount<=MaxChecksum) then begin
                 // check duplication on first checksum
                 if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
                   Inc(dupCount[chkCount-1])

@@ -106,6 +106,7 @@ function ImageLoad(url) {
         var eurl=this.src;
         setTimeout(function () {
             ImageLoad(eurl);
+            console.log(eurl);
         }, 100);
         /* sleep(100).then(() => {
             console.log("retry");
@@ -118,7 +119,7 @@ function ImageLoad(url) {
         var imgname=this.src+i.toString();
         // 이미지 별로 단일한 이름을 만든다.
         while(images[imgname]!==undefined) {
-            imgname=imgtag+i.toString();
+            imgname=this.src+i.toString();
             i++;
         }
         imgx[imgname] = Math.random() * (canvas.width - (canvas.width / 8) );
@@ -126,7 +127,6 @@ function ImageLoad(url) {
         imgvx[imgname] = -3 + Math.random() * 6;
         imgvy[imgname] = Math.random() * -3;
         images[imgname]=img;
-        console.log(this.src);
     }
     img.src=url;
 }
