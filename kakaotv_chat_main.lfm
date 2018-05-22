@@ -113,6 +113,9 @@ object FormKakaoTVChat: TFormKakaoTVChat
       object MenuItem4: TMenuItem
         Caption = '-'
       end
+      object MenuItem6: TMenuItem
+        Action = ActionAutoSurf
+      end
       object MenuItem5: TMenuItem
         Action = ActionDoImgLog
       end
@@ -134,5 +137,17 @@ object FormKakaoTVChat: TFormKakaoTVChat
       Caption = 'Show debug log'
       OnExecute = ActionDoImgLogExecute
     end
+    object ActionAutoSurf: TAction
+      Caption = 'Auto Surf'
+      Checked = True
+      OnExecute = ActionAutoSurfExecute
+    end
+  end
+  object TimerSurf: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerSurfTimer
+    Left = 88
+    Top = 400
   end
 end

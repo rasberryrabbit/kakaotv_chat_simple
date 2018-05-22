@@ -9,6 +9,10 @@ msgstr ""
 msgid "Auto Start"
 msgstr ""
 
+#: tformkakaotvchat.actionautosurf.caption
+msgid "Auto Surf"
+msgstr ""
+
 #: tformkakaotvchat.actiondoimglog.caption
 msgid "Show debug log"
 msgstr ""

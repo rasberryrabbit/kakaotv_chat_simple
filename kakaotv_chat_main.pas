@@ -30,6 +30,7 @@ type
   { TFormKakaoTVChat }
 
   TFormKakaoTVChat = class(TForm)
+    ActionAutoSurf: TAction;
     ActionDoImgLog: TAction;
     ActionAutoStart: TAction;
     ActionPortSet: TAction;
@@ -46,11 +47,14 @@ type
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
     Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
+    TimerSurf: TTimer;
     UniqueInstance1: TUniqueInstance;
     procedure ActionAutoStartExecute(Sender: TObject);
+    procedure ActionAutoSurfExecute(Sender: TObject);
     procedure ActionDoImgLogExecute(Sender: TObject);
     procedure ActionPortSetExecute(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
@@ -60,6 +64,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure TimerSurfTimer(Sender: TObject);
   private
     FEventMain:TEvent;
   public
@@ -133,6 +138,8 @@ var
 
   LogAddAttr    : string = ' class="kakao_chat" ';
 
+  alivelink : UnicodeString = '';
+
 
 type
 
@@ -152,14 +159,24 @@ type
     procedure Leave;
   end;
 
+  { TLiveResultParser }
 
-procedure ProcessElementsById(const AFrame: ICefFrame; const AId: string);
+  TLiveResultParser = class(TCefDomVisitorOwn)
+  private
+  protected
+    procedure Visit(const document: ICefDomDocument); override;
+  public
+  end;
+
+
+function ProcessElementsById(const AFrame: ICefFrame; const AId: string):Boolean;
 var
   Visitor: TElementIdVisitor;
   surl:string;
   retv8, v8:ICefV8Value;
   errv8:ICefV8Exception;
 begin
+  Result:=False;
   if Assigned(AFrame) then
   begin
     {
@@ -168,9 +185,66 @@ begin
       ChatScript.Add(surl);
     }
     if (0<>Pos('live/chat/',AFrame.GetUrl)) then begin
+      Result:=True;
       Visitor := TElementIdVisitor.Create(AId);
       AFrame.VisitDom(Visitor);
     end;
+  end;
+end;
+
+procedure ProcessLiveResult(const AFrame: ICefFrame);
+var
+  Visitor: TLiveResultParser;
+begin
+  if Assigned(AFrame) then
+  begin
+    Visitor := TLiveResultParser.Create;
+    AFrame.VisitDom(Visitor);
+  end;
+end;
+
+{ TLiveResultParser }
+
+procedure TLiveResultParser.Visit(const document: ICefDomDocument);
+  procedure ProcessChildNode(ANode:ICefDomNode);
+  var
+    Node, NodeA:ICefDomNode;
+    livelink:UnicodeString;
+  begin
+    if alivelink<>'' then
+      exit;
+    if Assigned(ANode) then begin
+      Node:=ANode.FirstChild;
+      while Assigned(Node) do begin
+        if Assigned(Node) then begin
+          if (Node.GetElementTagName='DIV') and
+             (Node.GetElementAttribute('CLASS')='inner_videoitem') then
+          begin
+             NodeA:=Node.FirstChild;
+             while Assigned(NodeA) do begin
+               if NodeA.GetElementAttribute('CLASS')='link_itembox' then
+               begin
+                 livelink:=NodeA.GetElementAttribute('HREF');
+                 if Pos('/livelink/',livelink)<>0 then begin
+                   alivelink:=UnicodeString('https://tv.kakao.com')+livelink;
+                   FormDebug.logdebug(UTF8Encode(livelink));
+                   break;
+                 end;
+               end;
+               NodeA:=NodeA.NextSibling;
+             end;
+          end;
+          ProcessChildNode(Node);
+          Node:=Node.NextSibling;
+        end;
+      end;
+    end;
+  end;
+begin
+  if Assigned(document) then begin
+    ProcessChildNode(document.Body);
+    if FormKakaoTVChat.ActionAutoSurf.Checked and (alivelink<>'') then
+      FormKakaoTVChat.TimerSurf.Enabled:=True;
   end;
 end;
 
@@ -197,7 +271,10 @@ begin
           browser.GetFrameIdentifiers(@fcount,@fid[0]);
           for i:=0 to fcount-1 do begin
             chatframe:=browser.GetFrameByident(fid[i]);
-            ProcessElementsById(chatframe,LogAttrValue);
+            if (not ProcessElementsById(chatframe,LogAttrValue)) and
+               FormKakaoTVChat.ActionAutoSurf.Checked then
+               // auto surf url
+               ProcessLiveResult(chatframe);
           end;
         finally
           SetLength(fid,0);
@@ -632,6 +709,11 @@ begin
   ActionAutoStart.Checked:=not ActionAutoStart.Checked;
 end;
 
+procedure TFormKakaoTVChat.ActionAutoSurfExecute(Sender: TObject);
+begin
+  ActionAutoSurf.Checked:=not ActionAutoSurf.Checked;
+end;
+
 procedure TFormKakaoTVChat.ActionDoImgLogExecute(Sender: TObject);
 begin
   FormDebug.Show;
@@ -651,6 +733,7 @@ begin
     config.WriteInteger('URL','INT',cInterval);
 
     config.WriteBool('PARSER','START',ActionAutoStart.Checked);
+    config.WriteBool('PARSER','AUTOSURF',ActionAutoSurf.Checked);
     config.WriteString('PARSER','LogAttrName',LogAttrName);
     config.WriteString('PARSER','LogAttrValue',LogAttrValue);
     config.WriteString('PARSER','LogChatClass',LogChatClass);
@@ -678,8 +761,10 @@ var
   b : TStringObject;
   config : TIniFile;
 begin
-  //
-  cefb.Load(UTF8Decode('https://tv.kakao.com'));
+  if ParamCount>1 then
+     cefb.Load(ParamStr(1))  // auto surf
+     else
+       cefb.Load(UTF8Decode('https://tv.kakao.com'));
   //
   InitMimeList('');
   b:=TStringObject.Create;
@@ -713,6 +798,7 @@ begin
     cInterval:=config.ReadInteger('URL','INT',300);
 
     ActionAutoStart.Checked:=config.ReadBool('PARSER','START',ActionAutoStart.Checked);
+    ActionAutoSurf.Checked:=config.ReadBool('PARSER','AUTOSURF',ActionAutoSurf.Checked);
     LogAttrName:=config.ReadString('PARSER','LogAttrName',LogAttrName);
     LogAttrValue:=config.ReadString('PARSER','LogAttrValue',LogAttrValue);
     LogChatClass:=config.ReadString('PARSER','LogChatClass',LogChatClass);
@@ -763,6 +849,13 @@ begin
   cefb.Browser.SendProcessMessage(PID_RENDERER,TCefProcessMessageRef.New('visitdom'));
 end;
 
+procedure TFormKakaoTVChat.TimerSurfTimer(Sender: TObject);
+begin
+  if alivelink<>'' then
+    cefb.Load(alivelink);
+  TimerSurf.Enabled:=False;
+end;
+
 function TFormKakaoTVChat.TryEnter: Boolean;
 begin
   Result:=FEventMain.WaitFor(0)<>wrTimeout;
@@ -783,6 +876,7 @@ end;
 procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrowser;
   const Frame: ICefFrame; transitionType: TCefTransitionType);
 begin
+  alivelink:='';
   if TryEnter then begin
     try
       ChatHead.Clear;
