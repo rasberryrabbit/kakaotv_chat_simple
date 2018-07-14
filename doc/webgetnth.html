@@ -54,7 +54,7 @@ function initlabels(conf) {
 function updateitem(item, nid) {
     $("li").each(function() {
         var itn=$(this).find("#itemname").text();
-        if(itn!="" && item.indexOf(itn)!=-1) {
+        if(idlist[nid]===undefined && itn!="" && item.indexOf(itn)!=-1) {
             var itid=$(this).find("#idlistul");
             if(itid.children().length<maxcount[itn]) {
                 // 카운터 증가
@@ -161,7 +161,7 @@ chatsock.onmessage = function (event) {
         newid=res[1];
     }
     // unique id
-    if(res && idlist[newid]===undefined) {
+    if(res) {
         var check=res[2];
         // 문자열을 체크하고 카운터를 올림
         updateitem(check,newid);
