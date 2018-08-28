@@ -76,6 +76,8 @@ type
     procedure HttpError(const msg: string; aSocket: TLSocket);
     procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
     procedure CefAddressChange(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
+    procedure CefLoadError(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
+    const errorText, failedUrl: ustring);
 
   end;
 
@@ -298,6 +300,7 @@ procedure TKaKaoRenderProcessHandler.OnUncaughtException(
   const context: ICefV8Context; const exception: ICefV8Exception;
   const stackTrace: ICefV8StackTrace);
 begin
+
   inherited OnUncaughtException(browser, frame, context, exception, stackTrace);
 end;
 
@@ -626,12 +629,14 @@ begin
   cefImageFolder:=ImgPath+PathDelim+'img';
   if not DirectoryExists(cefImageFolder) then
     CreateDir(cefImageFolder);
+  CefUserAgent:='';
   cefb:=TkakaoCEF.Create(self);
   cefb.Name:='cefKakao';
   cefb.Parent:=Panel1;
   cefb.Align:=alClient;
   cefb.OnLoadStart:=@CefLoadStart;
   cefb.OnAddressChange:=@CefAddressChange;
+  cefb.OnLoadError:=@CefLoadError;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
@@ -894,6 +899,27 @@ procedure TFormKakaoTVChat.CefAddressChange(Sender: TObject;
   const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
 begin
   EditURL.Text:=UTF8Encode(url);
+end;
+
+procedure TFormKakaoTVChat.CefLoadError(Sender: TObject;
+  const Browser: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
+  const errorText, failedUrl: ustring);
+var
+  errorstr:string;
+begin
+  case errorCode of
+  ERR_ABORTED: errorstr:='Aborted';
+  ERR_ACCESS_DENIED: errorstr:='Access denied';
+  ERR_ADDRESS_INVALID: errorstr:='Invalid Address';
+  ERR_ADDRESS_UNREACHABLE: errorstr:='Address unreachable';
+  ERR_INVALID_URL: errorstr:='Invalid URL';
+  ERR_NAME_NOT_RESOLVED: errorstr:='Name not resolved';
+  else
+    errorstr:='error';
+  end;
+  if not FormDebug.Visible then
+    FormDebug.Show;
+  FormDebug.logdebug(Format('%s %s, %d, %s',[errorText,failedUrl,errorCode,errorstr]));
 end;
 
 procedure AppExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
