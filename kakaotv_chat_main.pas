@@ -629,7 +629,7 @@ begin
   cefImageFolder:=ImgPath+PathDelim+'img';
   if not DirectoryExists(cefImageFolder) then
     CreateDir(cefImageFolder);
-  CefUserAgent:='';
+  CefIgnoreCertificateError:=True;
   cefb:=TkakaoCEF.Create(self);
   cefb.Name:='cefKakao';
   cefb.Parent:=Panel1;
