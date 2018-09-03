@@ -54,7 +54,7 @@ function initlabels(conf) {
 function updateitem(item, nid) {
     $("li").each(function() {
         var itn=$(this).find("#itemname").text();
-        if(idlist[nid]===undefined && itn!="" && item.indexOf(itn)!=-1) {
+        if(idlist[nid]===undefined && itn!="" && item!="" && item.indexOf(itn)!=-1) {
             var itid=$(this).find("#idlistul");
             if(itid.children().length<maxcount[itn]) {
                 // 카운터 증가
