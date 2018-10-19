@@ -159,7 +159,8 @@ type
 
 implementation
 
-uses lMimeTypes,lHTTPUtil,FileUtil,lStrBuffer,base64,LazUTF8, kakaotv_chat_main;
+uses lMimeTypes,lHTTPUtil,FileUtil,lStrBuffer,base64,LazUTF8, kakaotv_chat_main,
+    LazFileUtils;
 
 resourcestring
   rsHtmlBodyPUpl = '<html><body><p>Uploaded</p><br/><a href="/%s">back</a></'

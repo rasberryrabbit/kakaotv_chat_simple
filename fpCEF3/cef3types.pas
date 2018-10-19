@@ -1255,7 +1255,7 @@ Type
     width: Integer;
     height: Integer;
   end;
-  TCefRectArray = array[0..(High(Integer) div SizeOf(TCefRect)) - 1] of TCefRect;
+  TCefRectArray = array[0..(High(Integer) div SizeOf(TCefRect)) - 2] of TCefRect;
   PCefRectArray = ^TCefRectArray;
 
   // Structure representing a size.
