@@ -91,7 +91,7 @@ implementation
 uses
   uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
   uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
-  StrUtils, uformDebug;
+  StrUtils, uformDebug, uStringHashList;
 
 const
   MaxChecksum = 3;
@@ -137,6 +137,7 @@ var
   LogAlertName  : UnicodeString = 'txt_name';
   LogAlertMsg   : UnicodeString = 'txt_msg';
   LogSysValue   : UnicodeString = 'txt_system';
+  LogKnownClass : TFPStringHashTableList;
 
   LogAddAttr    : string = ' class="kakao_chat" ';
 
@@ -333,6 +334,12 @@ begin
   FEvent.SetEvent;
 end;
 
+
+function IsKnownClass(const s:UnicodeString):Boolean;
+begin
+  Result:=LogKnownClass.Find(pchar(UTF8Encode(s)))<>nil;
+end;
+
 procedure TElementIdVisitor.Visit(const document: ICefDomDocument);
 var
   NodeH : ICefDomNode;
@@ -370,6 +377,7 @@ var
               // checksum
               scheck:='';
               // check known patterns, chat + cookie alert
+              // link_id, box_alert
               IsUnknown:=True;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
@@ -615,6 +623,7 @@ begin
   ChatBuffer:=TCefChatBuffer.Create;
   ChatHead:=TCefChatBuffer.Create;
   ChatScript:=TCefChatBuffer.Create;
+  LogKnownClass:=TFPStringHashTableList.Create;
   log:=TLogListFPC.Create(self);
   log.Parent:=Panel2;
   log.Align:=alClient;
@@ -641,6 +650,7 @@ end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
 begin
+  LogKnownClass.Free;
   ChatScript.Free;
   ChatHead.Free;
   ChatBuffer.Free;
