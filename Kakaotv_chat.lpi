@@ -21,7 +21,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="60"/>
+      <BuildNr Value="61"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -44,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="9">
+    <Units Count="10">
       <Unit0>
         <Filename Value="Kakaotv_chat.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -94,6 +94,10 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uformDebug"/>
       </Unit8>
+      <Unit9>
+        <Filename Value="uStringHashList.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
