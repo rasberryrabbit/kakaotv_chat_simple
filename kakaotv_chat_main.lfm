@@ -7,19 +7,11 @@ object FormKakaoTVChat: TFormKakaoTVChat
   ClientHeight = 659
   ClientWidth = 1248
   Menu = MainMenu1
-  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '2.1.0.0'
-  object Panel1: TPanel
-    Left = 8
-    Height = 439
-    Top = 32
-    Width = 1232
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    TabOrder = 2
-  end
   object ButtonStart: TButton
     Left = 536
     Height = 25
@@ -28,7 +20,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Anchors = [akBottom]
     Caption = 'Activate'
     OnClick = ButtonStartClick
-    TabOrder = 6
+    TabOrder = 5
   end
   object Panel2: TPanel
     Left = 8
@@ -36,7 +28,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 511
     Width = 1232
     Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 7
+    TabOrder = 6
   end
   object CheckBoxClearB: TCheckBox
     Left = 8
@@ -45,7 +37,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 95
     Anchors = [akLeft, akBottom]
     Caption = 'Clear on Load'
-    TabOrder = 3
+    TabOrder = 2
   end
   object CheckBoxDisableLog: TCheckBox
     Left = 144
@@ -54,7 +46,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 80
     Anchors = [akLeft, akBottom]
     Caption = 'Disable log'
-    TabOrder = 4
+    TabOrder = 3
   end
   object CheckBoxRemSyS: TCheckBox
     Left = 256
@@ -65,7 +57,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Caption = 'Remove system'
     Checked = True
     State = cbChecked
-    TabOrder = 5
+    TabOrder = 4
   end
   object EditURL: TEdit
     Left = 8
@@ -85,6 +77,14 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Caption = '>>'
     OnClick = ButtonBrowseClick
     TabOrder = 1
+  end
+  object CEFWindowParent1: TCEFWindowParent
+    Left = 8
+    Height = 440
+    Top = 32
+    Width = 1232
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabOrder = 7
   end
   object Timer1: TTimer
     Enabled = False
@@ -149,5 +149,22 @@ object FormKakaoTVChat: TFormKakaoTVChat
     OnTimer = TimerSurfTimer
     Left = 88
     Top = 400
+  end
+  object Chromium1: TChromium
+    OnLoadStart = Chromium1LoadStart
+    OnLoadError = Chromium1LoadError
+    OnAddressChange = Chromium1AddressChange
+    OnAfterCreated = Chromium1AfterCreated
+    OnBeforeClose = Chromium1BeforeClose
+    OnClose = Chromium1Close
+    OnGetResourceHandler = Chromium1GetResourceHandler
+    Left = 88
+    Top = 288
+  end
+  object TimerChrome: TTimer
+    Interval = 100
+    OnTimer = TimerChromeTimer
+    Left = 88
+    Top = 232
   end
 end

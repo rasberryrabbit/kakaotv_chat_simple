@@ -21,7 +21,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="61"/>
+      <RevisionNr Value="1"/>
+      <BuildNr Value="63"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -31,20 +32,22 @@
     </PublishOptions>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="uniqueinstance_package"/>
+        <PackageName Value="CEF4Delphi_Lazarus"/>
       </Item1>
       <Item2>
-        <PackageName Value="lnetvisual"/>
+        <PackageName Value="uniqueinstance_package"/>
       </Item2>
       <Item3>
-        <PackageName Value="LCL"/>
+        <PackageName Value="lnetvisual"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="9">
       <Unit0>
         <Filename Value="Kakaotv_chat.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -57,47 +60,43 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="fpCEF3\uchatbuffer.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="uChatBuffer"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="uHttpHandlerCEF.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit3>
-      <Unit4>
         <Filename Value="ukakaocef.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uKakaoCEF"/>
-      </Unit4>
-      <Unit5>
+      </Unit2>
+      <Unit3>
         <Filename Value="uwebsocksimple.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uWebsockSimple"/>
-      </Unit5>
-      <Unit6>
+      </Unit3>
+      <Unit4>
         <Filename Value="form_portset.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormPortSet"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit6>
-      <Unit7>
+      </Unit4>
+      <Unit5>
         <Filename Value="uhashimpl.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit7>
-      <Unit8>
+      </Unit5>
+      <Unit6>
         <Filename Value="uformdebug.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormDebug"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uformDebug"/>
-      </Unit8>
-      <Unit9>
+      </Unit6>
+      <Unit7>
         <Filename Value="uStringHashList.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit9>
+      </Unit7>
+      <Unit8>
+        <Filename Value="ucustomcefreshandler.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ucustomCEFResHandler"/>
+      </Unit8>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -109,7 +108,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="mormot\static\i386-win32"/>
-      <OtherUnitFiles Value="fpCEF3;fpCEF3\Component;mormot;mphash;C:\development\extras\lnet\"/>
+      <OtherUnitFiles Value="mormot;mphash;C:\development\extras\lnet\;C:\development\extras\CEF4Delphi\source\;C:\development\extras\CEF4Delphi\packages\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

@@ -6,26 +6,15 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Menus, ActnList, cef3types, cef3lib, cef3intf, cef3lcl, cef3ref, cef3api,
-  cef3own, cef3gui, lNetComponents, lhttp, lNet, UniqueInstance, loglistfpc,
-  syncobjs;
+  Menus, ActnList, lNetComponents, lhttp, lNet, UniqueInstance,
+  uCEFWindowParent, uCEFChromiumWindow, uCEFChromium, loglistfpc, syncobjs,
+  uCEFInterfaces, uCEFConstants, Messages, uCEFDomVisitor, uCEFApplication,
+  uCEFTypes, uCEFChromiumEvents, uCEFProcessMessage;
+
+const
+  WM_CEFMsg = WM_USER+$100;
 
 type
-
-  { TKaKaoRenderProcessHandler }
-
-  TKaKaoRenderProcessHandler=class(TCefRenderProcessHandlerOwn)
-    protected
-      function OnProcessMessageReceived(const browser: ICefBrowser;
-        sourceProcess: TCefProcessId; const message: ICefProcessMessage
-        ): Boolean; override;
-      procedure OnBrowserCreated(const browser: ICefBrowser); override;
-      procedure OnUncaughtException(const browser: ICefBrowser;
-        const frame: ICefFrame; const context: ICefV8Context;
-        const exception: ICefV8Exception; const stackTrace: ICefV8StackTrace);
-        override;
-  end;
-
 
   { TFormKakaoTVChat }
 
@@ -37,9 +26,11 @@ type
     ActionList1: TActionList;
     ButtonStart: TButton;
     ButtonBrowse: TButton;
+    CEFWindowParent1: TCEFWindowParent;
     CheckBoxRemSyS: TCheckBox;
     CheckBoxDisableLog: TCheckBox;
     CheckBoxClearB: TCheckBox;
+    Chromium1: TChromium;
     EditURL: TEdit;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -48,9 +39,9 @@ type
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
-    Panel1: TPanel;
     Panel2: TPanel;
     Timer1: TTimer;
+    TimerChrome: TTimer;
     TimerSurf: TTimer;
     UniqueInstance1: TUniqueInstance;
     procedure ActionAutoStartExecute(Sender: TObject);
@@ -59,27 +50,51 @@ type
     procedure ActionPortSetExecute(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
     procedure ButtonBrowseClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure Chromium1AddressChange(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame; const url: ustring);
+    procedure Chromium1AfterCreated(Sender: TObject; const browser: ICefBrowser
+      );
+    procedure Chromium1BeforeClose(Sender: TObject; const browser: ICefBrowser);
+    procedure Chromium1Close(Sender: TObject; const browser: ICefBrowser;
+      var aAction: TCefCloseBrowserAction);
+    procedure Chromium1GetResourceHandler(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const request: ICefRequest; var aResourceHandler: ICefResourceHandler);
+    procedure Chromium1LoadError(Sender: TObject; const browser: ICefBrowser;
+      const frame: ICefFrame; errorCode: TCefErrorCode; const errorText,
+      failedUrl: ustring);
+    procedure Chromium1LoadStart(Sender: TObject; const browser: ICefBrowser;
+      const frame: ICefFrame; transitionType: TCefTransitionType);
+    // chrome
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure TimerChromeTimer(Sender: TObject);
     procedure TimerSurfTimer(Sender: TObject);
   private
     FEventMain:TEvent;
+    FClosing:Boolean;
+    FCanClose:Boolean;
+    // chrome
+    procedure BrowserCreateMsg(var aMsg:TMessage); message CEF_AFTERCREATED;
+    procedure BrowserDestroyMsg(var aMsg:TMessage); message CEF_DESTROY;
+    procedure WMMove(var aMsg:TMessage); message WM_MOVE;
+    procedure WMMoving(var aMsg:TMessage); message WM_MOVING;
+    procedure WMCEFMsg(var aMsg:TMessage); message WM_CEFMsg;
   public
     log:TLogListFPC;
 
+    procedure SaveSettings;
     function TryEnter:Boolean;
     procedure Leave;
 
     procedure HttpError(const msg: string; aSocket: TLSocket);
-    procedure CefLoadStart(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; transitionType: TCefTransitionType);
-    procedure CefAddressChange(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
-    procedure CefLoadError(Sender: TObject; const Browser: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
-    const errorText, failedUrl: ustring);
 
   end;
+
+  procedure CreateGlobalCEFApp;
 
 var
   FormKakaoTVChat: TFormKakaoTVChat;
@@ -89,17 +104,14 @@ implementation
 {$R *.lfm}
 
 uses
-  uChatBuffer, uhttpHandleCEF, lMimeTypes, uRequestHandler, uKakaoCEF,
-  uWebsockSimple, form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
-  StrUtils, uformDebug, uStringHashList;
+  Windows, uChatBuffer, uhttpHandleCEF, lMimeTypes, uWebsockSimple,
+  form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
+  StrUtils, uformDebug, uStringHashList, ucustomCEFResHandler;
 
 const
   MaxChecksum = 3;
 
 var
-  cefb : TkakaoCEF;
-  MainBrowser : ICefBrowser;
-
   lastchecksum : array[0..MaxChecksum] of THashDigest;
   lastchkCount : Integer = 0;
   lastDupChk : array[0..MaxChecksum] of Integer;
@@ -176,8 +188,8 @@ function ProcessElementsById(const AFrame: ICefFrame; const AId: string):Boolean
 var
   Visitor: TElementIdVisitor;
   surl:string;
-  retv8, v8:ICefV8Value;
-  errv8:ICefV8Exception;
+  //retv8, v8:ICefV8Value;
+  //errv8:ICefV8Exception;
 begin
   Result:=False;
   if Assigned(AFrame) then
@@ -204,6 +216,51 @@ begin
     Visitor := TLiveResultParser.Create;
     AFrame.VisitDom(Visitor);
   end;
+end;
+
+procedure OnCEFProcessMsg(const browser: ICefBrowser; const frame: ICefFrame; sourceProcess: TCefProcessId; const message: ICefProcessMessage; var aHandled : boolean);
+var
+  chatframe:ICefFrame;
+  fcount, i:NativeUInt;
+  fid:array of int64;
+  surl:string;
+begin
+  aHandled:=False;
+  if message.Name='visitdom' then begin
+    { thread-safe? }
+    if FormKakaoTVChat.TryEnter then begin
+      try
+        fcount:=browser.GetFrameCount;
+        SetLength(fid,fcount);
+        try
+          browser.GetFrameIdentifiers(fcount,fid);
+          for i:=0 to fcount-1 do begin
+            chatframe:=browser.GetFrameByident(fid[i]);
+            if (not ProcessElementsById(chatframe,LogAttrValue)) and
+               FormKakaoTVChat.ActionAutoSurf.Checked then
+               // auto surf url
+               ProcessLiveResult(chatframe);
+          end;
+        finally
+          SetLength(fid,0);
+        end;
+      finally
+        FormKakaoTVChat.Leave;
+      end;
+    end;
+    aHandled:=True;
+  end;
+end;
+
+procedure CreateGlobalCEFApp;
+begin
+  GlobalCEFApp                  := TCefApplication.Create;
+  GlobalCEFApp.LogFile          := 'cef.log';
+  GlobalCEFApp.LogSeverity      := LOGSEVERITY_VERBOSE;
+  GlobalCEFApp.SingleProcess:=True;
+  //GlobalCEFApp.WindowlessRenderingEnabled:=True;
+  GlobalCEFApp.OnProcessMessageReceived:=@OnCEFProcessMsg;
+  //GlobalCEFApp.IgnoreCertificateErrors:=True;
 end;
 
 { TLiveResultParser }
@@ -250,61 +307,6 @@ begin
       FormKakaoTVChat.TimerSurf.Enabled:=True;
   end;
 end;
-
-{ TKaKaoRenderProcessHandler }
-
-function TKaKaoRenderProcessHandler.OnProcessMessageReceived(
-  const browser: ICefBrowser; sourceProcess: TCefProcessId;
-  const message: ICefProcessMessage): Boolean;
-var
-  chatframe:ICefFrame;
-  fcount, i:TSize;
-  fid:array of int64;
-  surl:string;
-begin
-  Result:=inherited OnProcessMessageReceived(browser, sourceProcess, message);
-  if not Result then
-  if message.Name='visitdom' then begin
-    { thread-safe? }
-    if FormKakaoTVChat.TryEnter then begin
-      try
-        fcount:=browser.GetFrameCount;
-        SetLength(fid,fcount);
-        try
-          browser.GetFrameIdentifiers(@fcount,@fid[0]);
-          for i:=0 to fcount-1 do begin
-            chatframe:=browser.GetFrameByident(fid[i]);
-            if (not ProcessElementsById(chatframe,LogAttrValue)) and
-               FormKakaoTVChat.ActionAutoSurf.Checked then
-               // auto surf url
-               ProcessLiveResult(chatframe);
-          end;
-        finally
-          SetLength(fid,0);
-        end;
-      finally
-        FormKakaoTVChat.Leave;
-      end;
-    end;
-    Result:=True;
-  end;
-end;
-
-procedure TKaKaoRenderProcessHandler.OnBrowserCreated(const browser: ICefBrowser);
-begin
-  inherited OnBrowserCreated(browser);
-  MainBrowser:=browser;
-end;
-
-procedure TKaKaoRenderProcessHandler.OnUncaughtException(
-  const browser: ICefBrowser; const frame: ICefFrame;
-  const context: ICefV8Context; const exception: ICefV8Exception;
-  const stackTrace: ICefV8StackTrace);
-begin
-
-  inherited OnUncaughtException(browser, frame, context, exception, stackTrace);
-end;
-
 
 { TElementNameVisitor }
 
@@ -619,7 +621,10 @@ end;
 
 procedure TFormKakaoTVChat.FormCreate(Sender: TObject);
 begin
-  IsMultiThread:=True;
+  FClosing:=False;
+  FCanClose:=False;
+
+  //IsMultiThread:=True;
   ChatBuffer:=TCefChatBuffer.Create;
   ChatHead:=TCefChatBuffer.Create;
   ChatScript:=TCefChatBuffer.Create;
@@ -628,8 +633,7 @@ begin
   log.Parent:=Panel2;
   log.Align:=alClient;
   FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
-  CefSingleProcess:=True; //must be true
-  CefLogSeverity:=LOGSEVERITY_ERROR_REPORT;
+
   // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
   if not DirectoryExists(ImgPath) then
@@ -638,28 +642,21 @@ begin
   cefImageFolder:=ImgPath+PathDelim+'img';
   if not DirectoryExists(cefImageFolder) then
     CreateDir(cefImageFolder);
-  CefIgnoreCertificateError:=True;
-  cefb:=TkakaoCEF.Create(self);
-  cefb.Name:='cefKakao';
-  cefb.Parent:=Panel1;
-  cefb.Align:=alClient;
-  cefb.OnLoadStart:=@CefLoadStart;
-  cefb.OnAddressChange:=@CefAddressChange;
-  cefb.OnLoadError:=@CefLoadError;
 end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
 begin
+  FEventMain.Free;
   LogKnownClass.Free;
   ChatScript.Free;
   ChatHead.Free;
   ChatBuffer.Free;
-  FEventMain.Free;
 
   WebSockChat.Free;
   WebSockAlert.Free;
   WebSockRChat.Free;
-  Sleep(100);
+
+  SaveSettings;
 end;
 
 procedure TFormKakaoTVChat.ButtonStartClick(Sender: TObject);
@@ -673,7 +670,82 @@ end;
 
 procedure TFormKakaoTVChat.ButtonBrowseClick(Sender: TObject);
 begin
-  cefb.Load(UTF8Decode(EditURL.Text));
+  Chromium1.LoadURL(UTF8Decode(EditURL.Text));
+end;
+
+procedure TFormKakaoTVChat.Chromium1AddressChange(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame; const url: ustring);
+begin
+  if url<>'about:blank' then
+    EditURL.Text:=UTF8Encode(url);
+end;
+
+procedure TFormKakaoTVChat.Chromium1AfterCreated(Sender: TObject;
+  const browser: ICefBrowser);
+begin
+  PostMessage(Handle, CEF_AFTERCREATED, 0, 0);
+end;
+
+procedure TFormKakaoTVChat.Chromium1BeforeClose(Sender: TObject;
+  const browser: ICefBrowser);
+begin
+  FCanClose := True;
+  PostMessage(Handle, WM_CLOSE, 0, 0);
+  // prevent infinite loop on terminate, but crash.
+  Application.ProcessMessages;
+end;
+
+procedure TFormKakaoTVChat.Chromium1Close(Sender: TObject;
+  const browser: ICefBrowser; var aAction: TCefCloseBrowserAction);
+begin
+  aAction := cbaDelay;
+  PostMessage(Handle, CEF_DESTROY, 0, 0);
+end;
+
+procedure TFormKakaoTVChat.Chromium1GetResourceHandler(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const request: ICefRequest; var aResourceHandler: ICefResourceHandler);
+begin
+  //aResourceHandler:=TKakaoResourceHandler.Create(browser, frame, '', request);
+end;
+
+procedure TFormKakaoTVChat.Chromium1LoadError(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame; errorCode: TCefErrorCode;
+  const errorText, failedUrl: ustring);
+var
+  errorstr:string;
+begin
+  case errorCode of
+  ERR_ABORTED: errorstr:='Aborted';
+  ERR_ACCESS_DENIED: errorstr:='Access denied';
+  ERR_ADDRESS_INVALID: errorstr:='Invalid Address';
+  ERR_ADDRESS_UNREACHABLE: errorstr:='Address unreachable';
+  ERR_INVALID_URL: errorstr:='Invalid URL';
+  ERR_NAME_NOT_RESOLVED: errorstr:='Name not resolved';
+  else
+    errorstr:='error';
+  end;
+  if not FormDebug.Visible then
+    FormDebug.Show;
+  FormDebug.logdebug(Format('%s %s, %d, %s',[errorText,failedUrl,errorCode,errorstr]));
+end;
+
+procedure TFormKakaoTVChat.Chromium1LoadStart(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  transitionType: TCefTransitionType);
+begin
+  alivelink:='';
+  if TryEnter then begin
+    try
+      ChatHead.Clear;
+      //ChatScript.Clear;
+      if CheckBoxClearB.Checked then
+        ChatBuffer.Clear;
+      log.Font.Name:='Default';
+    finally
+      Leave;
+    end;
+  end;
 end;
 
 procedure TFormKakaoTVChat.ActionPortSetExecute(Sender: TObject);
@@ -734,39 +806,15 @@ begin
   FormDebug.Show;
 end;
 
-procedure TFormKakaoTVChat.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
-var
-  config : TIniFile;
+procedure TFormKakaoTVChat.FormCloseQuery(Sender: TObject; var CanClose: Boolean
+  );
 begin
-  config:=TIniFile.Create(ChangeFileExt(Application.ExeName,'.ini'));
-  try
-    config.WriteString('PORT','HTTP',PortHttp);
-    config.WriteString('PORT','CHAT',PortChat);
-    config.WriteString('PORT','ALERT',PortAlert);
-    config.WriteString('PORT','RAWCHAT',PortRChat);
-    config.WriteInteger('URL','INT',cInterval);
-
-    config.WriteBool('PARSER','START',ActionAutoStart.Checked);
-    config.WriteBool('PARSER','AUTOSURF',ActionAutoSurf.Checked);
-    config.WriteString('PARSER','LogAttrName',LogAttrName);
-    config.WriteString('PARSER','LogAttrValue',LogAttrValue);
-    config.WriteString('PARSER','LogChatClass',LogChatClass);
-    config.WriteString('PARSER','LogSessionAttr',LogSessionAttr);
-    config.WriteString('PARSER','LogChatValue',LogChatValue);
-    config.WriteString('PARSER','LogChatEmoti',LogChatEmoti);
-    config.WriteString('PARSER','ImgPathHeader',ImgPathHeader);
-    config.WriteString('PARSER','ImagePathCheckN',ImagePathCheck);
-    config.WriteString('PARSER','ImageExtPos',ImageExtPos);
-    config.WriteString('PARSER','LogAlertClass',LogAlertClass);
-    config.WriteString('PARSER','LogAlertValue',LogAlertValue);
-    config.WriteString('PARSER','LogAlertCookie',LogAlertCookie);
-    config.WriteString('PARSER','LogAlertName',LogAlertName);
-    config.WriteString('PARSER','LogAlertMsg',LogAlertMsg);
-    config.WriteString('PARSER','LogSysValue',LogSysValue);
-    config.WriteString('PARSER','LogAddAttr',LogAddAttr);
-  finally
-    config.Free
+  Timer1.Enabled:=False;
+  CanClose:=FCanClose;
+  if not FClosing then begin
+    FClosing:=True;
+    Visible:=False;
+    Chromium1.CloseBrowser(True);
   end;
 end;
 
@@ -776,11 +824,6 @@ var
   b : TStringObject;
   config : TIniFile;
 begin
-  if ParamCount>1 then
-     cefb.Load(ParamStr(1))  // auto surf
-     else
-       cefb.Load(UTF8Decode('https://tv.kakao.com'));
-  //
   InitMimeList('');
   b:=TStringObject.Create;
   b.Str:='text/html';
@@ -851,24 +894,90 @@ begin
     WebSockChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortChat,ChatBuffer);
     WebSockAlert:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortAlert,ChatScript);
     WebSockRChat:=TSimpleWebsocketServer.Create('0.0.0.0:'+PortRChat);
+
+    if ParamCount>1 then
+       EditURL.Text:=ParamStr(1)  // auto surf
+       else
+         EditURL.Text:=UTF8Decode('https://tv.kakao.com');
+
+    if not(Chromium1.CreateBrowser(CEFWindowParent1, '')) then
+      TimerChrome.Enabled := True;
   except
     on e:exception do
       ShowMessage(e.Message);
   end;
+
   if ActionAutoStart.Checked then
     ButtonStart.Click;
 end;
 
 procedure TFormKakaoTVChat.Timer1Timer(Sender: TObject);
 begin
-  cefb.Browser.SendProcessMessage(PID_RENDERER,TCefProcessMessageRef.New('visitdom'));
+  PostMessage(Handle,WM_CEFMsg,0,0);
+end;
+
+procedure TFormKakaoTVChat.TimerChromeTimer(Sender: TObject);
+begin
+  TimerChrome.Enabled := False;
+  if not(Chromium1.CreateBrowser(CEFWindowParent1, '')) and not(Chromium1.Initialized) then
+    TimerChrome.Enabled := True;
+
+  if Chromium1.Initialized then
+    Chromium1.LoadURL(EditUrl.Text);
 end;
 
 procedure TFormKakaoTVChat.TimerSurfTimer(Sender: TObject);
 begin
   if alivelink<>'' then
-    cefb.Load(alivelink);
-  TimerSurf.Enabled:=False;
+    if Chromium1.Initialized then
+      Chromium1.LoadURL(alivelink)
+      else
+        TimerSurf.Enabled:=False;
+end;
+
+procedure TFormKakaoTVChat.BrowserCreateMsg(var aMsg: TMessage);
+begin
+  CEFWindowParent1.UpdateSize;
+end;
+
+procedure TFormKakaoTVChat.BrowserDestroyMsg(var aMsg: TMessage);
+begin
+  CEFWindowParent1.Free;
+end;
+
+procedure TFormKakaoTVChat.WMMove(var aMsg: TMessage);
+begin
+  inherited;
+  if Chromium1<>nil then
+     Chromium1.NotifyMoveOrResizeStarted;
+end;
+
+procedure TFormKakaoTVChat.WMMoving(var aMsg: TMessage);
+begin
+  inherited;
+  if Chromium1<>nil then
+     Chromium1.NotifyMoveOrResizeStarted;
+end;
+
+procedure TFormKakaoTVChat.WMCEFMsg(var aMsg: TMessage);
+var
+  i,j:NativeUInt;
+  fid:TCefFrameIdentifierArray;
+  imsg:ICefProcessMessage;
+begin
+  if (Chromium1<>nil) and Chromium1.Initialized then begin
+    // chrome
+    imsg:=TCefProcessMessageRef.New('visitdom');
+    {
+    j:=Chromium1.FrameCount;
+    SetLength(fid,j);
+    Chromium1.GetFrameIdentifiers(j,fid);
+    for i:=0 to j-1 do
+      Chromium1.SendProcessMessage(PID_RENDERER,imsg,fid[i]);
+    }
+    Chromium1.SendProcessMessage(PID_RENDERER,imsg);
+    //Chromium1.SendProcessMessage(PID_BROWSER,imsg);
+  end;
 end;
 
 function TFormKakaoTVChat.TryEnter: Boolean;
@@ -876,6 +985,41 @@ begin
   Result:=FEventMain.WaitFor(0)<>wrTimeout;
   if Result then
     FEventMain.ResetEvent;
+end;
+
+procedure TFormKakaoTVChat.SaveSettings;
+var
+  config: TIniFile;
+begin
+  config:=TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
+  try
+    config.WriteString('PORT', 'HTTP', PortHttp);
+    config.WriteString('PORT', 'CHAT', PortChat);
+    config.WriteString('PORT', 'ALERT', PortAlert);
+    config.WriteString('PORT', 'RAWCHAT', PortRChat);
+    config.WriteInteger('URL', 'INT', cInterval);
+
+    config.WriteBool('PARSER', 'START', ActionAutoStart.Checked);
+    config.WriteBool('PARSER', 'AUTOSURF', ActionAutoSurf.Checked);
+    config.WriteString('PARSER', 'LogAttrName', LogAttrName);
+    config.WriteString('PARSER', 'LogAttrValue', LogAttrValue);
+    config.WriteString('PARSER', 'LogChatClass', LogChatClass);
+    config.WriteString('PARSER', 'LogSessionAttr', LogSessionAttr);
+    config.WriteString('PARSER', 'LogChatValue', LogChatValue);
+    config.WriteString('PARSER', 'LogChatEmoti', LogChatEmoti);
+    config.WriteString('PARSER', 'ImgPathHeader', ImgPathHeader);
+    config.WriteString('PARSER', 'ImagePathCheckN', ImagePathCheck);
+    config.WriteString('PARSER', 'ImageExtPos', ImageExtPos);
+    config.WriteString('PARSER', 'LogAlertClass', LogAlertClass);
+    config.WriteString('PARSER', 'LogAlertValue', LogAlertValue);
+    config.WriteString('PARSER', 'LogAlertCookie', LogAlertCookie);
+    config.WriteString('PARSER', 'LogAlertName', LogAlertName);
+    config.WriteString('PARSER', 'LogAlertMsg', LogAlertMsg);
+    config.WriteString('PARSER', 'LogSysValue', LogSysValue);
+    config.WriteString('PARSER', 'LogAddAttr', LogAddAttr);
+  finally
+    config.Free
+  end;
 end;
 
 procedure TFormKakaoTVChat.Leave;
@@ -888,57 +1032,12 @@ begin
   log.AddLogLine(msg);
 end;
 
-procedure TFormKakaoTVChat.CefLoadStart(Sender: TObject; const Browser: ICefBrowser;
-  const Frame: ICefFrame; transitionType: TCefTransitionType);
-begin
-  alivelink:='';
-  if TryEnter then begin
-    try
-      ChatHead.Clear;
-      //ChatScript.Clear;
-      if CheckBoxClearB.Checked then
-        ChatBuffer.Clear;
-      log.Font.Name:='Default';
-    finally
-      Leave;
-    end;
-  end;
-end;
-
-procedure TFormKakaoTVChat.CefAddressChange(Sender: TObject;
-  const Browser: ICefBrowser; const Frame: ICefFrame; const url: ustring);
-begin
-  EditURL.Text:=UTF8Encode(url);
-end;
-
-procedure TFormKakaoTVChat.CefLoadError(Sender: TObject;
-  const Browser: ICefBrowser; const Frame: ICefFrame; errorCode: TCefErrorCode;
-  const errorText, failedUrl: ustring);
-var
-  errorstr:string;
-begin
-  case errorCode of
-  ERR_ABORTED: errorstr:='Aborted';
-  ERR_ACCESS_DENIED: errorstr:='Access denied';
-  ERR_ADDRESS_INVALID: errorstr:='Invalid Address';
-  ERR_ADDRESS_UNREACHABLE: errorstr:='Address unreachable';
-  ERR_INVALID_URL: errorstr:='Invalid URL';
-  ERR_NAME_NOT_RESOLVED: errorstr:='Name not resolved';
-  else
-    errorstr:='error';
-  end;
-  if not FormDebug.Visible then
-    FormDebug.Show;
-  FormDebug.logdebug(Format('%s %s, %d, %s',[errorText,failedUrl,errorCode,errorstr]));
-end;
-
 procedure AppExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
 begin
   ShowMessage(Format('%s',[BacktraceStrFunc(Addr)]));
 end;
 
 initialization
-  CefRenderProcessHandler := TKaKaoRenderProcessHandler.Create;
   //ExceptProc:=@AppExceptProc;
 
 end.
