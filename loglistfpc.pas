@@ -197,7 +197,7 @@ begin
     if not FSkipLast then
        SetLastPos;
   end;
-  if FUpdated and (FEvent.WaitFor(0)=wrSignaled) then begin
+  if FUpdated {and (FEvent.WaitFor(0)=wrSignaled)} then begin
     FUpdated:=False;
     Invalidate;
   end;
