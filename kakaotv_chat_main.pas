@@ -9,7 +9,8 @@ uses
   Menus, ActnList, lNetComponents, lhttp, lNet, UniqueInstance,
   uCEFWindowParent, uCEFChromiumWindow, uCEFChromium, loglistfpc, syncobjs,
   uCEFInterfaces, uCEFConstants, Messages, uCEFDomVisitor, uCEFApplication,
-  uCEFTypes, uCEFChromiumEvents, uCEFProcessMessage;
+  uCEFTypes, uCEFChromiumEvents, uCEFProcessMessage,
+  uCEFUrlRequestClientComponent;
 
 const
   WM_CEFMsg = WM_USER+$100;
@@ -57,14 +58,19 @@ type
     procedure Chromium1BeforeClose(Sender: TObject; const browser: ICefBrowser);
     procedure Chromium1Close(Sender: TObject; const browser: ICefBrowser;
       var aAction: TCefCloseBrowserAction);
-    procedure Chromium1GetResourceHandler(Sender: TObject;
+    procedure Chromium1GetResourceResponseFilter(Sender: TObject;
       const browser: ICefBrowser; const frame: ICefFrame;
-      const request: ICefRequest; var aResourceHandler: ICefResourceHandler);
+      const request: ICefRequest; const response: ICefResponse; out
+      Result: ICefResponseFilter);
     procedure Chromium1LoadError(Sender: TObject; const browser: ICefBrowser;
       const frame: ICefFrame; errorCode: TCefErrorCode; const errorText,
       failedUrl: ustring);
     procedure Chromium1LoadStart(Sender: TObject; const browser: ICefBrowser;
       const frame: ICefFrame; transitionType: TCefTransitionType);
+    procedure Chromium1ResourceLoadComplete(Sender: TObject;
+      const browser: ICefBrowser; const frame: ICefFrame;
+      const request: ICefRequest; const response: ICefResponse;
+      status: TCefUrlRequestStatus; receivedContentLength: Int64);
     // chrome
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
@@ -255,12 +261,12 @@ end;
 procedure CreateGlobalCEFApp;
 begin
   GlobalCEFApp                  := TCefApplication.Create;
-  GlobalCEFApp.LogFile          := 'cef.log';
-  GlobalCEFApp.LogSeverity      := LOGSEVERITY_VERBOSE;
+  //GlobalCEFApp.LogFile          := 'cef.log';
+  //GlobalCEFApp.LogSeverity      := LOGSEVERITY_VERBOSE;
   GlobalCEFApp.SingleProcess:=True;
   //GlobalCEFApp.WindowlessRenderingEnabled:=True;
   GlobalCEFApp.OnProcessMessageReceived:=@OnCEFProcessMsg;
-  //GlobalCEFApp.IgnoreCertificateErrors:=True;
+  GlobalCEFApp.IgnoreCertificateErrors:=True;
 end;
 
 { TLiveResultParser }
@@ -393,7 +399,7 @@ var
                   if NodeName.HasElementAttribute(LogAlertClass) then begin
                     sclass:=NodeName.GetElementAttribute(LogAlertClass);
                     IsUnknown:=sclass<>LogAlertValue;
-                  end
+                  end;
                 end;
               end else
                 scheck:=NodeN.ElementInnerText;
@@ -646,17 +652,7 @@ end;
 
 procedure TFormKakaoTVChat.FormDestroy(Sender: TObject);
 begin
-  FEventMain.Free;
-  LogKnownClass.Free;
-  ChatScript.Free;
-  ChatHead.Free;
-  ChatBuffer.Free;
-
-  WebSockChat.Free;
-  WebSockAlert.Free;
-  WebSockRChat.Free;
-
-  SaveSettings;
+  //
 end;
 
 procedure TFormKakaoTVChat.ButtonStartClick(Sender: TObject);
@@ -691,6 +687,10 @@ procedure TFormKakaoTVChat.Chromium1BeforeClose(Sender: TObject;
 begin
   FCanClose := True;
   PostMessage(Handle, WM_CLOSE, 0, 0);
+  try
+    SaveSettings;
+  except
+  end;
   // prevent infinite loop on terminate, but crash.
   Application.ProcessMessages;
 end;
@@ -702,11 +702,13 @@ begin
   PostMessage(Handle, CEF_DESTROY, 0, 0);
 end;
 
-procedure TFormKakaoTVChat.Chromium1GetResourceHandler(Sender: TObject;
+procedure TFormKakaoTVChat.Chromium1GetResourceResponseFilter(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
-  const request: ICefRequest; var aResourceHandler: ICefResourceHandler);
+  const request: ICefRequest; const response: ICefResponse; out
+  Result: ICefResponseFilter);
 begin
-  //aResourceHandler:=TKakaoResourceHandler.Create(browser, frame, '', request);
+  if Pos(ImagePathCheck,request.Url)<>0 then
+    Result:=TKakaoResponseFilter.Create(request.Identifier);
 end;
 
 procedure TFormKakaoTVChat.Chromium1LoadError(Sender: TObject;
@@ -741,10 +743,26 @@ begin
       //ChatScript.Clear;
       if CheckBoxClearB.Checked then
         ChatBuffer.Clear;
-      log.Font.Name:='Default';
+      //log.Font.Name:='Default';
+
+      ResourceDict.Clear;
     finally
       Leave;
     end;
+  end;
+end;
+
+procedure TFormKakaoTVChat.Chromium1ResourceLoadComplete(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame;
+  const request: ICefRequest; const response: ICefResponse;
+  status: TCefUrlRequestStatus; receivedContentLength: Int64);
+begin
+  if Pos(ImagePathCheck,request.Url)<>0 then begin
+    try
+      CEFCompleteRequest(request);
+    except
+    end;
+    FormDebug.log.AddLog(request.Url);
   end;
 end;
 
@@ -814,6 +832,17 @@ begin
   if not FClosing then begin
     FClosing:=True;
     Visible:=False;
+    //
+    FEventMain.Free;
+    LogKnownClass.Free;
+    ChatScript.Free;
+    ChatHead.Free;
+    ChatBuffer.Free;
+
+    WebSockChat.Free;
+    WebSockAlert.Free;
+    WebSockRChat.Free;
+    //
     Chromium1.CloseBrowser(True);
   end;
 end;
@@ -968,15 +997,7 @@ begin
   if (Chromium1<>nil) and Chromium1.Initialized then begin
     // chrome
     imsg:=TCefProcessMessageRef.New('visitdom');
-    {
-    j:=Chromium1.FrameCount;
-    SetLength(fid,j);
-    Chromium1.GetFrameIdentifiers(j,fid);
-    for i:=0 to j-1 do
-      Chromium1.SendProcessMessage(PID_RENDERER,imsg,fid[i]);
-    }
     Chromium1.SendProcessMessage(PID_RENDERER,imsg);
-    //Chromium1.SendProcessMessage(PID_BROWSER,imsg);
   end;
 end;
 
