@@ -236,7 +236,7 @@ var
   temp : TLogStringData;
   SRect : TRect;
 begin
-  FEvent.ResetEvent;
+  //FEvent.ResetEvent;
   try
   Canvas.Brush.Color:=Color;
   SRect:=GetScrolledClientRect;
@@ -269,7 +269,7 @@ begin
      else Canvas.Brush.Color:=clInactiveBorder;
   Canvas.FillRect(SRect.Left,SRect.Top,SRect.Left+BorderWidth-2,SRect.Bottom);
   finally
-    FEvent.SetEvent;
+    //FEvent.SetEvent;
   end;
   inherited Paint;
 end;
