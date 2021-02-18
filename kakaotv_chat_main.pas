@@ -410,13 +410,19 @@ var
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               // check, skip at sys msg
-              if (not stopChk) and matched and (i<lastchkCount) then begin
-                if CompareHash(checksumN,lastchecksum[i]) then begin
-                  Dec(dupCountChk[i]);
-                  if dupCountChk[i]=0 then
-                    Inc(i);
-                end else
-                  matched:=False;
+              if (not stopChk) and matched then begin
+                if (i<lastchkCount) then begin
+                  if CompareHash(checksumN,lastchecksum[i]) then begin
+                    Dec(dupCountChk[i]);
+                    if dupCountChk[i]=0 then
+                      Inc(i);
+                  end else
+                    matched:=False;
+                end else begin
+                  stopChk:=True;
+                  if (i>0) and CompareHash(checksumN,lastchecksum[i-1]) then
+                    matched:=False;
+                end;
               end;
 
               // fill bottom checksum, skip sys msg
@@ -590,6 +596,7 @@ var
           if chkCount>0 then begin
             for i:=0 to chkCount-1 do
               lastchecksum[i]:=bottomchecksum[i];
+            dupCount[chkCount]:=0;
             lastDupChk:=dupCount;
             lastchkCount:=chkCount;
           end;
