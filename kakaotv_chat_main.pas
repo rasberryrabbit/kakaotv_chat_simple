@@ -361,7 +361,7 @@ var
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, k, l, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown, SysBreak : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
@@ -381,6 +381,7 @@ var
             matched:=lastchkCount>0;
             i:=0;
             dupCountChk:=lastDupChk;
+            SysBreak:=False;
             while Assigned(NodeN) do begin
               // checksum
               scheck:='';
@@ -392,6 +393,8 @@ var
                 sclass:=NodeName.GetElementAttribute(csclass);
                 if (sclass=LogSysValue) or (sclass=LogAlertValue) then
                   IsUnknown:=False;
+                if sclass=LogSysValue then
+                  SysBreak:=True;
                 scheck:=scheck+sclass;
                 // always valid, chat message
                 NodeChat:=NodeName.NextSibling;
@@ -405,6 +408,7 @@ var
 
               // check, skip at sys msg
               if (not IsUnknown) and matched then begin
+                if not SysBreak then
                 if (i<lastchkCount) then begin
                   if CompareHash(checksumN,lastchecksum[i]) then begin
                     Dec(dupCountChk[i]);
@@ -420,6 +424,7 @@ var
 
               // fill bottom checksum, skip sys msg
               if chkCount<MaxChecksum then begin
+                if not SysBreak then
                 if not IsUnknown then begin
                   // find dup check on last checksum
                   if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
@@ -436,6 +441,8 @@ var
                 if (i>=lastchkCount) or (not matched) then
                   break;
 
+              if SysBreak then
+                break;
               NodeN:=NodeN.PreviousSibling;
             end;
             if matched then
