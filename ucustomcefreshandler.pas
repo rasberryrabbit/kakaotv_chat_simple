@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, uCEFInterfaces, uCEFTypes, LazUTF8Classes,
   uCEFUrlRequest, uCEFMiscFunctions, uCEFConstants, uCEFResponseFilter,
-  Generics.Collections;
+  Generics.Collections, syncobjs;
 
 type
 
@@ -22,9 +22,12 @@ type
     public
       rsid:UInt64;
       constructor Create(id:UInt64); overload;
+      destructor Destroy; override;
   end;
 
   procedure CEFCompleteRequest(const Request: ICefRequest);
+  procedure RHEnter;
+  procedure RHLeave;
 
 var
   cefImageFolder:string='';
@@ -36,6 +39,9 @@ implementation
 
 uses
   kakaotv_chat_main, uformDebug;
+
+var
+  fEvent:TEvent;
 
 { TKakaoResponseFilter }
 
@@ -53,17 +59,22 @@ begin
       data_out_written:=data_in_read;
   system.Move(data_in^,data_out^,data_out_written);
 
-  if not ResourceDict.TryGetValue(rsid,ms) then begin
-    ms:=TMemoryStream.Create;
-    try
-      ResourceDict.AddOrSetValue(rsid,ms);
-    except
-      ms.Free;
-      ms:=nil;
+  RHEnter;
+  try
+    if not ResourceDict.TryGetValue(rsid,ms) then begin
+      ms:=TMemoryStream.Create;
+      try
+        ResourceDict.AddOrSetValue(rsid,ms);
+      except
+        ms.Free;
+        ms:=nil;
+      end;
     end;
+    if Assigned(ms) then
+      ms.Write(data_in^,data_out_written);
+  finally
+    RHLeave;
   end;
-  if Assigned(ms) then
-    ms.Write(data_in^,data_out_written);
 
   Result:=Inherited Filter(data_in,data_in_size,data_in_read,
                            data_out,data_out_size,data_out_written);
@@ -75,6 +86,23 @@ begin
   rsid:=id;
 end;
 
+destructor TKakaoResponseFilter.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure RHEnter;
+begin
+  while FEvent.WaitFor(0)=wrTimeout do
+    Sleep(0);
+  FEvent.ResetEvent;
+end;
+
+procedure RHLeave;
+begin
+  FEvent.SetEvent;
+end;
+
 procedure CEFCompleteRequest(const Request: ICefRequest);
 var
   newName:UnicodeString;
@@ -82,8 +110,9 @@ var
   FFileStream:TFileStreamUTF8;
   Stream:TMemoryStream;
 begin
-  if not ResourceDict.TryGetValue(Request.Identifier,Stream) then
-    exit;
+  RHEnter;
+  try
+  if ResourceDict.TryGetValue(Request.Identifier,Stream) then begin
   if Assigned(Stream) then
     Stream.Position:=0;
   if cefImageFolder<>'' then begin
@@ -127,14 +156,21 @@ begin
       end;
     end;
   end;
+  end;
+  finally
+    RHLeave;
+  end;
 end;
 
 initialization
+  FEvent:=TEvent.Create(nil,True,True,'RSFILTER'+IntToStr(Random(65535)));
   ResourceDict:=specialize TObjectDictionary<UInt64,TMemoryStream>.Create;
 
 finalization
   ResourceDict.Clear;
   ResourceDict.Free;
+  fEvent.SetEvent;
+  fEvent.Free;
 
 
 end.
