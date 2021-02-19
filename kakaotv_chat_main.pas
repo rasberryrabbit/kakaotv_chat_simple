@@ -397,7 +397,8 @@ var
                   // check cookie alert
                   if NodeName.HasElementAttribute(LogAlertClass) then begin
                     sclass:=NodeName.GetElementAttribute(LogAlertClass);
-                    IsUnknown:=sclass<>LogAlertValue;
+                    if Pos(LogAlertValue,sclass)<>0 then
+                      IsUnknown:=False;
                   end;
                 end;
               end else
@@ -421,7 +422,7 @@ var
               end;
 
               // fill bottom checksum, skip sys msg
-              if chkCount<=MaxChecksum then begin
+              if chkCount<MaxChecksum then begin
                 if not IsUnknown then begin
                   // find dup check on last checksum
                   if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
@@ -477,7 +478,7 @@ var
               while Assigned(NodeChat) do begin
                 // make log message
                 sclass:=NodeChat.GetElementAttribute(LogChatClass);
-                if sclass=LogChatValue then begin
+                if Pos(LogChatValue,sclass)<>0 then begin
                   utemp:=NodeChat.ElementInnerText;
                   sbuf:=sbuf+utemp;
                   srawbuf:=srawbuf+utemp;
@@ -533,7 +534,7 @@ var
               end;
             end else if Assigned(NodeName) then begin
               // cookie alert
-              if NodeName.GetElementAttribute(LogAlertClass)=LogAlertValue then begin
+              if Pos(LogAlertValue, NodeName.GetElementAttribute(LogAlertClass))<>0 then begin
                 NodeChat:=NodeName.FirstChild;
                 while Assigned(NodeChat) do begin
                   sclass:=NodeChat.GetElementAttribute(LogAlertClass);
