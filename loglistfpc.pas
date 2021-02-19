@@ -245,7 +245,7 @@ begin
   cPos := GetItemIndex; // FLastPosY updated
   cPointY:=cPos*tHeight+BorderWidth;
   cPointX:=BorderWidth-FLastPosX;
-  ViewHeight:=HorzScrollBar.ClientSizeWithBar;
+  ViewHeight:=HorzScrollBar.ClientSizeWithoutBar;
   while cPos<Count do begin
     cstr:=LogData.GetStrObj(cPos,_LogMaxCharLen,temp);
     if temp<>nil then begin
@@ -358,7 +358,7 @@ begin
   FLastPosY:=0;
   FLastPosX:=0;
   LogData := TLogStringList.Create;
-  FEvent := TEvent.Create(nil,True,True,'LOGLIST'+IntToStr(GetTickCount));
+  FEvent := TEvent.Create(nil,True,True,'LOGLIST'+IntToStr(Random(65535)));
   FontChanged(Self);
   LogData.DefaultBCol:=Color;
   LogData.DefaultTCol:=Font.Color;
@@ -696,8 +696,8 @@ end;
 function TLogStringList.GetStrObj(Index, MaxLen: Integer; out
   obj: TLogStringData): string;
 begin
-  Result:=Copy(Get(Index),1,MaxLen);
   try
+    Result:=Copy(Get(Index),1,MaxLen);
     obj:=TLogStringData(GetObject(Index));
   except
     obj:=nil;
