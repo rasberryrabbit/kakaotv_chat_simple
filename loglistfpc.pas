@@ -372,6 +372,7 @@ destructor TLogListFPC.Destroy;
 begin
   FTimer.OnTimer:=nil;
   LogData.Free;
+  FEvent.SetEvent;
   FEvent.Free;
   inherited Destroy;
 end;
@@ -689,6 +690,7 @@ end;
 
 destructor TLogStringList.Destroy;
 begin
+  fEvent.SetEvent;
   fEvent.Free;
   inherited Destroy;
 end;
