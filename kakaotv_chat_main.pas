@@ -487,7 +487,7 @@ var
                 if Pos(LogChatEmoti,sclass)<>0 then begin
                   skipAddMarkup:=True;
                   sbuf:=sbuf+NodeChat.ElementInnerText;
-                  FormDebug.logdebug(UTF8Encode(NodeChat.AsMarkup));
+                  //FormDebug.logdebug(UTF8Encode(NodeChat.AsMarkup));
                 end else
                   sbuf:=sbuf+NodeChat.AsMarkup;
                 NodeChat:=NodeChat.NextSibling;
@@ -528,7 +528,7 @@ var
                         scheck:=Copy(scheck,1,i-1)+UnicodeString('img/')+sclass+Copy(scheck,j);
                     end;
                     Inc(k);
-                    FormDebug.logdebug('(image) '+pchar(UTF8Encode(Copy(scheck,k,j-k))));
+                    //FormDebug.logdebug('(image) '+pchar(UTF8Encode(Copy(scheck,k,j-k))));
                   end;
                 end;
               end;
