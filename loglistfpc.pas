@@ -684,7 +684,7 @@ begin
   DefaultBCol:=clBtnFace;
   DefaultTCol:=clWindowText;
   OwnsObjects:=True;
-  fEvent:=TEvent.Create(nil,True,True,'LOGSTRLST'+IntToStr(GetTickCount));
+  fEvent:=TEvent.Create(nil,True,True,'LOGSTRLST'+IntToStr(Random(65535)));
 end;
 
 destructor TLogStringList.Destroy;
