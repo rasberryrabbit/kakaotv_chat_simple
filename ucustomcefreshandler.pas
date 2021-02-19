@@ -55,9 +55,15 @@ begin
 
   if not ResourceDict.TryGetValue(rsid,ms) then begin
     ms:=TMemoryStream.Create;
-    ResourceDict.AddOrSetValue(rsid,ms);
+    try
+      ResourceDict.AddOrSetValue(rsid,ms);
+    except
+      ms.Free;
+      ms:=nil;
+    end;
   end;
-  ms.Write(data_in^,data_out_written);
+  if Assigned(ms) then
+    ms.Write(data_in^,data_out_written);
 
   Result:=Inherited Filter(data_in,data_in_size,data_in_read,
                            data_out,data_out_size,data_out_written);
