@@ -115,7 +115,7 @@ uses
   StrUtils, uformDebug, uStringHashList, ucustomCEFResHandler;
 
 const
-  MaxChecksum = 3;
+  MaxChecksum = 10;
 
 var
   lastchecksum : array[0..MaxChecksum] of THashDigest;
@@ -360,7 +360,7 @@ var
     bottomchecksum : array[0..MaxChecksum] of THashDigest;
     dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
     chkCount, i, j, k, l, ItemCount : Integer;
-    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown, stopChk : Boolean;
+    matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown : Boolean;
     stemp: string;
   begin
     if Assigned(ANode) then
@@ -380,7 +380,6 @@ var
             matched:=lastchkCount>0;
             i:=0;
             dupCountChk:=lastDupChk;
-            stopChk:=False;
             while Assigned(NodeN) do begin
               // checksum
               scheck:='';
@@ -404,13 +403,10 @@ var
               end else
                 scheck:=NodeN.ElementInnerText;
 
-              if IsUnknown then
-                 stopChk:=True;
-
               checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               // check, skip at sys msg
-              if (not stopChk) and matched then begin
+              if (not IsUnknown) and matched then begin
                 if (i<lastchkCount) then begin
                   if CompareHash(checksumN,lastchecksum[i]) then begin
                     Dec(dupCountChk[i]);
@@ -425,21 +421,21 @@ var
               end;
 
               // fill bottom checksum, skip sys msg
-              if (not IsUnknown) and (chkCount<=MaxChecksum) then begin
-                // find dup check on last checksum
-                if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
-                  Inc(dupCount[chkCount-1])
-                else begin
-                // find new checksum
-                  bottomchecksum[chkCount]:=checksumN;
-                  dupCount[chkCount]:=1;
-                  Inc(chkCount);
+              if chkCount<=MaxChecksum then begin
+                if not IsUnknown then begin
+                  // find dup check on last checksum
+                  if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
+                    Inc(dupCount[chkCount-1])
+                  else begin
+                  // find new checksum
+                    bottomchecksum[chkCount]:=checksumN;
+                    dupCount[chkCount]:=1;
+                    Inc(chkCount);
+                  end;
                 end;
               end else
-                // compares all old checksum list
-                if (i>=lastchkCount) or
-                // or stopped by sys msg and full new checksum list
-                  (stopChk and (chkCount>MaxChecksum)) then
+                // full new checksum buffers and ending checksum comparing
+                if (i>=lastchkCount) or (not matched) then
                   break;
 
               NodeN:=NodeN.PreviousSibling;
