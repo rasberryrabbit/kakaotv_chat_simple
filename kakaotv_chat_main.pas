@@ -116,6 +116,7 @@ uses
 
 const
   MaxChecksum = 10;
+  csclass = 'CLASS';
 
 var
   lastchecksum : array[0..MaxChecksum] of THashDigest;
@@ -142,14 +143,14 @@ var
   LogAttrName : UnicodeString = 'id';
   LogAttrValue : UnicodeString = 'chatArea';
 
-  LogChatClass : UnicodeString = 'CLASS';
+  LogChatClass : UnicodeString = csclass;
   LogChatID : UnicodeString = 'link_id';
   LogSessionAttr : UnicodeString = 'data-sessionid';
   LogChatValue : UnicodeString = 'txt_talk';
   LogChatEmoti : UnicodeString = 'kakao_emoticon';
   ImgPathHeader: UnicodeString = '//mk.';
 
-  LogAlertClass : UnicodeString = 'CLASS';
+  LogAlertClass : UnicodeString = csclass;
   LogAlertValue : UnicodeString = 'box_alert';
   LogAlertCookie: UnicodeString = 'txt_cookie';
   LogAlertName  : UnicodeString = 'txt_name';
@@ -388,23 +389,19 @@ var
               IsUnknown:=True;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
-                scheck:=scheck+NodeName.AsMarkup;
+                sclass:=NodeName.GetElementAttribute(csclass);
+                if (sclass=LogSysValue) or (sclass=LogAlertValue) then
+                  IsUnknown:=False;
+                scheck:=scheck+sclass;
                 // always valid, chat message
                 NodeChat:=NodeName.NextSibling;
                 if Assigned(NodeChat) then
-                  IsUnknown:=False
-                else begin
-                  // check cookie alert
-                  if NodeName.HasElementAttribute(LogAlertClass) then begin
-                    sclass:=NodeName.GetElementAttribute(LogAlertClass);
-                    if Pos(LogAlertValue,sclass)<>0 then
-                      IsUnknown:=False;
-                  end;
-                end;
+                  IsUnknown:=False;
               end else
                 scheck:=NodeN.ElementInnerText;
 
-              checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
+              if not IsUnknown then
+                checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
 
               // check, skip at sys msg
               if (not IsUnknown) and matched then begin
@@ -737,6 +734,7 @@ procedure TFormKakaoTVChat.Chromium1LoadStart(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   transitionType: TCefTransitionType);
 begin
+  lastchkCount:=0;
   alivelink:='';
   if TryEnter then begin
     try
