@@ -730,8 +730,6 @@ begin
   else
     errorstr:='error';
   end;
-  if not FormDebug.Visible then
-    FormDebug.Show;
   FormDebug.logdebug(Format('%s %s, %d, %s',[errorText,failedUrl,errorCode,errorstr]));
 end;
 
@@ -765,7 +763,7 @@ begin
       CEFCompleteRequest(request);
     except
     end;
-    FormDebug.log.AddLog(request.Url);
+    //FormDebug.log.AddLog(request.Url);
   end;
 end;
 
