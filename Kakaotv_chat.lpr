@@ -7,17 +7,20 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
+  Windows,
+  uCEFApplication,
   Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package,
   uWebsockSimple, form_portset, uformDebug,
-  uCEFApplication, ucustomCEFResHandler;
+  ucustomCEFResHandler;
 
 {$R *.res}
 
 begin
+  RequireDerivedFormResource:=True;
+
   CreateGlobalCEFApp;
 
   if GlobalCEFApp.StartMainProcess then begin
-  RequireDerivedFormResource:=True;
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TFormKakaoTVChat, FormKakaoTVChat);

@@ -163,7 +163,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 288
   end
   object TimerChrome: TTimer
-    Interval = 100
+    Interval = 300
     OnTimer = TimerChromeTimer
     Left = 88
     Top = 232
