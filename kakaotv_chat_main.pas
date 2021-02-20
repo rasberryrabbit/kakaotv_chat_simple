@@ -427,10 +427,7 @@ var
                       Inc(i);
                   end else
                     matched:=False;
-                end{ else begin
-                  if matched and (i>0) and CompareHash(checksumN,lastchecksum[i-1]) then
-                    matched:=False;
-                end};
+                end;
               end;
 
               // fill bottom checksum, skip sys msg
