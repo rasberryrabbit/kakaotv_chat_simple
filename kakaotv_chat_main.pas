@@ -272,7 +272,7 @@ begin
   //GlobalCEFApp.WindowlessRenderingEnabled:=True;
   GlobalCEFApp.OnProcessMessageReceived:=@OnCEFProcessMsg;
   GlobalCEFApp.IgnoreCertificateErrors:=True;
-  //GlobalCEFApp.SingleProcess:=True;
+  GlobalCEFApp.SingleProcess:=True;
 end;
 
 { TLiveResultParser }
