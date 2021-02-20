@@ -28,6 +28,7 @@ type
   procedure CEFCompleteRequest(const Request: ICefRequest);
   procedure RHEnter;
   procedure RHLeave;
+  procedure RHClearDict;
 
 var
   cefImageFolder:string='';
@@ -101,6 +102,16 @@ end;
 procedure RHLeave;
 begin
   FEvent.SetEvent;
+end;
+
+procedure RHClearDict;
+begin
+  RHEnter;
+  try
+    ResourceDict.Clear;
+  finally
+    RHLeave;
+  end;
 end;
 
 procedure CEFCompleteRequest(const Request: ICefRequest);

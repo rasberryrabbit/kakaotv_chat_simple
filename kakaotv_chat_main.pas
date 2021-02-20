@@ -264,10 +264,10 @@ begin
   GlobalCEFApp                  := TCefApplication.Create;
   //GlobalCEFApp.LogFile          := 'cef.log';
   //GlobalCEFApp.LogSeverity      := LOGSEVERITY_VERBOSE;
-  GlobalCEFApp.SingleProcess:=True;
   //GlobalCEFApp.WindowlessRenderingEnabled:=True;
   GlobalCEFApp.OnProcessMessageReceived:=@OnCEFProcessMsg;
   GlobalCEFApp.IgnoreCertificateErrors:=True;
+  GlobalCEFApp.SingleProcess:=True;
 end;
 
 { TLiveResultParser }
@@ -751,7 +751,7 @@ begin
         ChatBuffer.Clear;
       //log.Font.Name:='Default';
 
-      ResourceDict.Clear;
+      RHClearDict;
     finally
       Leave;
     end;
