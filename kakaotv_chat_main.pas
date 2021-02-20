@@ -395,19 +395,22 @@ var
               IsUnknown:=True;
               NodeName:=NodeN.FirstChild;
               if Assigned(NodeName) then begin
-                sclass:=NodeName.GetElementAttribute(csclass);
-                if (sclass=LogSysValue) or (sclass=LogAlertValue) then
-                  IsUnknown:=False;
-                if sclass=LogSysValue then
-                  SysBreak:=True;
-                scheck:=scheck+sclass+NodeName.ElementInnerText;
                 // always valid, chat message
                 NodeChat:=NodeName.NextSibling;
                 if Assigned(NodeChat) then begin
                   IsUnknown:=False;
-                  // session id
-                  scheck:=scheck+NodeName.GetElementAttribute(LogSessionAttr);
+                  // id + session id
+                  scheck:=scheck+NodeName.ElementInnerText+NodeName.GetElementAttribute(LogSessionAttr);
                   //FormDebug.logdebug(scheck);
+                end else begin
+                  sclass:=NodeName.GetElementAttribute(csclass);
+                  if (sclass=LogSysValue) or (sclass=LogAlertValue) then
+                    IsUnknown:=False;
+                  if sclass=LogSysValue then
+                    SysBreak:=True;
+                  if sclass='' then
+                    sclass:='<known>';
+                  scheck:=scheck+sclass;
                 end;
               end else
                 scheck:=NodeN.ElementInnerText;
