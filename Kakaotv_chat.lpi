@@ -108,7 +108,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="mormot\static\i386-win32"/>
-      <OtherUnitFiles Value="mormot;mphash;C:\development\extras\lnet\;C:\development\extras\CEF4Delphi\source\;C:\development\extras\CEF4Delphi\packages\"/>
+      <OtherUnitFiles Value="mormot;mphash;C:\development\extras\lnet\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

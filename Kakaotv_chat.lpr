@@ -7,10 +7,10 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  uCEFApplication,
   Forms, kakaotv_chat_main, lnetvisual, uniqueinstance_package,
   uWebsockSimple, form_portset, uformDebug,
-  ucustomCEFResHandler;
+  ucustomCEFResHandler,
+  uCEFApplication;
 
 {$R *.res}
 

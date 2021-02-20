@@ -8,9 +8,8 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Menus, ActnList, lNetComponents, lhttp, lNet, UniqueInstance,
   uCEFWindowParent, uCEFChromiumWindow, uCEFChromium, loglistfpc, syncobjs,
-  uCEFInterfaces, uCEFConstants, Messages, uCEFDomVisitor, uCEFApplication,
-  uCEFTypes, uCEFChromiumEvents, uCEFProcessMessage,
-  uCEFUrlRequestClientComponent;
+  uCEFInterfaces, uCEFConstants, Messages, uCEFDomVisitor, uCEFTypes,
+  uCEFChromiumEvents, uCEFProcessMessage, uCEFUrlRequestClientComponent;
 
 const
   WM_CEFMsg = WM_USER+$100;
@@ -112,7 +111,8 @@ implementation
 uses
   Windows, uChatBuffer, uhttpHandleCEF, lMimeTypes, uWebsockSimple,
   form_portset, IniFiles, Hash, uhashimpl, DefaultTranslator,
-  StrUtils, uformDebug, uStringHashList, ucustomCEFResHandler;
+  StrUtils, uformDebug, uStringHashList, ucustomCEFResHandler,
+  uCEFApplication, uCEFSchemeRegistrar;
 
 const
   MaxChecksum = 10;
@@ -650,7 +650,7 @@ begin
   log:=TLogListFPC.Create(self);
   log.Parent:=Panel2;
   log.Align:=alClient;
-  FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(GetTickCount64));
+  FEventMain:=TEvent.Create(nil,True,True,'KAKAOMAIN'+IntToStr(Random(65535)));
 
   // doc folder
   ImgPath:=ExtractFilePath(Application.ExeName)+'doc';
