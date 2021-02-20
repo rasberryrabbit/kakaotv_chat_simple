@@ -118,10 +118,14 @@ const
   MaxChecksum = 10;
   csclass = 'CLASS';
 
+type
+  THashChkArray = array[0..MaxChecksum] of THashDigest;
+  TDupChkArray = array[0..MaxChecksum] of Integer;
+
 var
-  lastchecksum : array[0..MaxChecksum] of THashDigest;
+  lastchecksum : THashChkArray;
   lastchkCount : Integer = 0;
-  lastDupChk : array[0..MaxChecksum] of Integer;
+  lastDupChk : TDupChkArray;
 
   ChatBuffer:TCefChatBuffer;
   ChatHead:TCefChatBuffer;
@@ -262,6 +266,7 @@ end;
 procedure CreateGlobalCEFApp;
 begin
   GlobalCEFApp                  := TCefApplication.Create;
+  //GlobalCEFApp.RemoteDebuggingPort:=9000;
   //GlobalCEFApp.LogFile          := 'cef.log';
   //GlobalCEFApp.LogSeverity      := LOGSEVERITY_VERBOSE;
   //GlobalCEFApp.WindowlessRenderingEnabled:=True;
@@ -358,8 +363,8 @@ var
     Node, Nodex, NodeN, NodeName, NodeChat, NodeStart, NodeEnd: ICefDomNode;
     s, smarkup, sclass, sbuf, srawbuf, scheck, ssocket, utemp: UnicodeString;
     checksumN : THashDigest;
-    bottomchecksum : array[0..MaxChecksum] of THashDigest;
-    dupCount, dupCountChk : array[0..MaxChecksum] of Integer;
+    bottomchecksum : THashChkArray;
+    dupCount, dupCountChk : TDupChkArray;
     chkCount, i, j, k, l, ItemCount : Integer;
     matched, skipAddMarkup, disLog, RemoveSys, doAddMsg, IsUnknown, SysBreak : Boolean;
     stemp: string;
