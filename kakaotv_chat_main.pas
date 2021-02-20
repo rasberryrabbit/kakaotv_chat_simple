@@ -401,6 +401,8 @@ var
                   IsUnknown:=False;
                   // id + session id
                   scheck:=scheck+NodeName.ElementInnerText+NodeName.GetElementAttribute(LogSessionAttr);
+                  // chat message
+                  scheck:=scheck+Copy(NodeChat.ElementInnerText,1,30);
                   //FormDebug.logdebug(scheck);
                 end else begin
                   sclass:=NodeName.GetElementAttribute(csclass);
