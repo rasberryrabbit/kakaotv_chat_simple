@@ -403,8 +403,11 @@ var
                 scheck:=scheck+sclass;
                 // always valid, chat message
                 NodeChat:=NodeName.NextSibling;
-                if Assigned(NodeChat) then
+                if Assigned(NodeChat) then begin
                   IsUnknown:=False;
+                  // session id
+                  scheck:=scheck+NodeName.GetElementAttribute(LogSessionAttr);
+                end;
               end else
                 scheck:=NodeN.ElementInnerText;
 
