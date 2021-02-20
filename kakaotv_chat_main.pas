@@ -412,8 +412,7 @@ var
                     sclass:='<known>';
                   scheck:=scheck+sclass;
                 end;
-              end else
-                scheck:=NodeN.ElementInnerText;
+              end;
 
               if not IsUnknown then
                 checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
@@ -428,10 +427,10 @@ var
                       Inc(i);
                   end else
                     matched:=False;
-                end else begin
+                end{ else begin
                   if matched and (i>0) and CompareHash(checksumN,lastchecksum[i-1]) then
                     matched:=False;
-                end;
+                end};
               end;
 
               // fill bottom checksum, skip sys msg
