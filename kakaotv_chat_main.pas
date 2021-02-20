@@ -400,13 +400,14 @@ var
                   IsUnknown:=False;
                 if sclass=LogSysValue then
                   SysBreak:=True;
-                scheck:=scheck+sclass;
+                scheck:=scheck+sclass+NodeName.ElementInnerText;
                 // always valid, chat message
                 NodeChat:=NodeName.NextSibling;
                 if Assigned(NodeChat) then begin
                   IsUnknown:=False;
                   // session id
                   scheck:=scheck+NodeName.GetElementAttribute(LogSessionAttr);
+                  //FormDebug.logdebug(scheck);
                 end;
               end else
                 scheck:=NodeN.ElementInnerText;
