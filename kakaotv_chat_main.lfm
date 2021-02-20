@@ -20,7 +20,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Anchors = [akBottom]
     Caption = 'Activate'
     OnClick = ButtonStartClick
-    TabOrder = 5
+    TabOrder = 6
   end
   object Panel2: TPanel
     Left = 8
@@ -28,7 +28,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 512
     Width = 1232
     Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 6
+    TabOrder = 7
   end
   object CheckBoxClearB: TCheckBox
     Left = 8
@@ -37,7 +37,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 95
     Anchors = [akLeft, akBottom]
     Caption = 'Clear on Load'
-    TabOrder = 2
+    TabOrder = 3
   end
   object CheckBoxDisableLog: TCheckBox
     Left = 136
@@ -46,7 +46,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Width = 80
     Anchors = [akLeft, akBottom]
     Caption = 'Disable log'
-    TabOrder = 3
+    TabOrder = 4
   end
   object CheckBoxRemSyS: TCheckBox
     Left = 256
@@ -57,7 +57,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Caption = 'Remove system'
     Checked = True
     State = cbChecked
-    TabOrder = 4
+    TabOrder = 5
   end
   object EditURL: TEdit
     Left = 8
@@ -65,7 +65,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 0
     Width = 1168
     Anchors = [akTop, akLeft, akRight]
-    TabOrder = 0
+    TabOrder = 1
     Text = 'about:blank'
   end
   object ButtonBrowse: TButton
@@ -76,7 +76,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Anchors = [akTop, akRight]
     Caption = '>>'
     OnClick = ButtonBrowseClick
-    TabOrder = 1
+    TabOrder = 2
   end
   object CEFWindowParent1: TCEFWindowParent
     Left = 8
@@ -84,7 +84,7 @@ object FormKakaoTVChat: TFormKakaoTVChat
     Top = 32
     Width = 1232
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabOrder = 7
+    TabOrder = 0
   end
   object Timer1: TTimer
     Enabled = False
