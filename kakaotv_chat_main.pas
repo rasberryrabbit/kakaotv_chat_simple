@@ -115,7 +115,7 @@ uses
   uCEFApplication, uCEFSchemeRegistrar;
 
 const
-  MaxChecksum = 10;
+  MaxChecksum = 11; // odd length
   csclass = 'CLASS';
 
 type
