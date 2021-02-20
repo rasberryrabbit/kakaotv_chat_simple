@@ -887,9 +887,6 @@ begin
   b.Str:='image';
   MimeList.AddObject('.png', b);
 
-  if not(Chromium1.CreateBrowser(CEFWindowParent1, '')) then
-    TimerChrome.Enabled := True;
-
   config:=TIniFile.Create(ChangeFileExt(Application.ExeName,'.ini'));
   try
     PortHttp:=config.ReadString('PORT','HTTP',PortHttp);
@@ -942,6 +939,9 @@ begin
        EditURL.Text:=ParamStr(1)  // auto surf
        else
          EditURL.Text:=UTF8Decode('https://tv.kakao.com');
+
+    if not(Chromium1.CreateBrowser(CEFWindowParent1, '')) then
+      TimerChrome.Enabled := True;
   except
     on e:exception do
       ShowMessage(e.Message);
