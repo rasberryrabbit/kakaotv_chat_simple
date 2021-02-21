@@ -166,6 +166,8 @@ var
 
   alivelink : UnicodeString = '';
 
+  skipchecksum : THashDigest;
+
 
 type
 
@@ -386,10 +388,10 @@ var
             matched:=lastchkCount>0;
             i:=0;
             dupCountChk:=lastDupChk;
-            SysBreak:=False;
             while Assigned(NodeN) do begin
               // checksum
               scheck:='';
+              SysBreak:=False;
               // check known patterns, chat + cookie alert
               // link_id, box_alert
               IsUnknown:=True;
@@ -416,14 +418,19 @@ var
                 end;
               end;
 
-              if not IsUnknown then
-                checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
+              if not IsUnknown then begin
+                if SysBreak then
+                  checksumN:=skipchecksum
+                  else
+                    checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
+              end;
 
               // check, skip at sys msg
               if (not IsUnknown) and matched then begin
-                if not SysBreak then
                 if (i<lastchkCount) then begin
-                  if CompareHash(checksumN,lastchecksum[i]) then begin
+                  if SysBreak or
+                     CompareHash(checksumN,lastchecksum[i]) or
+                     CompareHash(lastchecksum[i],skipchecksum) then begin
                     Dec(dupCountChk[i]);
                     if dupCountChk[i]=0 then
                       Inc(i);
@@ -434,7 +441,6 @@ var
 
               // fill bottom checksum, skip sys msg
               if chkCount<MaxChecksum then begin
-                if not SysBreak then
                 if not IsUnknown then begin
                   // find dup check on last checksum
                   if (chkCount>0) and CompareHash(checksumN,bottomchecksum[chkCount-1]) then
@@ -451,8 +457,6 @@ var
                 if (i>=lastchkCount) or (not matched) then
                   break;
 
-              if SysBreak then
-                break;
               NodeN:=NodeN.PreviousSibling;
             end;
             if matched then
@@ -646,6 +650,9 @@ procedure TFormKakaoTVChat.FormCreate(Sender: TObject);
 begin
   FClosing:=False;
   FCanClose:=False;
+
+  //skip checksum
+  FillChar(skipchecksum,sizeof(THashDigest),$ff);
 
   //IsMultiThread:=True;
   ChatBuffer:=TCefChatBuffer.Create;
