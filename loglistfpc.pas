@@ -86,7 +86,7 @@ type
       FEvent : TEvent;
       FOnDeleteLimit : TEventLogDeleteLimit;
       FTimer : TTimer;
-      FAddFlag, FSkipLast, FIsViewHorz, FUpdated : Boolean;
+      FAddFlag, FSkipLast, FIsViewHorz, FUpdated, FLastHBar : Boolean;
 
       function GetCount:Integer;
       procedure SetItemIndex(Value : Integer);
@@ -271,6 +271,10 @@ begin
   finally
     Canvas.Unlock;
   end;
+  if HorzScrollBar.IsScrollBarVisible<>FLastHBar then begin
+    FLastHBar:=HorzScrollBar.IsScrollBarVisible;
+    DoOnResize;
+  end;
   inherited Paint;
 end;
 
@@ -366,6 +370,7 @@ begin
   FTimer.OnTimer:=@OnTimer;
   FTimer.Interval:=100;
   FUpdated:=True;
+  FLastHBar:=HorzScrollBar.IsScrollBarVisible;
 end;
 
 destructor TLogListFPC.Destroy;
