@@ -3,3 +3,7 @@ backup/
 lib/
 mormot/
 locales/
+mphash/
+blob_storage/
+swiftshader/
+webrtc_event_logs/
