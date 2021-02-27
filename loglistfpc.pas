@@ -236,7 +236,7 @@ var
   temp : TLogStringData;
   SRect : TRect;
 begin
-  Canvas.Lock;
+  if Canvas.TryLock then begin
   try
   Canvas.Brush.Color:=Color;
   SRect:=GetScrolledClientRect;
@@ -270,6 +270,7 @@ begin
   Canvas.FillRect(SRect.Left,SRect.Top,SRect.Left+BorderWidth-2,SRect.Bottom);
   finally
     Canvas.Unlock;
+  end;
   end;
   if HorzScrollBar.IsScrollBarVisible<>FLastHBar then begin
     FLastHBar:=HorzScrollBar.IsScrollBarVisible;
