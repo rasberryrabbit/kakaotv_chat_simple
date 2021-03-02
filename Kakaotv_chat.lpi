@@ -22,7 +22,7 @@
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="87"/>
+      <BuildNr Value="90"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -108,7 +108,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="mormot\static\i386-win32"/>
-      <OtherUnitFiles Value="mormot;mphash;C:\development\extras\lnet\"/>
+      <OtherUnitFiles Value="mormot;mphash"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
