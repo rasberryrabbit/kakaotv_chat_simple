@@ -389,6 +389,10 @@ var
             i:=0;
             dupCountChk:=lastDupChk;
             while Assigned(NodeN) do begin
+              // <li>
+              //   <span...></span>
+              //   <div...></div>
+              // </li>
               // checksum
               scheck:='';
               SysBreak:=False;
@@ -396,26 +400,16 @@ var
               // link_id, box_alert
               IsUnknown:=True;
               NodeName:=NodeN.FirstChild;
-              if Assigned(NodeName) then begin
-                // always valid, chat message
-                NodeChat:=NodeName.NextSibling;
-                if Assigned(NodeChat) then begin
+              while Assigned(NodeName) do begin
+                sclass:=NodeName.GetElementAttribute(csclass);
+                if (Pos(LogChatID,sclass)>0) or
+                   (Pos(LogSysValue,sclass)>0) or
+                   (Pos(LogAlertValue,sclass)>0)  then
                   IsUnknown:=False;
-                  // id + session id
-                  scheck:=scheck+NodeName.ElementInnerText+NodeName.GetElementAttribute(LogSessionAttr);
-                  // chat message
-                  scheck:=scheck+Copy(NodeChat.ElementInnerText,1,30);
-                  //FormDebug.logdebug(scheck);
-                end else begin
-                  sclass:=NodeName.GetElementAttribute(csclass);
-                  if (sclass=LogSysValue) or (sclass=LogAlertValue) then
-                    IsUnknown:=False;
-                  if sclass=LogSysValue then
-                    SysBreak:=True;
-                  if sclass='' then
-                    sclass:='<known>';
-                  scheck:=scheck+sclass;
-                end;
+                if Pos(LogSysValue,sclass)>0 then
+                  SysBreak:=True;
+                scheck:=scheck+Copy(NodeName.ElementInnerText,1,255);
+                NodeName:=NodeName.NextSibling;
               end;
 
               if not IsUnknown then begin
@@ -423,20 +417,19 @@ var
                   checksumN:=skipchecksum
                   else
                     checksumN:=MakeHash(@scheck[1],Length(scheck)*SizeOf(WideChar));
-              end;
-
-              // check, skip at sys msg
-              if (not IsUnknown) and matched then begin
-                if (i<lastchkCount) then begin
-                  if SysBreak or
-                     CompareHash(checksumN,lastchecksum[i]) or
-                     CompareHash(lastchecksum[i],skipchecksum) then begin
-                    Dec(dupCountChk[i]);
-                    if dupCountChk[i]=0 then
-                      Inc(i);
-                  end else
-                    matched:=False;
+                // check, skip at sys msg
+                if matched then begin
+                  if (i<lastchkCount) then begin
+                    if SysBreak or
+                       CompareHash(checksumN,lastchecksum[i]) then begin
+                      Dec(dupCountChk[i]);
+                      if dupCountChk[i]=0 then
+                        Inc(i);
+                    end else
+                      matched:=False;
+                  end;
                 end;
+                //FormDebug.logdebug(Format('>> %d %d',[i,lastchkCount]));
               end;
 
               // fill bottom checksum, skip sys msg
@@ -450,6 +443,7 @@ var
                     bottomchecksum[chkCount]:=checksumN;
                     dupCount[chkCount]:=1;
                     Inc(chkCount);
+                    //FormDebug.logdebug(scheck);
                   end;
                 end;
               end else
@@ -647,12 +641,14 @@ end;
 { TFormKakaoTVChat }
 
 procedure TFormKakaoTVChat.FormCreate(Sender: TObject);
+const
+  dummy:string = 'SKIP';
 begin
   FClosing:=False;
   FCanClose:=False;
 
   //skip checksum
-  FillChar(skipchecksum,sizeof(THashDigest),$ff);
+  skipchecksum:=MakeHash(@dummy[1],Length(dummy));
 
   //IsMultiThread:=True;
   ChatBuffer:=TCefChatBuffer.Create;
