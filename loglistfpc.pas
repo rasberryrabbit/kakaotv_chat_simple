@@ -408,8 +408,13 @@ end;
 procedure TLogListFPC.SetLastPos;
 begin
   if Assigned(VertScrollBar) then begin
-    VertScrollBar.Position:=VertScrollBar.Range;
-    FUpdated:=True;
+    Enter;
+    try
+      VertScrollBar.Position:=VertScrollBar.Range;
+      FUpdated:=True;
+    finally
+      Leave;
+    end;
   end;
 end;
 
