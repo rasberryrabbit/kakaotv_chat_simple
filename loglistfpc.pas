@@ -197,7 +197,7 @@ begin
     if not FSkipLast then
        SetLastPos;
   end;
-  if FUpdated {and (FEvent.WaitFor(0)=wrSignaled)} then begin
+  if FUpdated and (FEvent.WaitFor(0)=wrSignaled) then begin
     FUpdated:=False;
     Invalidate;
   end;
@@ -247,6 +247,7 @@ begin
   cPointX:=BorderWidth-FLastPosX;
   ViewHeight:=HorzScrollBar.ClientSizeWithoutBar;
   while cPos<Count do begin
+    while (FEvent.WaitFor(0)=wrTimeout) do Sleep(0);
     cstr:=LogData.GetStrObj(cPos,_LogMaxCharLen,temp);
     if temp<>nil then begin
       Canvas.Brush.Color:=temp.B;
@@ -272,10 +273,9 @@ begin
     Canvas.Unlock;
   end;
   end;
-  if HorzScrollBar.IsScrollBarVisible<>FLastHBar then begin
-    FLastHBar:=HorzScrollBar.IsScrollBarVisible;
+  if HorzScrollBar.IsScrollBarVisible<>FLastHBar then
     DoOnResize;
-  end;
+  FLastHBar:=HorzScrollBar.IsScrollBarVisible;
   inherited Paint;
 end;
 
