@@ -275,6 +275,7 @@ begin
   GlobalCEFApp.OnProcessMessageReceived:=@OnCEFProcessMsg;
   GlobalCEFApp.IgnoreCertificateErrors:=True;
   GlobalCEFApp.SingleProcess:=True;
+  GlobalCEFApp.CheckCEFFiles:=False;
 end;
 
 { TLiveResultParser }
