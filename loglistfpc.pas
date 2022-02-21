@@ -90,6 +90,7 @@ type
       FOnDeleteLimit : TEventLogDeleteLimit;
       FTimer : TTimer;
       FAddFlag, FSkipLast, FIsViewHorz, FUpdated, FLastHBar : Boolean;
+      FLastCHeight: Integer;
 
       function GetCount:Integer;
       procedure SetItemIndex(Value : Integer);
@@ -186,8 +187,6 @@ begin
 end;
 
 procedure TLogListFPC.OnTimer(Sender: TObject);
-var
-  CurCount, NewRange : Integer;
 begin
   if FUpdated then
     if VertScrollBar.Visible then
@@ -252,7 +251,6 @@ begin
   cPointX:=BorderWidth-FLastPosX;
   ViewHeight:=HorzScrollBar.ClientSizeWithoutBar;
   while cPos<Count do begin
-    while (FEvent.WaitFor(0)=wrTimeout) do Sleep(0);
     cstr:=LogData.GetStrObj(cPos,_LogMaxCharLen,temp);
     if temp<>nil then begin
       Canvas.Brush.Color:=temp.B;
@@ -299,11 +297,16 @@ end;
 procedure TLogListFPC.DoOnResize;
 begin
   inherited DoOnResize;
-  if Assigned(VertScrollBar) then
-    VertScrollBar.Page:=ClientHeight;// div tHeight * tHeight;
+  if Assigned(VertScrollBar) then begin
+    VertScrollBar.Page:=ClientHeight;
+    // update position
+    VertScrollBar.Position:=VertScrollBar.Position+(FLastCHeight-ClientHeight);
+  end;
   if Assigned(HorzScrollBar) then
     HorzScrollBar.Page:=ClientWidth div 2;
+  FLastCHeight:=ClientHeight;
   FUpdated:=True;
+  OnTimer(Self);
 end;
 
 procedure TLogListFPC.KeyDown(var Key: Word; Shift: TShiftState);
